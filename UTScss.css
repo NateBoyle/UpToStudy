@@ -1,0 +1,12 @@
+@font-face {
+    font-family: UTSfont;
+    src: url(PlusJakartaSans-Medium.TTF);
+  }
+  body {
+   
+    background-size: cover;
+    
+    
+    font-family: "UTSfont";
+    text-align: center;
+}
