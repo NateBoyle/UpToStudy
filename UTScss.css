@@ -1,12 +1,21 @@
 @font-face {
     font-family: UTSfont;
     src: url(PlusJakartaSans-Medium.TTF);
-  }
-  body {
+}
+
+.header {
+    background-color: rgb(64, 68, 74, .87);
+}
+
+body {
    
     background-size: cover;
-    background-color: #40444A;
+    background-color: #252525;
     color: #FFFFFF;
     font-family: "UTSfont";
     text-align: center;
+}
+
+div {
+    font-family: "UTSfont";
 }
