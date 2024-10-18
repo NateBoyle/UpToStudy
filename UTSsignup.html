@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="UTSicon2.png">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery library -->
+
+    
+
+    <style>
+        @font-face {
+            font-family: UTSfont;
+            src: url(PlusJakartaSans-Medium.TTF);
+        }
+    </style>
+    
+    <title>Sign Up Form</title>
+</head>
+<body style="background-color: black; color: white; font-family: UTSfont, sans-serif;">
+
+    <form id="signupForm" method="post">
+
+        <!--<div style="width: 510px; height: 120px; position: absolute; left: 500px; top: 785px; background: #4AB3FF; border-radius: 25px;">
+            <div style="width: 188.11px; position: absolute; left: 161px; top: 28px; color: white; font-size: 40px; font-weight: 800;">Sign Up</div>
+        </div>-->
+
+        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 150px;">
+            <label for="full_name" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Full Name</label>
+            
+            <input type="text" id="full_name" name="full_name" placeholder="e.g., John Doe"
+            style="width: 612px; border: none; font-size: 18px; margin-top: 40px; margin-bottom: 5px; background: none; color: white;">
+            <span class="error" id="fullNameError" style="text-align: left; font-size: 12px; color: red;"></span>
+            <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
+        </div>
+
+        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 270px;">
+            <label for="email" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Email Address</label>
+            <input type="text" id="email" name="email" placeholder="e.g., johndoe@gmail.com"
+            style="width: 612px; border: none; font-size: 18px; margin-top: 40px; margin-bottom: 5px; background: none; color: white;" >
+            <span class="error" id="emailError" style="font-size: 12px; color: red;"></span>
+            <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
+        </div>
+
+        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 380px;">
+            <label for="phone" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="##########"
+            style="width: 612px; border: none; font-size: 18px; margin-top: 40px; margin-bottom: 5px; background: none; color: white; " >
+            <span class="error" id="phoneError" style="font-size: 12px; color: red;"></span>
+            <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
+        </div>
+
+        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 490px;">
+            <label for="username" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Username</label>
+            <input type="text" id="username" name="username" placeholder="Must be at least 8 characters" 
+            style="width: 612px; border: none; font-size: 18px; margin-top: 40px; margin-bottom: 5px; background: none; color: white" >
+            <span class="error" id="usernameError" style="font-size: 12px; color: red;"></span>
+            <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
+        </div>
+
+        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 600px;">
+            <label for="password" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Password</label>
+            <input type="password" id="password" name="password" placeholder="Minimum 8 characters with at least one lower and uppercase letter, one number, and one special character"
+            onfocus="this.style.fontSize='18px';" onblur="this.style.fontSize='12px';" style="width: 612px; border: none; font-size: 12px; margin-top: 40px; margin-bottom: 5px; background: none; color: white;" >
+            <span class="error" id="passwordError" style="font-size: 12px; color: red;"></span>
+            <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
+            <!--<div style="position: absolute; left: 382px; top: 22px; color: white; font-size: 24px; font-weight: 500;">At least 8 characters</div>-->
+        </div>
+
+        
+        <input type="submit" name="submit" value="Sign Up" style="width: 400px; height: 120px; position: absolute; left: 660px; top: 750px; background: #4AB3FF; border-radius: 30px; color: white; font-size: 40px; font-weight: 800; border: none; cursor: pointer;">
+        <span id="result" style="position: absolute; left: 680px; top: 80px; font-size: 25px; color: white"></span>
+    </form>
+
+    <script src="UTSsignupjs.js"></script>
+
+</body>
+</html>
