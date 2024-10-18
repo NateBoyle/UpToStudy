@@ -26,24 +26,24 @@
             <div style="width: 188.11px; position: absolute; left: 161px; top: 28px; color: white; font-size: 40px; font-weight: 800;">Sign Up</div>
         </div>-->
 
-        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 150px;">
+        <div style="width: 650px; height: 100px; position: absolute; left: 550px; top: 150px;">
             <label for="full_name" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Full Name</label>
             
             <input type="text" id="full_name" name="full_name" placeholder="e.g., John Doe"
             style="width: 612px; border: none; font-size: 18px; margin-top: 40px; margin-bottom: 5px; background: none; color: white;">
-            <span class="error" id="fullNameError" style="text-align: left; font-size: 12px; color: red;"></span>
+            <span class="error" id="fullNameError" style="display: block; margin-top: 5px; text-align: left; font-size: 12px; color: red;"></span>
             <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
         </div>
 
-        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 270px;">
+        <div style="width: 650px; height: 100px; position: absolute; left: 550px; top: 270px;">
             <label for="email" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Email Address</label>
             <input type="text" id="email" name="email" placeholder="e.g., johndoe@gmail.com"
             style="width: 612px; border: none; font-size: 18px; margin-top: 40px; margin-bottom: 5px; background: none; color: white;" >
-            <span class="error" id="emailError" style="font-size: 12px; color: red;"></span>
+            <span class="error" id="emailError" style="display: block; margin-top: 5px; font-size: 12px; color: red;"></span>
             <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
         </div>
 
-        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 380px;">
+        <div style="width: 650px; height: 100px; position: absolute; left: 550px; top: 380px;">
             <label for="phone" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Phone Number</label>
             <input type="tel" id="phone" name="phone" placeholder="##########"
             style="width: 612px; border: none; font-size: 18px; margin-top: 40px; margin-bottom: 5px; background: none; color: white; " >
@@ -51,7 +51,7 @@
             <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
         </div>
 
-        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 490px;">
+        <div style="width: 650px; height: 100px; position: absolute; left: 550px; top: 490px;">
             <label for="username" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Username</label>
             <input type="text" id="username" name="username" placeholder="Must be at least 8 characters" 
             style="width: 612px; border: none; font-size: 18px; margin-top: 40px; margin-bottom: 5px; background: none; color: white" >
@@ -59,12 +59,18 @@
             <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
         </div>
 
-        <div style="width: 614px; height: 100px; position: absolute; left: 550px; top: 600px;">
+        <div style="width: 650px; height: 135px; position: absolute; left: 550px; top: 600px;">
             <label for="password" style="position: absolute; color: white; font-size: 25px; font-weight: 500;">Password</label>
-            <input type="password" id="password" name="password" placeholder="Minimum 8 characters with at least one lower and uppercase letter, one number, and one special character"
-            onfocus="this.style.fontSize='18px';" onblur="this.style.fontSize='12px';" style="width: 612px; border: none; font-size: 12px; margin-top: 40px; margin-bottom: 5px; background: none; color: white;" >
+            <input type="password" id="password" name="password" placeholder="Minimum 8 characters with at least one lower and uppercase letter, number, and special character"
+             style="width: 612px; border: none; font-size: 18px; margin-top: 40px; margin-bottom: 5px; background: none; color: white;" >
             <span class="error" id="passwordError" style="font-size: 12px; color: red;"></span>
-            <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 95px;"></div>
+            
+            <!-- Adjusted checkbox placement -->
+            <div style="position: absolute; top: 100px; left: 0;"> <!-- Added more margin for better spacing -->
+                <input type="checkbox" onclick="showPassword()" style="transform: scale(1.2); margin-right: 5px;"> 
+                <label style="color: white; font-size: 14px;">Show Password</label> <!-- Adjusted label style -->
+            </div>
+            <div style="width: 612px; height: 4px; position: absolute; background: #D9D9D9; border-radius: 8px; top: 130px;"></div>
             <!--<div style="position: absolute; left: 382px; top: 22px; color: white; font-size: 24px; font-weight: 500;">At least 8 characters</div>-->
         </div>
 
@@ -72,6 +78,17 @@
         <input type="submit" name="submit" value="Sign Up" style="width: 400px; height: 120px; position: absolute; left: 660px; top: 750px; background: #4AB3FF; border-radius: 30px; color: white; font-size: 40px; font-weight: 800; border: none; cursor: pointer;">
         <span id="result" style="position: absolute; left: 680px; top: 80px; font-size: 25px; color: white"></span>
     </form>
+
+    <script>
+        function showPassword() {
+            var x = document.getElementById("password");
+            if (x.type === "password") {
+            x.type = "text";
+            } else {
+            x.type = "password";
+            }
+        }
+    </script>
 
     <script src="UTSsignupjs.js"></script>
 
