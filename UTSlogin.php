@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             // Prepare the SQL query to fetch the password for the given username
-            $sql_query = "SELECT password FROM users WHERE username = ?";
+            $sql_query = "SELECT user_id, password FROM users WHERE username = ?";
               
             // Use prepared statements to prevent SQL injection
             $stmt = $conn->prepare($sql_query);
@@ -93,12 +93,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($result->num_rows > 0) {
                 // Fetch the hashed password from the database
                 $row = $result->fetch_assoc();
+                $user_id_from_database = $row['user_id'];
                 $hashed_password = $row['password'];
 
                 // Verify the password
                 if (password_verify($password1, $hashed_password)) {
+
                     // Regenerate session ID, and return success
                     session_regenerate_id(true); // Prevent session fixation
+
+                    // **Set the user_id in the session**
+                    $_SESSION['user_id'] = $user_id_from_database; // **This line is added**
+
                     $_SESSION['username'] = $username1;
                     $_SESSION['last_activity'] = time(); // Record the login time
                     // Password is correct

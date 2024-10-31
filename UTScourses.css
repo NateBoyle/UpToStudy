@@ -1,0 +1,206 @@
+
+/* Flexbox layout for the course container */
+#courseContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between items */
+    justify-content: flex-start;
+    align-items: flex-start; /* Align items at the top of each row */
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100%; /* Adjusts based on screen size */
+    max-width: 1440px; /* Or set to a fixed maximum */
+    overflow-x: auto; /* Allows horizontal scrolling */
+    overflow-y: hidden; /* Hides vertical scroll */
+    white-space: nowrap; /* Prevents wrapping */
+    margin: 0 auto; /* Centers the container itself */
+    border: 2px solid white; /* Adds a white border around the container */
+    border-radius: 15px; /* Optional: adds rounded corners to the border */
+}
+
+/* Style for course cards and the Add Course button */
+.course-card, .add-course {
+    min-width: 450px; /* Fixed width */
+    max-width: 450px;
+    min-height: 350px; /* Fixed height */
+    max-height: 350px;
+    flex-shrink: 0; /* Prevents shrinking */
+    background: #2C2C2C;
+    border-radius: 20px;
+    color: white;
+    font-family: UTSfont;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 0; /* Ensure no extra padding */
+    position: relative;
+}
+
+/* Header styles for each course */
+.course-header {
+    width: 100%;
+    height: 86px;
+    background: linear-gradient(90deg, #7DBC4B 0%, #3C6C2B 100%);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 20px;
+    font-weight: 500;
+    text-transform: capitalize;
+    padding: 0; /* Remove padding */
+    margin: 0; /* Ensure no extra margin */
+    box-sizing: border-box;
+}
+
+/* Content area inside each course card */
+.course-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 400;
+    width: 100%;
+    height: calc(100% - 86px);
+    padding: 10px 0; /* Minimal padding for consistent height */
+    box-sizing: border-box;
+}
+
+/* Adjust individual paragraph styles inside course-content */
+.course-content p {
+    margin: 5px 0; /* Tighter margins for less spacing between items */
+    line-height: 1.2; /* Adjust line height for tighter spacing */
+}
+
+/* Add Course button specific styling */
+.add-course {
+    background: #5DD770;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-course:hover {
+    background: #4bb362;
+}
+
+/* Responsive adjustments for smaller screens (optional) */
+@media screen and (max-width: 1600px) {
+    .course-card, .add-course {
+        width: 100%;
+        height: auto;
+    }
+}
+
+.options-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.options-menu {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    background-color: #333; /* Adjust color as needed */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+.options-menu button {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    padding: 5px 0;
+}
+
+.options-menu button:hover {
+    background-color: #444;
+}
+
+
+/* Modal container */
+#modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal content */
+#modal div {
+    width: 400px;
+    background: #2C2C2C;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    color: white;
+    text-align: center;
+}
+
+/* Form header */
+#modal h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Input fields */
+#modal input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Add Course button */
+#addCourseBtn {
+    width: 100%;
+    padding: 10px;
+    background: #5DD770;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Close button */
+#closeModalBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+}

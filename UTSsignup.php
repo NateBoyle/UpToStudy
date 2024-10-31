@@ -12,6 +12,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username1 = trim($_POST['username']);
     $password1 = trim($_POST['password']);
 
+    // Database connection variables
+    $host = "localhost";
+    $username2 = "root";
+    $password2 = "";
+    $database_name = "utsdb";
+
+    $conn = mysqli_connect($host, $username2, $password2, $database_name);
+
+    if (!$conn) {
+        // Return connection error
+        echo json_encode(['status' => 'error', 'message' => "Unable to connect to the database. Please try again later."]);
+        exit; // Stop the script execution
+    }
+
     // Validate full name
     if (empty($full_name)) {
         $errors['fullName'] = "Full name is required.";
@@ -36,8 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate username
     if (empty($username1)) {
         $errors['username'] = "Username is required.";
-    }
-    elseif (strlen($username1) < 8) {
+    } elseif (strlen($username1) < 8) {
         $errors['username'] = "Username must be at least 8 characters long.";
     }
 
@@ -46,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors['password'] = "Password is required.";
     } elseif (strlen($password1) < 8) {
         $errors['password'] = "Password must be at least 8 characters long.";
-    }elseif (!preg_match('/[A-Z]/', $password1)) {
+    } elseif (!preg_match('/[A-Z]/', $password1)) {
         $errors['password'] = "Password must contain at least one uppercase letter.";
     } elseif (!preg_match('/[a-z]/', $password1)) {
         $errors['password'] = "Password must contain at least one lowercase letter.";
@@ -54,122 +67,82 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors['password'] = "Password must contain at least one number.";
     } elseif (!preg_match('/[~!@#$%^&*<>?]/', $password1)) {
         $errors['password'] = "Password must contain at least one special character (!@#$%^&*<>?).";
-    }else {
-        $password1 = password_hash($password1, PASSWORD_BCRYPT); // Hash password
     }
 
-    // Output the result
-    // Proceed only if there are no validation errors
+    // Check for duplicate username or email in the database
     if (empty($errors)) {
+        $check_query = "SELECT username, email FROM users WHERE username = ? OR email = ?";
+        $stmt = $conn->prepare($check_query);
 
-        // Database connection variables
-        $host="localhost";
-        $username2="root";
-        $password2="";
-        $database_name="utsdb";
-
-        $conn=mysqli_connect($host,$username2,$password2,$database_name);
-
-        if(!$conn){
-
-            // Return connection error
-            echo json_encode(['status' => 'error', 'message' => "Unable to connect to the database. Please try again later."]);
-            exit; // Stop the script execution
-
-        }
-        else
-        {
-                        
-
-            // Check if the username or email already exists
-            $check_user_query = "SELECT username, email FROM users WHERE username = ? OR email = ?";
-            $stmt = $conn->prepare($check_user_query);
-
-            if ($stmt === false) {
-
-                echo json_encode(['status' => 'error', 'message' => 'There was an issue checking your username and email. Please try again.']);
-                exit;
-            }
-
+        if ($stmt) {
             $stmt->bind_param("ss", $username1, $email);
             $stmt->execute();
             $stmt->store_result();
 
             if ($stmt->num_rows > 0) {
-
-                // Bind the results
                 $stmt->bind_result($existing_username, $existing_email);
-                $stmt->fetch();
-
-                // Check if the username already exists
-                if ($existing_username === $username1) {
-                    $errors['username'] = "Username already exists.";
+                while ($stmt->fetch()) {
+                    if ($existing_username === $username1) {
+                        $errors['username'] = "Username already exists.";
+                    }
+                    if ($existing_email === $email) {
+                        $errors['email'] = "Email already exists.";
+                    }
                 }
-
-                // Check if the email already exists
-                if ($existing_email === $email) {
-                    $errors['email'] = "Email already exists.";
-                }
-                
-            } 
-            // Return errors if they exist
-            if (!empty($errors)) {
-                echo json_encode(['status' => 'error', 'errors' => $errors]);
-                $stmt->close();
-                mysqli_close($conn);
-                exit;
             }
 
-
-            // Close the existing check statement
             $stmt->close();
-
-            mysqli_begin_transaction($conn);
-
-            try {
-
-                // Insert the new user into the database
-                $sql_query = "INSERT INTO users (full_name, username, password, email, phone_number) VALUES (?, ?, ?, ?, ?)";
-                $stmt = $conn->prepare($sql_query);
-
-                if ($stmt === false) {
-                    error_log("Database query error: " . $conn->error);  // Log the error message
-                    echo json_encode(['status' => 'error', 'message' => 'An error occurred while preparing the insert query.']);
-                    exit;
-                }
-
-                $stmt->bind_param("sssss", $full_name, $username1, $password1, $email, $phone);
-
-                if($stmt->execute())
-                {
-                    mysqli_commit($conn);  // Commit the transaction
-                    echo json_encode(['status' => 'success', 'message' => 'New user added successfully!']);
-                }
-                else
-                {
-                    mysqli_rollback($conn); // Roll back if something goes wrong
-                    echo json_encode(['status' => 'error', 'message' => 'An error occurred while executing the insert query.']);
-                }
-
-            } catch (Exception $e) {
-                mysqli_rollback($conn); // Roll back on exception
-                error_log("Error during signup: " . $e->getMessage());  // Log the actual error
-                echo json_encode(['status' => 'error', 'message' => 'An unexpected error occurred.']);
-            } finally {
-                // Close the statement and the connection
-                $stmt->close();
-                mysqli_close($conn);
-            }
-            
-            
+        } else {
+            error_log("Failed to prepare duplicate check query: " . $conn->error);
+            echo json_encode(['status' => 'error', 'message' => 'An error occurred while checking for duplicate entries.']);
+            mysqli_close($conn);
+            exit;
         }
-
-
-    } else {
-        // Return the errors as JSON
-        echo json_encode(['status' => 'error', 'errors' => $errors]);
     }
 
-    
+    // If there are errors, return them to the user
+    if (!empty($errors)) {
+        echo json_encode(['status' => 'error', 'errors' => $errors]);
+        mysqli_close($conn);
+        exit;
+    }
+
+    // If no errors, proceed with user registration
+    $password1 = password_hash($password1, PASSWORD_BCRYPT); // Hash the password
+
+    mysqli_begin_transaction($conn);
+
+    try {
+        $insert_query = "INSERT INTO users (full_name, username, password, email, phone_number) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($insert_query);
+
+        if ($stmt === false) {
+            error_log("Failed to prepare insert query: " . $conn->error);
+            echo json_encode(['status' => 'error', 'message' => 'An error occurred while preparing the insert query.']);
+            mysqli_rollback($conn);
+            mysqli_close($conn);
+            exit;
+        }
+
+        $stmt->bind_param("sssss", $full_name, $username1, $password1, $email, $phone);
+
+        if ($stmt->execute()) {
+            mysqli_commit($conn);
+            echo json_encode(['status' => 'success', 'message' => 'New user added successfully!']);
+        } else {
+            mysqli_rollback($conn);
+            echo json_encode(['status' => 'error', 'message' => 'An error occurred while executing the insert query.']);
+        }
+
+        $stmt->close();
+
+    } catch (Exception $e) {
+        mysqli_rollback($conn);
+        error_log("Error during registration: " . $e->getMessage());
+        echo json_encode(['status' => 'error', 'message' => 'An unexpected error occurred.']);
+    }
+
+    // Close the database connection
+    mysqli_close($conn);
 }
 ?>

@@ -23,8 +23,27 @@ $(document).ready(function() {
                 var data = JSON.parse(response);
                 
                 if (data.status === "success") {
+                    
+                    //get username
+                    const username = document.getElementById('username').value;
+
+                    
+                    
                     $("#loginForm")[0].reset(); // Reset the form
                     $("#result").html(data.message); // Show success message
+
+                    //get first letter
+                    const initial = username.charAt(0);
+
+                    // Debug log to confirm the first letter is being captured
+                    console.log("First letter of username:", initial);
+
+                    // Create query string with only the first letter of the name
+                    const param = new URLSearchParams({firstLetter: initial}).toString();
+                    
+                    // Redirect to a new webpage with the form data as query parameters
+                    window.location.href = 'UTSdash.html?' + param;
+
                 } else if (data.status === "error") {
                      // Show general error message in the result span
                     if (data.message) {
