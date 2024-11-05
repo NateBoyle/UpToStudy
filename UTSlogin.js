@@ -20,7 +20,8 @@ $(document).ready(function() {
             type: 'POST',
             data: $(this).serialize(),
             success: function(response) {
-                var data = JSON.parse(response);
+                // No need to parse response; it's already a JavaScript object
+                var data = response;
                 
                 if (data.status === "success") {
                     

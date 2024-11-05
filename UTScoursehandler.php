@@ -1,15 +1,28 @@
 <?php
 
-// Enable error reporting for debugging
+// Enable error reporting for debugging (use only in development)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Set the Content-Type header to application/json
+// Secure Cookie Settings (configure before starting session)
+ini_set('session.cookie_httponly', true);
+ini_set('session.cookie_secure', true); // Ensure HTTPS in production
+ini_set('session.use_strict_mode', true);
+
+// Start session only if none is active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Set Content-Type header to JSON (if returning JSON response)
 header('Content-Type: application/json');
 
-// Start the session to access the user_id
-session_start();
+// HTTP Security Headers (for enhanced security)
+header("Content-Security-Policy: default-src 'self';");
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
+header("X-XSS-Protection: 1; mode=block");
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {

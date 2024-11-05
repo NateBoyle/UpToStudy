@@ -1,16 +1,62 @@
 <?php
 
-// Secure Cookie Settings and Start the Session
-ini_set('session.cookie_httponly', true); // Prevent access to cookies via JavaScript
-ini_set('session.cookie_secure', true);   // Ensure cookies are sent over HTTPS
-ini_set('session.use_strict_mode', true); // Prevents session hijacking
-session_start();
+// Enable error reporting for debugging (use only in development)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// HTTP Security Headers
+// Secure Cookie Settings (configure before starting session)
+ini_set('session.cookie_httponly', true);
+ini_set('session.cookie_secure', true); // Ensure HTTPS in production
+ini_set('session.use_strict_mode', true);
+
+// Start session only if none is active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Set Content-Type header to JSON (if returning JSON response)
+header('Content-Type: application/json');
+
+// HTTP Security Headers (for enhanced security)
 header("Content-Security-Policy: default-src 'self';");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("X-XSS-Protection: 1; mode=block");
+
+// Check if the request is for logout
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+
+    // Database connection variables
+    $host = "localhost";
+    $username2 = "root";
+    $password2 = "";
+    $database_name = "utsdb";
+
+    // Create a connection to the database
+    $conn = mysqli_connect($host, $username2, $password2, $database_name);
+
+    if (!$conn) {
+        die("Database connection failed: " . mysqli_connect_error());
+    }
+    
+    $user_id = $_SESSION['user_id'];
+    $ip_address = $_SERVER['REMOTE_ADDR'];
+    $session_id = session_id();
+
+    // Record logout event with automatic timestamp
+    $query_logout_event = "INSERT INTO login_history (user_id, event_type, ip_address, session_id, event_time) VALUES (?, 'logout', ?, ?, CURRENT_TIMESTAMP)";
+    $stmt_logout_event = $conn->prepare($query_logout_event);
+    $stmt_logout_event->bind_param("iss", $user_id, $ip_address, $session_id);
+    $stmt_logout_event->execute();
+
+    // Clear session
+    session_unset();
+    session_destroy();
+    header("Location: UTSwelcome.html");
+    exit;
+}
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -65,7 +111,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($result_attempts->num_rows > 0) {
                 $row = $result_attempts->fetch_assoc();
-                if ($row['attempts'] >= $max_attempts && (time() - strtotime($row['last_attempt'])) < $lockout_time) {
+                $attempts = $row['attempts'];
+                $last_attempt = strtotime($row['last_attempt']);
+
+                // Check if the user should be locked out
+                if ($attempts >= $max_attempts && (time() - $last_attempt) < $lockout_time) {
+                    // Log the lockout event in security_events table
+                    $user_id_query = "SELECT user_id FROM users WHERE username = ?";
+                    $stmt_user_id = $conn->prepare($user_id_query);
+                    $stmt_user_id->bind_param("s", $username1);
+                    $stmt_user_id->execute();
+                    $user_id_result = $stmt_user_id->get_result();
+
+                    if ($user_id_result->num_rows > 0) {
+                        $user_row = $user_id_result->fetch_assoc();
+                        $user_id = $user_row['user_id'];
+
+                        $ip_address = $_SERVER['REMOTE_ADDR'];
+                        $log_lockout_query = "INSERT INTO security_events (user_id, event_type, ip_address) VALUES (?, 'lockout', ?)";
+                        $stmt_log_lockout = $conn->prepare($log_lockout_query);
+                        $stmt_log_lockout->bind_param("is", $user_id, $ip_address);
+                        $stmt_log_lockout->execute();
+                    }
+
                     echo json_encode(['status' => 'error', 'message' => 'Too many failed attempts. Try again later.']);
                     exit;
                 }
@@ -104,9 +172,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // **Set the user_id in the session**
                     $_SESSION['user_id'] = $user_id_from_database; // **This line is added**
-
                     $_SESSION['username'] = $username1;
                     $_SESSION['last_activity'] = time(); // Record the login time
+
+                    // Record login event
+                    $ip_address = $_SERVER['REMOTE_ADDR'];
+                    $session_id = session_id();
+                    $query_login_event = "INSERT INTO login_history (user_id, event_type, ip_address, session_id) VALUES (?, 'login', ?, ?)";
+                    $stmt_login_event = $conn->prepare($query_login_event);
+                    $stmt_login_event->bind_param("iss", $user_id_from_database, $ip_address, $session_id);
+                    $stmt_login_event->execute();
+
+
                     // Password is correct
                     echo json_encode(['status' => 'success', 'message' => 'Login successful. Welcome, ' . htmlspecialchars($username1) . "!"]);
                     // Reset failed login attempts on successful login
@@ -114,6 +191,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt_reset_attempts = $conn->prepare($query_reset_attempts);
                     $stmt_reset_attempts->bind_param("s", $username1);
                     $stmt_reset_attempts->execute();
+
+
                 } else {
                     
                     // Password is incorrect
@@ -129,6 +208,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Return the errors as JSON
                     echo json_encode(['status' => 'error', 'message' => "Invalid username or password1."]);
                 }
+
             } else {
                 // Username not found, return error
                 error_log("Failed login attempt for username: $username1");

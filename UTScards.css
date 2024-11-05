@@ -1,0 +1,227 @@
+/* Sidebar Styling */
+.sidebar {
+    position: fixed;
+    top: 200; /* Adjust as needed for your header */
+    left: 0;
+    width: 20%;
+    height: 100vh; /* Full viewport height */
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #1a1a1a; /* Sidebar background color */
+    color: white;
+    border-right: 2px solid white;
+}
+
+/* Flashcard Content Area (Main Section) */
+.flashcard-content {
+    width: calc(80% - 40px); /* Adjust the width to account for margin on both sides */
+    margin-left: auto;
+    padding: 20px;
+}
+
+
+
+/* Flashcard Header with Search and Create Button */
+.flashcard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* Create Set Button Styling */
+.create-set {
+    padding: 10px 20px;
+    background: #5DD770;
+    width: 200px;
+    height: 50px;
+    font-size: large;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Flashcard Search Box */
+.flashcard-search input {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    top: 120;
+    z-index: 200;
+    width: 400px;
+}
+
+/* Flashcard Container Layout */
+.flashcardContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    top: 20px;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%; /* Takes up 80% of the screen */
+    /*max-width: calc(100% - 10%);  Adjust to avoid overflow */
+    /*margin-left: 10%;  Offsets by sidebar width */
+    border: 2px solid white;
+    border-radius: 15px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Allows vertical scrolling */
+}
+
+/* Flashcard Grid Layout */
+.flashcard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Creates three equal columns */
+    gap: 20px; /* Adjust spacing between items as needed */
+    width: 100%; /* Adjust to fit the available space */
+    justify-items: center; /* Centers items within each column */
+}
+
+/* Flashcard Set Styles */
+.flashcard-set {
+    width: 400px;
+    height: 250px;
+    background: #2C2C2C;
+    border-radius: 20px;
+    color: white;
+    display: flex;
+    flex-direction: column; /* Stacks h2 and p vertically */
+    align-items: center; /* Centers content horizontally */
+    justify-content: center; /* Centers content vertically */
+    text-align: center;
+}
+
+/* Flashcard Header Styles 
+.flashcard-set-header {
+    background: linear-gradient(90deg, #4B90D0 0%, #2266AA 100%);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 20px;
+    width: 100%;
+}*/
+
+.flashcard-set-header h2 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 10px; /* Adjusts the space between h2 and p */
+}
+
+.flashcard-set-header p {
+    font-size: 16px;
+    color: #DDDDDD;
+    margin-top: 0;
+}
+
+
+
+/* Modal Styles */
+#modal {
+    display: none; /* Flexbox to center content */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+/* Modal content */
+#modal div {
+    width:  400px;
+    height: 250px;
+    background: #2C2C2C;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: center;
+}
+
+.modal.show {
+    display: flex; /* To make modal visible when this class is added */
+}
+
+.modal-content {
+    width: 90%;
+    
+    background: #2C2C2C;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    color: white;
+    background-color: #333;
+    box-sizing: border-box;
+}
+
+#setNameInput::placeholder {
+    color: white; /* Sets the placeholder text color to white */
+    opacity: 1; /* Ensures full opacity for better visibility */
+}
+
+#courseDropdown {
+    width: 100%; /* Make it the same width as the Set Name input */
+    padding: 12px; /* Adjust padding to match other inputs */
+    border-radius: 5px; /* Same border radius as other inputs */
+    background-color: #333; /* Black background */
+    color: white; /* White text */
+    border: none; /* Remove border for a clean look */
+    font-size: 16px; /* Match font size */
+    margin-bottom: 15px; /* Add bottom margin to create space */
+    box-sizing: border-box; /* Ensures padding doesn’t affect width */
+}
+
+#courseDropdown option {
+    background-color: #333; /* Black background for dropdown options */
+    color: white; /* White text for dropdown options */
+}
+
+/* Save Set Button */
+#saveSetBtn {
+    width: 100%;
+    padding: 20px;
+    margin-top: 10px;
+    background: #5DD770;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#saveSetBtn:hover {
+    background: #4fb963;
+}
+
+/* Close Button */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+}

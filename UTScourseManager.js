@@ -20,11 +20,25 @@ class Course {
         return `${month}-${day}-${year}`;
     }
 
+    formatTimeTo12Hour(time) {
+        let [hour, minute] = time.split(':');
+        hour = parseInt(hour, 10);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12; // Convert to 12-hour format, with 12 instead of 0
+        return `${hour}:${minute} ${ampm}`;
+    }
+
+    
+
     render() {
         const courseCard = document.createElement('div');
         courseCard.classList.add('course-card');
 
         const formattedDays = this.days.join(', ');
+
+        // Assuming course.startTime and course.endTime are in HH:MM:SS format
+        const startTimeFormatted = this.formatTimeTo12Hour(this.startTime);
+        const endTimeFormatted = this.formatTimeTo12Hour(this.endTime);
 
         courseCard.innerHTML = `
             <div class="course-header" style="background: ${this.color};">
@@ -38,7 +52,7 @@ class Course {
             <div class="course-content">
                 <p>Subject: ${this.subject}</p>
                 <p>Professor: ${this.professor}</p>
-                <p>Time: ${this.startTime} - ${this.endTime}</p>
+                <p>Time: ${startTimeFormatted} - ${endTimeFormatted}</p>
                 <p>Start Date: ${this.formatDate(this.startDate)}</p>
                 <p>End Date: ${this.formatDate(this.endDate)}</p>
                 <p>Days: ${formattedDays}</p>
@@ -64,6 +78,8 @@ class Course {
         return courseCard;
     }
 }
+
+
 
 function displayErrors(errors) {
     console.log("Errors:", errors); // Debugging line
