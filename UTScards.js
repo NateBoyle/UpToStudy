@@ -16,6 +16,31 @@ function closeCreateSetModal() {
     document.getElementById("modal").style.display = "none";
 }
 
+function openAddCardModal(setId) {
+    // Open the modal for adding a card
+    document.getElementById('flashcardModal').style.display = 'flex';
+    // Optionally, store the setId for linking new cards to the correct set
+}
+
+function closeFlashcardModal() {
+    document.getElementById('flashcardModal').style.display = 'none';
+
+    // Clear input fields
+    document.getElementById('flashcardQuestion').value = '';
+    document.getElementById('flashcardAnswer').value = '';
+}
+
+// Scoped functions for the options menu
+function toggleOptionsMenu(ellipsisElement) {
+    const optionsMenu = ellipsisElement.nextElementSibling;
+    optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
+}
+
+function deleteFlashcardSet(setId) {
+    console.log(`Deleting set with ID: ${setId}`);
+    // Implement deletion logic here
+}
+
 function loadCourses() {
     fetch(COURSES_URL)
         .then(response => response.json())
@@ -67,15 +92,57 @@ function loadFlashcardSets() {
 
             if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
                 data.data.forEach(set => {
+
                     const setElement = document.createElement('div');
                     setElement.classList.add('flashcard-set');
 
+                    // Ellipsis menu and dropdown options
+                    const optionsMenu = document.createElement('div');
+                    optionsMenu.classList.add('options-menu');
+
+                    const ellipsis = document.createElement('span');
+                    ellipsis.classList.add('ellipsis');
+                    ellipsis.textContent = '⋮';
+                    ellipsis.onclick = () => toggleOptionsMenu(ellipsis);
+                    
+                    const dropdownOptions = document.createElement('div');
+                    dropdownOptions.classList.add('dropdown-options');
+
+                    const addCardsBtn = document.createElement('button');
+                    addCardsBtn.textContent = 'Add Cards';
+                    addCardsBtn.onclick = () => openAddCardModal(set.set_id); // Pass set ID if needed
+
+                    const deleteSetBtn = document.createElement('button');
+                    deleteSetBtn.textContent = 'Delete Set';
+                    deleteSetBtn.onclick = () => deleteFlashcardSet(set.set_id); // Pass set ID if needed
+
+                    // Append buttons to dropdown
+                    dropdownOptions.appendChild(addCardsBtn);
+                    dropdownOptions.appendChild(deleteSetBtn);
+
+                    // Append ellipsis and dropdown to options menu
+                    optionsMenu.appendChild(ellipsis);
+                    optionsMenu.appendChild(dropdownOptions);
+
                     setElement.innerHTML = `
-                        <h2>${set.set_name}</h2>
+                        <div class="options-button-container">
+                            <button class="options-button" onclick="toggleOptionsMenu(this)">&#8942;</button>
+                            <div class="options-menu">
+                                <button onclick="openAddCardModal(${set.set_id})">Add Cards</button>
+                                <button onclick="deleteFlashcardSet(${set.set_id})">Delete Set</button>
+                            </div>
+                        </div>
+                        <div class="flashcard-header">
+                            <h2>${set.set_name}</h2>
+                        </div>
                         <p>Course: ${set.course_name || 'N/A'}</p>
                         <p>${set.num_cards || 0} cards</p> <!-- Display num_cards or 0 if null -->
                     `;
 
+                     // Append options menu to the set element
+                     setElement.appendChild(optionsMenu);
+
+                    // Append set element to the grid
                     flashcardGrid.appendChild(setElement);
                 });
             } else {
@@ -92,12 +159,15 @@ function loadFlashcardSets() {
 
             // Append the grid to the container
             flashcardSetsContainer.appendChild(flashcardGrid);
+
+            
+
         })
         .catch(error => console.error('Error loading flashcard sets:', error));
 }
 
 // Define the function to save the set and close the modal
-function saveSet() {
+function saveSet(afterSaveAction) {
 
     const setName = document.getElementById('setNameInput').value;
     const courseId = document.getElementById('courseDropdown').value;
@@ -123,7 +193,8 @@ function saveSet() {
         if (data.status === 'success') {
             alert(data.message);
             closeCreateSetModal();  // Close the modal only if save is successful
-            // Optionally, reload flashcard sets to reflect the new addition
+            
+            if (afterSaveAction) afterSaveAction(data.set_id); // Call the callback if provided
         } else {
             alert("Error: " + data.message);
         }
@@ -147,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (saveButton) {
-        saveButton.addEventListener("click", saveSet);
+        saveButton.addEventListener("click", () => saveSet(openAddCardModal));
     }
 });
 

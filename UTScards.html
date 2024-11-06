@@ -104,7 +104,7 @@
                 <div id="modal">
 
                     <div class="modal-content">
-                        <span class="close" onclick="closeCreateSetModal()">&times;</span>
+                        <span class="close" onclick="closeCreateSetModal()">&#8942;</span>
                         <h2>Create New Flashcard Set</h2>
                         
                         <input type="text" id="setNameInput" placeholder="Set Name">
@@ -117,6 +117,19 @@
                         </select>
                         
                         <button id="saveSetBtn">Save Set</button>
+                    </div>
+                </div>
+
+                <!-- Modal for Creating Individual Flashcards -->
+                <div id="flashcardModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeFlashcardModal()">&times;</span>
+                        <h2>Create Flashcard</h2>
+
+                        <input type="text" id="flashcardQuestion" placeholder="Question" required>
+                        <input type="text" id="flashcardAnswer" placeholder="Answer" required>
+
+                        <button id="addFlashcardBtn">Add Flashcard</button>
                     </div>
                 </div>
 
