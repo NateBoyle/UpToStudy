@@ -91,26 +91,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
 
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Insert new flashcard set
-    $courseId = empty($_POST['course_id']) ? NULL : $_POST['course_id']; // Capture course_id from form submission
-    $setName = $_POST['set_name'];    // Capture set name from form submission
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['type'])) {
 
-    // Validate required fields
-    if (empty($setName)) {
-        echo json_encode(['status' => 'error', 'message' => 'Set name is required.']);
+    if ($_POST['type'] === 'add_set') {
+    
+        // Insert new flashcard set
+        $courseId = empty($_POST['course_id']) ? NULL : $_POST['course_id']; // Capture course_id from form submission
+        $setName = $_POST['set_name'];    // Capture set name from form submission
+
+        // Validate required fields
+        if (empty($setName)) {
+            echo json_encode(['status' => 'error', 'message' => 'Set name is required.']);
+            exit;
+        }
+
+        // Insert the new flashcard set
+        $insertQuery = "INSERT INTO flashcard_sets (user_id, course_id, set_name, date_created) VALUES (?, ?, ?, NOW())";
+        $insertStmt = $conn->prepare($insertQuery);
+        $insertStmt->bind_param("iis", $userId, $courseId, $setName);
+
+        if ($insertStmt->execute()) {
+            echo json_encode(['status' => 'success', 'message' => 'Flashcard set created successfully.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to create flashcard set: ' . $conn->error]);
+        }
+
+    } elseif ($_POST['type'] === 'add_flashcard') {
+
+        // Insert a new flashcard
+        $setId = $_POST['set_id'];
+        $question = $_POST['question'];
+        $answer = $_POST['answer'];
+
+        // Validate required fields
+        if (empty($setId) || empty($question) || empty($answer)) {
+            echo json_encode(['status' => 'error', 'message' => 'All fields are required for a flashcard.']);
+            exit;
+        }
+
+        // Insert the new flashcard into the database
+        $insertQuery = "INSERT INTO flashcards (set_id, question, answer, date_created) VALUES (?, ?, ?, NOW())";
+        $insertStmt = $conn->prepare($insertQuery);
+        $insertStmt->bind_param("iss", $setId, $question, $answer);
+
+        if ($insertStmt->execute()) {
+            echo json_encode(['status' => 'success', 'message' => 'Flashcard added successfully.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to add flashcard: ' . $conn->error]);
+        }
+    }
+
+} elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    
+    // Parse the DELETE request body for JSON
+    $input = json_decode(file_get_contents('php://input'), true);
+    $userId = $_SESSION['user_id'] ?? null;
+
+    if (!$userId) {
+        echo json_encode(['status' => 'error', 'message' => 'User is not authenticated.']);
         exit;
     }
 
-    // Insert the new flashcard set
-    $insertQuery = "INSERT INTO flashcard_sets (user_id, course_id, set_name, date_created) VALUES (?, ?, ?, NOW())";
-    $insertStmt = $conn->prepare($insertQuery);
-    $insertStmt->bind_param("iis", $userId, $courseId, $setName);
+    if (isset($input['type']) && $input['type'] === 'delete_set') {
+        $setId = $input['set_id'] ?? null;
 
-    if ($insertStmt->execute()) {
-        echo json_encode(['status' => 'success', 'message' => 'Flashcard set created successfully.']);
+        if ($setId) {
+            
+            // Delete the flashcard set itself
+            $deleteSetQuery = "DELETE FROM flashcard_sets WHERE set_id = ? AND user_id = ?";
+            $deleteSetStmt = $conn->prepare($deleteSetQuery);
+            $deleteSetStmt->bind_param("ii", $setId, $userId);
+
+            if ($deleteSetStmt->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'Flashcard set and associated flashcards deleted successfully.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to delete flashcard set: ' . $conn->error]);
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Set ID is missing.']);
+        }
+
+    } elseif (isset($input['type']) && $input['type'] === 'delete_flashcard') {
+        $flashcardId = $input['flashcard_id'] ?? null;
+
+        if ($flashcardId) {
+            // Delete the individual flashcard
+            $deleteFlashcardQuery = "DELETE FROM flashcards WHERE flashcard_id = ? AND user_id = ?";
+            $deleteFlashcardStmt = $conn->prepare($deleteFlashcardQuery);
+            $deleteFlashcardStmt->bind_param("ii", $flashcardId, $userId);
+
+            if ($deleteFlashcardStmt->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'Flashcard deleted successfully.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to delete flashcard: ' . $conn->error]);
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Flashcard ID is missing.']);
+        }
+
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to create flashcard set: ' . $conn->error]);
+        echo json_encode(['status' => 'error', 'message' => 'Invalid delete action type.']);
     }
 }
 
