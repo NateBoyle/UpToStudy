@@ -26,6 +26,8 @@ header("X-XSS-Protection: 1; mode=block");
 
 // Check if the request is for logout
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    
+    error_log("Logout request received with session ID: " . session_id());
 
     // Database connection variables
     $host = "localhost";
@@ -48,7 +50,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     $query_logout_event = "INSERT INTO login_history (user_id, event_type, ip_address, session_id, event_time) VALUES (?, 'logout', ?, ?, CURRENT_TIMESTAMP)";
     $stmt_logout_event = $conn->prepare($query_logout_event);
     $stmt_logout_event->bind_param("iss", $user_id, $ip_address, $session_id);
-    $stmt_logout_event->execute();
+    //$stmt_logout_event->execute();
+
+    if ($stmt_logout_event->execute()) {
+        error_log("Logout event successfully recorded"); // Success debug log
+    } else {
+        error_log("Failed to record logout event: " . $stmt_logout_event->error); // Error debug log
+    }
 
     // Clear session
     session_unset();

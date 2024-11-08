@@ -97,19 +97,18 @@
 
                 </div>
 
-            </div>
             
 
-                <!-- Modal for Creating Flashcards -->
-                <div id="modal">
+                <!-- Modal for Creating Flashcard sets -->
+                <div id="flashcardSetModal">
 
                     <div class="modal-content">
-                        <span class="close" onclick="closeCreateSetModal()">&#8942;</span>
+                        <span class="close" onclick="closeCreateSetModal()">&times;</span>
                         <h2>Create New Flashcard Set</h2>
                         
                         <input type="text" id="setNameInput" placeholder="Set Name">
                         
-                         <!-- Course Dropdown -->
+                            <!-- Course Dropdown -->
                         <select id="courseDropdown" placeholder="Select Course">
                             <option value="" disabled selected>Select Course</option>
                             <option value="">No course / N/A</option>
@@ -122,6 +121,8 @@
 
                 <!-- Modal for Creating Individual Flashcards -->
                 <div id="flashcardModal" class="modal">
+
+
                     <div class="modal-content">
                         <span class="close" onclick="closeFlashcardModal()">&times;</span>
                         <h2>Create Flashcard</h2>
@@ -130,13 +131,41 @@
                         <input type="text" id="flashcardAnswer" placeholder="Answer" required>
 
                         <button id="addFlashcardBtn">Add Flashcard</button>
+                    </div>      
+          
+          
+                </div>
+
+                <!-- Modal for Displaying Flashcards -->
+                <div id="flashcardDisplayModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeFlashcardDisplayModal()">&times;</span>
+
+                        <!-- Edit and Delete buttons positioned near the top left -->
+                        <div class="flashcard-options">
+                            <button onclick="editFlashcard()">Edit</button>
+                            <button onclick="deleteFlashcard()">Delete</button>
+                        </div>
+
+                        <div class="flashcard-display">
+                            <button id="prevFlashcardBtn">&larr;</button>
+                            <div>
+                                <h2 id="displayQuestion">Question</h2>
+                                <p id="displayAnswer" style="display: none;">Answer</p>
+                            </div>
+                            <button id="nextFlashcardBtn">&rarr;</button>
+                            <button id="toggleAnswerBtn">Show Answer</button>
+                            
+                        </div>
                     </div>
                 </div>
 
+
+
+            </div>
+
+
         </div>
-
-       
-
         
 
 

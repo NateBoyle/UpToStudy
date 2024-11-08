@@ -88,6 +88,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // Output the flashcard sets as a JSON response
         echo json_encode(['status' => 'success', 'data' => $flashcardSets]);
+    } elseif (isset($_GET['type']) && $_GET['type'] === 'flashcards') {
+        $setId = $_GET['set_id'] ?? null;
+    
+        if ($setId) {
+            // Prepare and execute the query to get flashcards in the set
+            $query = "SELECT flashcard_id, question, answer FROM flashcards WHERE set_id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $setId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+    
+            $flashcards = [];
+            while ($row = $result->fetch_assoc()) {
+                $flashcards[] = $row;
+            }
+
+            // After executing the flashcard query in UTScards.php
+            if (empty($flashcards)) {
+                error_log("No flashcards found for set_id: $setId");
+            } else {
+                error_log("Flashcards found for set_id: $setId");
+            }
+    
+            echo json_encode(['status' => 'success', 'data' => $flashcards]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Set ID is missing.']);
+        }
     }
 
 
@@ -116,6 +143,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             echo json_encode(['status' => 'error', 'message' => 'Failed to create flashcard set: ' . $conn->error]);
         }
 
+    } elseif ($_POST['type'] === 'edit_set') {
+        // Update an existing flashcard set
+        $setId = $_POST['set_id'];
+        $courseId = empty($_POST['course_id']) ? NULL : $_POST['course_id']; // Capture course_id from form submission
+        $setName = $_POST['set_name'];    // Capture new set name from form submission
+
+        // Validate required fields
+        if (empty($setId) || empty($setName)) {
+            echo json_encode(['status' => 'error', 'message' => 'Set ID and set name are required.']);
+            exit;
+        }
+
+        // Update the flashcard set with new values
+        $updateQuery = "UPDATE flashcard_sets SET course_id = ?, set_name = ? WHERE set_id = ? AND user_id = ?";
+        $updateStmt = $conn->prepare($updateQuery);
+        $updateStmt->bind_param("isii", $courseId, $setName, $setId, $userId);
+
+        if ($updateStmt->execute()) {
+            echo json_encode(['status' => 'success', 'message' => 'Flashcard set updated successfully.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to update flashcard set: ' . $conn->error]);
+        }
     } elseif ($_POST['type'] === 'add_flashcard') {
 
         // Insert a new flashcard

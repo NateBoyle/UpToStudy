@@ -52,9 +52,11 @@ $(document).ready(function() {
                     } else {
                         // Display field-specific error messages
                         if (data.errors.username) {
+                            console.log("Username Error:", data.errors.username);
                             $("#usernameError").html(data.errors.username);
                         }
                         if (data.errors.password) {
+                            console.log("Password Error:", data.errors.password);
                             $("#passwordError").html(data.errors.password);
                         }
                     }

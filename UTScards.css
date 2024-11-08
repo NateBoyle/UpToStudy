@@ -72,8 +72,8 @@
     box-sizing: border-box;
     width: 100%; /* Takes up 80% of the screen */
     /*max-width: calc(100% - 10%);  Adjust to avoid overflow */
-    /*margin-left: 10%;  Offsets by sidebar width */
-    border: 2px solid white;
+    /*margin-left: 10%;  Offsets by sidebar width 
+    border: 2px solid white;*/
     border-radius: 15px;
     overflow-x: hidden;
     overflow-y: auto; /* Allows vertical scrolling */
@@ -94,6 +94,7 @@
     width: 400px;
     height: 250px;
     background: #2C2C2C;
+    border: 1px solid #ddd;
     border-radius: 20px;
     color: white;
     display: flex;
@@ -101,6 +102,19 @@
     align-items: center; /* Centers content horizontally */
     justify-content: center; /* Centers content vertically */
     text-align: center;
+}
+
+.flashcardSetClickable {
+    text-align: center;
+    padding: 20px;
+    /*background-color: rgba(0, 0, 0, 0.05);  Light overlay */
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.flashcard-set.hover-effect {
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly lighter color */
 }
 
 /* Flashcard Header Styles 
@@ -124,10 +138,121 @@
     margin-top: 0;
 }
 
+/* Existing styling for Flashcard Display Modal */
+#flashcardDisplayModal {
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+#flashcardDisplayModal .modal-content {
+    width: 400px; /* Match flashcardModal width */
+    height: 300px; /* Increase height as desired */
+    background: #2C2C2C;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+}
+
+/* Container for Question and Answer Display */
+.flashcard-display {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content vertically */
+    align-items: center; /* Centers content horizontally */
+    flex-grow: 1;
+    height: 100%; /* Ensures it takes full height within modal-content */
+    text-align: center;
+}
+
+#displayQuestion, #displayAnswer {
+    margin: 25px 0;
+    font-size: 20px; /* Sets the same font size for question and answer */
+}
+
+/* Next and Previous Button Styling */
+#prevFlashcardBtn, #nextFlashcardBtn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#prevFlashcardBtn {
+    left: 10px; /* Position on the left side */
+}
+
+#nextFlashcardBtn {
+    right: 10px; /* Position on the right side */
+}
+
+/* Flashcard Display Toggle Button */
+#toggleAnswerBtn {
+    position: absolute;
+    bottom: 20px; /* Position the button at the bottom of the modal */
+    align-self: center; /* Centers button horizontally */
+    width: 60%; /* Narrow button width */
+    padding: 12px;
+    background: #5DD770;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: auto; /* Pushes the button towards the bottom */
+}
+
+#toggleAnswerBtn:hover {
+    background: #4fb963; /* Slightly darker green for hover effect */
+}
+
+/* New CSS for Edit and Delete Options */
+.flashcard-options {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 1px; /* Space between buttons */
+    flex-direction: column; /* Stack buttons vertically */
+    z-index: 10; /* Ensures buttons are in front */
+}
+
+.flashcard-options button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left; /* Align text to the left for a cleaner look */
+    padding: 5px 10px;
+}
+
+.flashcard-options button:hover {
+    color: #ddd; /* Slight color change on hover */
+    text-decoration: underline; /* Optional: underline on hover for visual feedback */
+}
 
 
 /* Modal Styles */
-#modal {
+#flashcardSetModal {
     display: none; /* Flexbox to center content */
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
@@ -141,7 +266,7 @@
 }
 
 /* Modal content */
-#modal div {
+#flashcardSetModal div {
     width:  400px;
     height: 250px;
     background: #2C2C2C;
@@ -342,3 +467,4 @@
 
 .options-menu button:hover {
     background-color: #444;
+}

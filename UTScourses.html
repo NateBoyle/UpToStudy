@@ -26,48 +26,32 @@
     <div style="width: 100%; height: 100%; position: relative; border-radius: 15px">
         <div style="width: 100%; height: 100%; position: relative; background: #1E1E1E; border-radius: 15px;"></div>
 
-        <div style="width: 100%; height: 110px; position: relative; z-index: 100;">
-            <!-- Header Container -->
-            <div style="width: 100%; height: 110px; position: fixed; top: 0; left: 0; background: #373B41; border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom: 1px rgba(205, 205, 205, 0.12) solid; display: flex; align-items: center; justify-content: space-between; padding: 0 20px;">
-                
-                <!-- Left Side: Logo -->
-                <a href="UTStemplate.html">
-                    <img style="width: 110px; height: 102px;" src="UTSicon2.png" />
-                </a>
+        <!-- Header Container -->
+        <div class="header">
+              
+            <!-- Left Side: Logo -->
+            <a href="UTStemplate.html">
+                <img src="UTSicon2.png" alt="UpToStudy Logo">
+            </a>
 
-                <!-- Center: Navigation Links -->
-                <div style="display: flex; gap: 20px;">
-                    <a href="UTSdash.html" style="text-decoration: none;">
-                        <div style="width: 200px; height: 60px; display: flex; justify-content: center; align-items: center; border-radius: 15px;">
-                            <div style="color: white; font-size: 28px; font-family: UTSfont; font-weight: 500;">Dashboard</div>
-                        </div>
-                    </a>
-                    <a href="UTScalendar.html" style="text-decoration: none;">
-                        <div style="width: 200px; height: 60px; display: flex; justify-content: center; align-items: center; border-radius: 15px;">
-                            <div style="color: white; font-size: 28px; font-weight: 500;">Calendar</div>
-                        </div>
-                    </a>
-                    <a href="UTScourses.html" style="text-decoration: none;">
-                        <div style="width: 200px; height: 60px; background: #5DD770; display: flex; justify-content: center; align-items: center; border-radius: 15px;">
-                            <div style="color: white; font-size: 28px; font-weight: 500;">Courses</div>
-                        </div>
-                    </a>
-                    <a href="UTScards.html" style="text-decoration: none;">
-                        <div style="width: 200px; height: 60px; display: flex; justify-content: center; align-items: center; border-radius: 15px;">
-                            <div style="color: white; font-size: 28px; font-weight: 500;">Flashcards</div>
-                        </div>
-                    </a>
-                    <a href="UTSgoals.html" style="text-decoration: none;">
-                        <div style="width: 200px; height: 60px; display: flex; justify-content: center; align-items: center; border-radius: 15px;">
-                            <div style="color: white; font-size: 28px; font-weight: 500;">Goals</div>
-                        </div>
-                    </a>
-                </div>
+            
 
-                <!-- Right Side: User Initial -->
-                <div style="width: 75px; height: 75px; background: #78AFF2; border-radius: 50%; display: flex; align-items: center; justify-content: center;  margin-right: 35px;">
-                    <div id="userInitial" style="color: white; font-size: 40px; font-family: UTSfont; font-weight: 800;">N</div>
-                </div>
+            <!-- Center: Navigation Links -->
+            <div class="nav-links">
+                <a href="UTSdash.html" class="nav-item">Dashboard</a>
+                <a href="UTScalendar.html" class="nav-item">Calendar</a>
+                <a href="UTScourses.html" class="nav-item active">Courses</a>
+                <a href="UTScards.html" class="nav-item">Flashcards</a>
+                <a href="UTSgoals.html" class="nav-item">Goals</a>
+            </div>
+
+            <!-- Right Side: User Initial -->
+            <div class="user-initial" id="userInitial">N</div>
+
+            <!-- Dropdown Modal for Profile Options -->
+            <div id="profileDropdown" class="profile-dropdown">
+                <button class="dropdown-option" id="editProfileBtn">Edit Profile</button>
+                <button class="dropdown-option" id="logoutBtn">Logout</button>
             </div>
 
         </div>

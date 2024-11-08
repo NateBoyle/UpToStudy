@@ -50,5 +50,27 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    let isInternalNavigation = false;
+
+    document.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+            isInternalNavigation = true;
+        });
+    });
+
+    // Attach the beforeunload event to handle logout only for external navigation or closing the tab
+    window.addEventListener('beforeunload', (event) => {
+        if (!isInternalNavigation) {
+            try {
+                navigator.sendBeacon('UTSlogin.php?action=logout');
+            } catch (error) {
+                // Fallback to AJAX
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "UTSlogin.php?action=logout", false); // Synchronous request
+                xhr.send();
+            }
+        }
+    });
+
 
 });
