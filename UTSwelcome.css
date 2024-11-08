@@ -1,0 +1,141 @@
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.welcome-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.background-overlay {
+    width: 100%;
+    height: 100%;
+    background: #1E1E1E;
+    border-radius: 10px;
+}
+
+.welcome-text {
+    position: absolute;
+    color: white;
+    font-size: 4vw; /* Relative to viewport width */
+    font-weight: 800;
+    word-wrap: break-word;
+    top: 15%; /* 15% from the top of the viewport */
+    left: 36%; /* Centered horizontally */
+    transform: translate(-50%, -50%);
+}
+
+.to-text {
+    position: absolute;
+    color: white;
+    font-size: 4vw; /* Relative to viewport width */
+    font-weight: 800;
+    word-wrap: break-word;
+    top: 25%; /* 25% from the top */
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.project-title {
+    position: absolute;
+    color: white;
+    font-size: 7vw; /* Relative to viewport width */
+    font-weight: 700;
+    word-wrap: break-word;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.left-panel {
+    position: absolute;
+    width: 15%; /* 15% of the viewport width */
+    height: 100%;
+    background: #6BE77F;
+    box-shadow: 2vw -0.1vw 0.2vw rgba(73, 248, 101, 0.25);
+}
+
+.right-panel {
+    position: absolute;
+    width: 15%; /* 15% of the viewport width */
+    height: 100%;
+    right: 0;
+    background: #5BC0F9;
+    transform: rotate(180deg);
+    box-shadow: -1.5vw 0.4vw 0.4vw rgba(129, 168, 245, 0.25);
+}
+
+.signup-box,
+.login-box {
+    width: 20%; /* Relative to viewport width */
+    height: 10%; /* Relative to viewport height */
+    position: absolute;
+    background: white;
+    border-radius: 48px;
+}
+
+.signup-box {
+    top: 70%; /* Adjusted for responsiveness */
+    left: 30%;
+}
+
+.login-box {
+    top: 70%; /* Adjusted for responsiveness */
+    left: 55%;
+}
+
+.signup-button,
+.login-button {
+    border: none;
+    width: 100%;
+    height: 100%;
+    background: white;
+    color: #6A6A6A;
+    font-size: 2vw; /* Responsive font size */
+    font-weight: 800;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.signup-button {
+    position: absolute;
+    top: 75%; /* Adjusts vertically relative to the viewport height */
+    left: 40%; /* Positions the button horizontally relative to the viewport width */
+    transform: translate(-50%, -50%); /* Centers the button relative to its top-left corner */
+    width: 15%; /* Responsive width */
+    height: 8%; /* Responsive height */
+    background: white;
+    color: #6A6A6A;
+    font-size: 2vw; /* Responsive font size */
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.login-button {
+    position: absolute;
+    top: 75%; /* Same vertical alignment as the signup button */
+    left: 65%; /* Positions the button to the right of the signup button */
+    transform: translate(-50%, -50%); /* Centers the button relative to its top-left corner */
+    width: 15%; /* Responsive width */
+    height: 8%; /* Responsive height */
+    background: white;
+    color: #6A6A6A;
+    font-size: 2vw; /* Responsive font size */
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+}

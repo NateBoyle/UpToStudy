@@ -7,6 +7,7 @@
     <link rel="icon" type="image/x-icon" href="UTSicon2.png">
 
     <link rel="stylesheet" href="UTScss.css">
+    <link rel="stylesheet" href="UTSwelcome.css">
 
     <style>
         @font-face {
@@ -19,19 +20,19 @@
 <body>
 
 
-    <div style="width: 100%; height: 100%; position: relative">
-        <div style="width: 1920px; height: 1080px; left: 0px; top: 0px; position: absolute">
-            <div style="width: 1920px; height: 1080px; left: 0px; top: 0px; position: absolute; background: #1E1E1E; border-radius: 10px"></div>
-            <div style="left: 700px; top: 200px; position: absolute; color: white; font-size: 60px; font-weight: 800; word-wrap: break-word">Welcome</div>
-            <div style="left: 1050px; top: 300px; position: absolute; color: white; font-size: 60px; font-weight: 800; word-wrap: break-word">to</div>
+    <div class="welcome-container">
+        <div class="background">
+            <div class="background-overlay"></div>
+            <div class="welcome-text">Welcome</div>
+            <div class="to-text">to</div>
         </div>
-        <div style="left: 800px; top: 400px; position: absolute; color: white; font-size: 100px; font-weight: 700; word-wrap: break-word">UpToStudy</div>
-        <div style="width: 539.51px; height: 1075.91px; left: 0px; top: 0.09px; position: absolute; background: #6BE77F; box-shadow: 18px -1px 2px rgba(73.10, 248.27, 101.13, 0.25)"></div>
-        <div style="width: 614px; height: 1065px; left: 1920px; top: 0px; position: absolute; transform: rotate(180deg); transform-origin: 0 0; background: #5BC0F9; box-shadow: -15px 4px 4.300000190734863px rgba(129.54, 168.94, 245.44, 0.25)"></div>
-        <div style="width: 320px; height: 100px; left: 600px; top: 675px; position: absolute; background: white; border-radius: 48px"></div>
-        <div style="width: 320px; height: 100px; left: 1000px; top: 675px; position: absolute; background: white; border-radius: 48px"></div>
-        <button onclick="window.location.href='UTSsignup.html'" style="border: none; left: 645px; top: 685px; position: absolute; background: white; color: #6A6A6A; font-size: 50px; font-weight: 800; z-index: 1000; cursor: pointer;">Sign up</button>
-        <button onclick="window.location.href='UTSlogin.html'" style="border: none; left: 1080px; top: 685px; position: absolute; background: white; color: #6A6A6A; font-size: 50px; font-weight: 800; z-index: 1000; cursor: pointer;">Login</button>
+        <div class="project-title">UpToStudy</div>
+        <div class="left-panel"></div>
+        <div class="right-panel"></div>
+        <div class="signup-box"></div>
+        <div class="login-box"></div>
+        <button onclick="window.location.href='UTSsignup.html'" class="signup-button">Sign up</button>
+        <button onclick="window.location.href='UTSlogin.html'" class="login-button">Login</button>
     </div>
 
 </body>

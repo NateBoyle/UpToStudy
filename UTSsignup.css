@@ -1,0 +1,106 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: white;
+    font-family: UTSfont, sans-serif;
+    display: flex; /* Use Flexbox for layout */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    min-height: 100vh; /* Ensure full viewport height */
+}
+/* Form Container */
+form {
+    background: #27292B;
+    box-shadow: 0px 8px 16.1px 3px rgba(0, 0, 0, 0.18);
+    border-radius: 48px;
+    padding: 40px;
+    max-width: 800px; /* Maximum width for larger screens */
+    width: 90%; /* Flexible width for smaller screens */
+    display: flex;
+    flex-direction: column; /* Stack form elements vertically */
+    gap: 30px; /* Space between form elements */
+    box-sizing: border-box; /* Include padding in width/height */
+    justify-content: space-between; /* Pushes elements to fill available space */
+}
+
+label {
+    font-size: 25px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+input[type="text"], input[type="tel"], input[type="password"] {
+    width: 100%;
+    border: none;
+    font-size: 18px;
+    padding: 10px;
+    background: none;
+    color: white;
+    border-bottom: 2px solid #D9D9D9;
+}
+
+
+
+/* Checkbox Section */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    margin-top: 3px;
+    gap: 5px; /* Space between checkbox and label */
+    
+}
+
+.checkbox-container input[type="checkbox"] {
+    vertical-align: middle; /* Ensure the checkbox aligns with the middle of the text */
+    transform: scale(1.5); /* Optional: Adjust the checkbox size if needed */
+}
+
+/* Checkbox Label Styles */
+.checkbox-container label {
+    position: relative;
+    top: 3px; /* Adjust this value to perfectly position the label */
+    vertical-align: middle; /* Align the label text with the checkbox */
+    line-height: 3; /* Adjust line height for perfect alignment */
+    font-size: 12px; /* Decrease font size */
+    color: white;
+}
+
+/* Submit Button Container */
+.submit-container {
+    display: flex;
+    justify-content: center; /* Center the button horizontally */
+    margin-top: auto; /* Push the button towards the bottom of the form */
+    margin-bottom: 0px; /* Reduce or remove bottom margin */
+}
+
+/* Submit Button */
+input[type="submit"] {
+    width: 60%;
+    height: 60px;
+    background: #4AB3FF;
+    border-radius: 30px;
+    color: white;
+    font-size: 24px;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: center;
+    margin-top: 4px;
+}
+
+input[type="submit"]:hover {
+    background: #3a9fd8;
+    
+}
+
+.error {
+    font-size: 12px;
+    color: red;
+    min-height: 16px; /* Reserve space for the error message */
+    display: block; /* Ensure it takes up space even when empty */
+    margin-top: 5px;
+}
