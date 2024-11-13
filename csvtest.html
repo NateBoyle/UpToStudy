@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Display CSV with Headers</title>
+</head>
+<body>
+    <h2>Upload and Display CSV File</h2>
+    <form id="uploadForm">
+        <!-- File input for CSV -->
+        <label for="csvFile">Select a CSV file:</label>
+        <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+    </form>
+    <br>
+    <!-- Container to display the CSV content -->
+    <div id="csvOutput">
+        <table id="csvTable" border="1">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Include PapaParse from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <script>
+        document.getElementById('csvFile').addEventListener('change', function(event) {
+            const file = event.target.files[0]; // Get the selected file
+            if (file) {
+                Papa.parse(file, {
+                    header: true, // Treat the first row as headers
+                    skipEmptyLines: true, // Skip empty lines
+                    complete: function(results) {
+                        console.log(results); // Debugging: View parsed data
+                        displayCSV(results.data); // Process and display the parsed data
+                    },
+                    error: function(error) {
+                        console.error('Error parsing CSV:', error);
+                    }
+                });
+            }
+        });
+
+        function displayCSV(parsedData) {
+            const table = document.getElementById('csvTable');
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+
+            // Clear previous content
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            // Get headers dynamically from the first object in the parsed data
+            const headers = Object.keys(parsedData[0]);
+            const headerRow = document.createElement('tr');
+
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header.trim();
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            // Populate table rows dynamically
+            parsedData.forEach(row => {
+                const tr = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.textContent = row[header].trim();
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+    </script>
+</body>
+</html>
