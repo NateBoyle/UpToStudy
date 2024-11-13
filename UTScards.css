@@ -1,145 +1,5 @@
-/* Sidebar Styling */
-.sidebar {
-    position: fixed;
-    top: 200; /* Adjust as needed for your header */
-    left: 0;
-    width: 20%;
-    height: 100vh; /* Full viewport height */
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: #1a1a1a; /* Sidebar background color */
-    color: white;
-    border-right: 2px solid white;
-}
-
-/* Flashcard Content Area (Main Section) */
-.flashcard-content {
-    width: calc(80% - 40px); /* Adjust the width to account for margin on both sides */
-    margin-left: auto;
-    padding: 20px;
-}
-
-
-
-/* Flashcard Header with Search and Create Button */
-.flashcard-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    box-sizing: border-box;
-    width: 100%;
-    margin-bottom: 20px;
-}
-
-.flashcard-header h2 {
-    flex-grow: 1; /* Allows the title to take up available space */
-    text-align: center; /* Center text within its area */
-    margin: 0; /* Remove default margins */
-}
-
-/* Create Set Button Styling */
-.create-set {
-    padding: 10px 20px;
-    background: #5DD770;
-    width: 200px;
-    height: 50px;
-    font-size: large;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* Flashcard Search Box */
-.flashcard-search input {
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    top: 120;
-    z-index: 200;
-    width: 400px;
-}
-
-/* Flashcard Container Layout */
-.flashcardContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
-    top: 20px;
-    position: relative;
-    box-sizing: border-box;
-    width: 100%; /* Takes up 80% of the screen */
-    /*max-width: calc(100% - 10%);  Adjust to avoid overflow */
-    /*margin-left: 10%;  Offsets by sidebar width 
-    border: 2px solid white;*/
-    border-radius: 15px;
-    overflow-x: hidden;
-    overflow-y: auto; /* Allows vertical scrolling */
-}
-
-/* Flashcard Grid Layout */
-.flashcard-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Creates three equal columns */
-    gap: 20px; /* Adjust spacing between items as needed */
-    width: 100%; /* Adjust to fit the available space */
-    justify-items: center; /* Centers items within each column */
-}
-
-/* Flashcard Set Styles */
-.flashcard-set {
-    position: relative; /* Enable absolute positioning within this container */
-    width: 400px;
-    height: 250px;
-    background: #2C2C2C;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    color: white;
-    display: flex;
-    flex-direction: column; /* Stacks h2 and p vertically */
-    align-items: center; /* Centers content horizontally */
-    justify-content: center; /* Centers content vertically */
-    text-align: center;
-}
-
-.flashcardSetClickable {
-    text-align: center;
-    padding: 20px;
-    /*background-color: rgba(0, 0, 0, 0.05);  Light overlay */
-    border-radius: 8px;
-    transition: background-color 0.2s;
-    cursor: pointer;
-}
-
-.flashcard-set.hover-effect {
-    background-color: rgba(255, 255, 255, 0.1); /* Slightly lighter color */
-}
-
-/* Flashcard Header Styles 
-.flashcard-set-header {
-    background: linear-gradient(90deg, #4B90D0 0%, #2266AA 100%);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    padding: 20px;
-    width: 100%;
-}*/
-
-.flashcard-set-header h2 {
-    font-size: 24px;
-    font-weight: 500;
-    margin-bottom: 10px; /* Adjusts the space between h2 and p */
-}
-
-.flashcard-set-header p {
-    font-size: 16px;
-    color: #DDDDDD;
-    margin-top: 0;
-}
-
-/* Existing styling for Flashcard Display Modal */
-#flashcardDisplayModal {
+/* General Modal Styling */
+.modal {
     display: none; /* Hidden by default */
     justify-content: center;
     align-items: center;
@@ -149,41 +9,47 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 1000;
+    z-index: 1100;
 }
 
+/* Flashcard Display Modal */
 #flashcardDisplayModal .modal-content {
-    width: 400px; /* Match flashcardModal width */
-    height: 300px; /* Increase height as desired */
+    width: 400px;
+    height: 300px;
     background: #2C2C2C;
     padding: 20px;
     border-radius: 10px;
     color: white;
     text-align: center;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center content vertically */
+    justify-content: center;
 }
 
-/* Container for Question and Answer Display */
-.flashcard-display {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Centers content vertically */
-    align-items: center; /* Centers content horizontally */
-    flex-grow: 1;
-    height: 100%; /* Ensures it takes full height within modal-content */
+/* Flashcard Content Styling */
+#flashcardContent {
+    padding: 20px;
     text-align: center;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    margin: 0 auto;
+    max-width: calc(100% - 60px);
 }
 
-#displayQuestion, #displayAnswer {
-    margin: 25px 0;
-    font-size: 20px; /* Sets the same font size for question and answer */
+#flashcardContent h2 {
+    font-size: 20px;
+    margin: 10px 0;
 }
 
-/* Next and Previous Button Styling */
+#flashcardContent p {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-top: 15px;
+}
+
+/* Navigation Buttons for Flashcards */
 #prevFlashcardBtn, #nextFlashcardBtn {
     background: none;
     border: none;
@@ -196,19 +62,19 @@
 }
 
 #prevFlashcardBtn {
-    left: 10px; /* Position on the left side */
+    left: 10px;
 }
 
 #nextFlashcardBtn {
-    right: 10px; /* Position on the right side */
+    right: 10px;
 }
 
-/* Flashcard Display Toggle Button */
+/* Toggle Answer Button */
 #toggleAnswerBtn {
     position: absolute;
-    bottom: 20px; /* Position the button at the bottom of the modal */
-    align-self: center; /* Centers button horizontally */
-    width: 60%; /* Narrow button width */
+    bottom: 20px;
+    align-self: center;
+    width: 60%;
     padding: 12px;
     background: #5DD770;
     border: none;
@@ -217,22 +83,21 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-top: auto; /* Pushes the button towards the bottom */
 }
 
 #toggleAnswerBtn:hover {
-    background: #4fb963; /* Slightly darker green for hover effect */
+    background: #4fb963;
 }
 
-/* New CSS for Edit and Delete Options */
+/* Flashcard Options (Edit/Delete) */
 .flashcard-options {
     position: absolute;
     top: 10px;
     left: 10px;
     display: flex;
-    gap: 1px; /* Space between buttons */
-    flex-direction: column; /* Stack buttons vertically */
-    z-index: 10; /* Ensures buttons are in front */
+    gap: 1px;
+    flex-direction: column;
+    z-index: 10;
 }
 
 .flashcard-options button {
@@ -241,230 +106,67 @@
     color: white;
     cursor: pointer;
     font-size: 14px;
-    text-align: left; /* Align text to the left for a cleaner look */
     padding: 5px 10px;
 }
 
 .flashcard-options button:hover {
-    color: #ddd; /* Slight color change on hover */
-    text-decoration: underline; /* Optional: underline on hover for visual feedback */
+    color: #ddd;
+    text-decoration: underline;
 }
 
-
-/* Modal Styles */
-#flashcardSetModal {
-    display: none; /* Flexbox to center content */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 1000;
-}
-
-/* Modal content */
-#flashcardSetModal div {
-    width:  400px;
-    height: 250px;
-    background: #2C2C2C;
-    padding: 20px;
-    border-radius: 10px;
-    position: relative;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    color: white;
-    text-align: center;
-}
-
-.modal.show {
-    display: flex; /* To make modal visible when this class is added */
-}
-
-.modal-content {
-    width: 90%;
-    
+/* Flashcard Overview Modal */
+#flashcardOverviewModal .modal-content {
+    width: 50%;
+    max-height: 80%;
     background: #2C2C2C;
     padding: 20px;
     border-radius: 10px;
     color: white;
-    text-align: center;
+    text-align: left;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    position: relative;
+    overflow-y: auto;
 }
 
-.modal-content input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
+.scrollable-container {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #414141;
     border-radius: 5px;
-    border: none;
-    font-size: 16px;
-    color: white;
-    background-color: #333;
-    box-sizing: border-box;
 }
 
-#setNameInput::placeholder {
-    color: white; /* Sets the placeholder text color to white */
-    opacity: 1; /* Ensures full opacity for better visibility */
-}
-
-#courseDropdown {
-    width: 100%; /* Make it the same width as the Set Name input */
-    padding: 12px; /* Adjust padding to match other inputs */
-    border-radius: 5px; /* Same border radius as other inputs */
-    background-color: #333; /* Black background */
-    color: white; /* White text */
-    border: none; /* Remove border for a clean look */
-    font-size: 16px; /* Match font size */
-    margin-bottom: 15px; /* Add bottom margin to create space */
-    box-sizing: border-box; /* Ensures padding doesn’t affect width */
-}
-
-#courseDropdown option {
-    background-color: #333; /* Black background for dropdown options */
-    color: white; /* White text for dropdown options */
-}
-
-/* Save Set Button */
-#saveSetBtn {
-    width: 100%;
-    padding: 20px;
-    margin-top: 10px;
-    background: #5DD770;
-    border: none;
-    color: white;
-    font-size: 18px;
-    border-radius: 5px;
+/* Flashcard Pair Styling */
+.flashcard-pair {
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    margin-bottom: 15px;
+    background-color: #2C2C2C;
+    border-radius: 10px;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    transition: background-color 0.2s ease;
 }
 
-#saveSetBtn:hover {
-    background: #4fb963;
+.flashcard-pair:hover {
+    background-color: rgba(255, 255, 255, 0.078);
 }
 
-/* Close Button */
-.close {
+.flashcard-pair:last-child {
+    border-bottom: none;
+}
+
+/* Close Button for Overview Modal */
+#closeOverviewModal {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: transparent;
+    background: none;
+    border: none;
     color: white;
     font-size: 24px;
-    border: none;
     cursor: pointer;
-}
-
-/* Flashcard Creation Modal Styling */
-#flashcardModal {
-    display: none; /* Hidden by default */
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 1000;
-}
-
-#flashcardModal .modal-content {
-    width: 400px;
-    background: #2C2C2C;
-    padding: 20px;
-    border-radius: 10px;
-    color: white;
-    text-align: center;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    position: relative;
-}
-
-#flashcardModal h2 {
-    font-size: 20px;
-    margin-bottom: 20px;
-}
-
-#flashcardModal input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    border: none;
-    font-size: 16px;
-    background-color: #333;
-    color: white;
-}
-
-#flashcardModal input[type="text"]::placeholder {
-    color: white;
-    opacity: 1;
-}
-
-#addFlashcardBtn {
-    width: 100%;
-    padding: 12px;
-    background: #5DD770;
-    border: none;
-    color: white;
-    font-size: 18px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#addFlashcardBtn:hover {
-    background: #4fb963;
-}
-
-.options-button-container {
-    position: absolute;
-    top: 10px; /* Adjust as needed */
-    right: 10px; /* Adjust as needed */
-}
-
-.options-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 24px; /* Smaller ellipsis */
-    cursor: pointer;
-}
-
-.options-menu {
-    display: none;
-    position: absolute;
-    top: 40px;
-    right: 10px;
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    z-index: 100;
-    width: 80px; /* Wider dropdown menu */
-    text-align: center;
-    justify-content: center;
-}
-
-.options-menu button {
-    display: block;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    width: 100%;
-    text-align: center;
-    padding: 5px 0;
-    font-size: 14px; /* Smaller font for dropdown options */
-}
-
-.options-menu button:hover {
-    background-color: #444;
 }

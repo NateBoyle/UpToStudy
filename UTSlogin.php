@@ -24,10 +24,19 @@ header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("X-XSS-Protection: 1; mode=block");
 
+// Log the incoming request method and parameters
+error_log("Request received in UTSlogin.php");
+error_log("Request method: " . $_SERVER['REQUEST_METHOD']);
+error_log("GET parameters: " . json_encode($_GET));
+error_log("POST parameters: " . json_encode($_POST));
+error_log("Session state at request: " . json_encode($_SESSION));
+
 // Check if the request is for logout
-if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'logout') {
     
     error_log("Logout request received with session ID: " . session_id());
+    error_log("Logout triggered explicitly.");
+    error_log("Session state before destruction: " . json_encode($_SESSION));
 
     // Database connection variables
     $host = "localhost";
@@ -61,6 +70,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     // Clear session
     session_unset();
     session_destroy();
+    error_log("Session destroyed. Redirecting to welcome page.");
     header("Location: UTSwelcome.html");
     exit;
 }

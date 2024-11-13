@@ -4,8 +4,20 @@ const FLASHCARD_SETS_URL = `${API_URL}?type=flashcard_sets`;
 const COURSES_URL = `${API_URL}?type=courses`;
 const FLASHCARDS_URL = `${API_URL}?type=flashcards`; // New constant for flashcards
 
+
+/* CLASSES CODE */
+
 // FlashcardSet class for managing each flashcard set
 class FlashcardSet {
+
+    /**
+     * Constructor to initialize a FlashcardSet instance
+     * @param {number} setId - The unique ID for the flashcard set.
+     * @param {string} setName - The name of the flashcard set.
+     * @param {string} courseName - The name of the associated course (or "N/A").
+     * @param {number} numCards - The number of flashcards in the set.
+     */
+
     constructor(setId, setName, courseName, numCards) {
         this.setId = setId;
         this.setName = setName;
@@ -13,6 +25,10 @@ class FlashcardSet {
         this.numCards = numCards;
     }
 
+    /**
+     * Renders the flashcard set as an HTML element
+     * @returns {HTMLElement} - The rendered flashcard set element.
+     */
     render() {
         const setCard = document.createElement('div');
         setCard.classList.add('flashcard-set');
@@ -43,29 +59,36 @@ class FlashcardSet {
             setCard.classList.remove('hover-effect');
         });
 
-        // Options menu setup
-        setCard.innerHTML = `
-            <div class="options-button-container">
-                <button class="options-button">&#8942;</button>
-                <div class="options-menu" style="display: none;">
-                    <button onclick="openAddCardModal(${this.setId})">Add Cards</button>
-                    <button onclick="editFlashcardSet(${this.setId}, '${this.setName}', '${this.courseName}')">Edit Set</button>
-                    <button onclick="deleteFlashcardSet(${this.setId})">Delete Set</button>
-                </div>
-            </div>
+        // Options menu and button
+        const optionsButton = document.createElement("button");
+        optionsButton.classList.add("options-button");
+        optionsButton.innerHTML = "&#8942;"; // Ellipsis symbol for the menu
+
+        const optionsMenu = document.createElement("div");
+        optionsMenu.classList.add("options-menu");
+        optionsMenu.style.display = "none"; // Hidden by default
+        optionsMenu.innerHTML = `
+            <button onclick="openFlashcardModal(${this.setId})">Add Cards Manually</button>
+            <button onclick="editFlashcardSet(${this.setId}, '${this.setName}', '${this.courseName}')">Edit Name/Course</button>
+            <button onclick="deleteFlashcardSet(${this.setId})">Delete Set</button>
+            <button onclick="openOverviewModal(${this.setId})">View All</button>
         `;
 
-        // Append the clickable area to setCard
-        setCard.appendChild(clickableCenter);
-
-        const optionsButton = setCard.querySelector('.options-button');
-        const optionsMenu = setCard.querySelector('.options-menu');
+        // Container for options button and menu
+        const optionsContainer = document.createElement("div");
+        optionsContainer.classList.add("options-button-container");
+        optionsContainer.appendChild(optionsButton);
+        optionsContainer.appendChild(optionsMenu);
 
         optionsButton.addEventListener('click', (e) => {
             e.stopPropagation();
             closeAllDropdowns();
             optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
         });
+
+        // Append elements to the set card
+        setCard.appendChild(clickableCenter);
+        setCard.appendChild(optionsContainer);
 
         return setCard;
     }
@@ -73,192 +96,78 @@ class FlashcardSet {
 
 // Flashcard class for individual flashcards within a set
 class Flashcard {
-    constructor(question, answer, flashcardId) {
+
+    /**
+     * Constructor to initialize a Flashcard instance
+     * @param {number} flashcardId - The unique ID for the flashcard.
+     * @param {number} setId - The ID of the set this flashcard belongs to.
+     * @param {string} question - The question text for the flashcard.
+     * @param {string} answer - The answer text for the flashcard.
+     */
+    constructor(flashcardId, setId, question, answer) {
+        this.flashcardId = flashcardId;
+        this.setId = setId; // Add setId to the class
         this.question = question;
         this.answer = answer;
-        this.flashcardId = flashcardId;
+        
     }
 
-    render() {
-        const card = document.createElement('div');
-        card.classList.add('flashcard');
-
-        card.innerHTML = `
-            <div class="flashcard-content">
-                
-                <h4>${this.question}</h4>
-                <p>${this.answer}</p>
-            </div>
-        `;
-
-
-        optionsButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeAllDropdowns();
-            optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
-        });
-
-        return card;
+    /**
+     * Converts the flashcard instance to a display object for rendering
+     * @returns {Object} - The structured flashcard data for display
+     */
+    toDisplayCard() {
+        return {
+            flashcardId: this.flashcardId,
+            setId: this.setId, // Include setId
+            question: this.question,
+            answer: this.answer,
+        };
     }
 }
 
-// Function to close all dropdowns
-function closeAllDropdowns() {
-    document.querySelectorAll('.options-menu').forEach(menu => {
-        menu.style.display = 'none';
-    });
-}
+
+
+
+/* FLASHCARD SET FUNCTIONS */
 
 // Function to open the modal for creating a new flashcard set
 function openCreateSetModal() {
+    // Reset the modal heading and inputs
+    const modalHeading = document.querySelector("#flashcardSetModal h2");
+    const setNameInput = document.getElementById("setNameInput");
+    const courseDropdown = document.getElementById("courseDropdown");
+
+    modalHeading.textContent = "Create New Flashcard Set";
+    setNameInput.placeholder = "Set Name";
+    setNameInput.value = ""; // Clear any previous input
+
+    // Reset the course dropdown to the default state
+    courseDropdown.selectedIndex = 0;
+
+    // Load courses dynamically (if required)
     loadCourses();
+
+    // Display the modal
     document.getElementById("flashcardSetModal").style.display = "flex";
 }
 
 // Define the function to close the modal
 function closeCreateSetModal() {
+    
+    // Hide the modal
     document.getElementById("flashcardSetModal").style.display = "none";
-}
 
-function openAddCardModal(setId) {
-    const modalHeading = document.querySelector("#flashcardSetModal h2");
-    modalHeading.textContent = "Create New Flashcard Set"; // Reset heading
-    document.getElementById('flashcardModal').style.display = 'flex';
-    document.getElementById('flashcardModal').setAttribute('data-set-id', setId);
-}
+    // Reset the file input and filename
+    const fileInput = document.getElementById("fileInput");
+    const fileNameDisplay = document.getElementById("fileName");
 
-function closeFlashcardModal() {
-    document.getElementById('flashcardModal').style.display = 'none';
-    document.getElementById('flashcardQuestion').value = '';
-    document.getElementById('flashcardAnswer').value = '';
-
-    // Refresh flashcard sets to show the updated card count after closing the modal
-    loadFlashcardSets();
-}
-
-function openFlashcardDisplayModal(question, answer) {
-    document.getElementById("displayQuestion").textContent = question; // Updated ID for question
-    document.getElementById("displayAnswer").textContent = answer;     // Updated ID for answer
-    document.getElementById("displayAnswer").style.display = "none";   // Hide answer initially
-    document.getElementById("flashcardDisplayModal").style.display = "flex"; // Show modal
-}
-
-function closeFlashcardDisplayModal() {
-    document.getElementById("flashcardDisplayModal").style.display = "none";
-}
-
-function toggleFlashcardAnswer(direction = null) {
-    const answerElement = document.getElementById("displayAnswer");
-    const button = document.getElementById("toggleAnswerBtn");
-    if (answerElement.style.display === "none") {
-        answerElement.style.display = "block";
-        button.textContent = "Hide Answer";
-    } else {
-        answerElement.style.display = "none";
-        button.textContent = "Show Answer";
-
-        // Move to the next or previous card if a direction is specified
-        if (direction === "next") {
-            showNextFlashcard();
-        } else if (direction === "previous") {
-            showPreviousFlashcard();
-        }
-
+    if (fileInput) fileInput.value = ""; // Clear the file input
+    if (fileNameDisplay) {
+        fileNameDisplay.textContent = "No file chosen"; // Reset the filename display
+        fileNameDisplay.style.color = "#666"; // Change text color back to gray
     }
-}
 
-function showNextFlashcard() {
-    if (window.currentFlashcards && window.currentFlashcards.length > 0) {
-        // Directly hide the answer if it's visible before moving to the next card
-        const answerElement = document.getElementById("displayAnswer");
-        const button = document.getElementById("toggleAnswerBtn");
-        
-        if (answerElement.style.display === "block") {
-            answerElement.style.display = "none"; // Hide the answer
-            button.textContent = "Show Answer"; // Reset button text
-        }
-
-        // Move to the next index, and wrap back to 0 if at the end
-        window.currentFlashcardIndex = (window.currentFlashcardIndex + 1) % window.currentFlashcards.length;
-        const nextFlashcard = window.currentFlashcards[window.currentFlashcardIndex];
-        openFlashcardDisplayModal(nextFlashcard.question, nextFlashcard.answer); // Display the next flashcard
-    }
-}
-
-function showPreviousFlashcard() {
-    if (window.currentFlashcards && window.currentFlashcards.length > 0) {
-       // Directly hide the answer if it's visible before moving to the previous card
-       const answerElement = document.getElementById("displayAnswer");
-       const button = document.getElementById("toggleAnswerBtn");
-
-       if (answerElement.style.display === "block") {
-           answerElement.style.display = "none"; // Hide the answer
-           button.textContent = "Show Answer"; // Reset button text
-       }
-
-        // Move to the previous index, and wrap to the last index if at the beginning
-        window.currentFlashcardIndex = (window.currentFlashcardIndex - 1 + window.currentFlashcards.length) % window.currentFlashcards.length;
-        const prevFlashcard = window.currentFlashcards[window.currentFlashcardIndex];
-        openFlashcardDisplayModal(prevFlashcard.question, prevFlashcard.answer); // Display the previous flashcard
-    }
-}
-
-function deleteFlashcardSet(setId) {
-    console.log(`Deleting set with ID: ${setId}`);
-    // Implement deletion logic here
-    if (confirm("Are you sure you want to delete this flashcard set?")) {
-        fetch(API_URL, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                type: 'delete_set',
-                set_id: setId
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json(); // This should succeed if PHP returns valid JSON
-        })
-        .then(data => {
-            if (data.status === 'success') {
-                alert(data.message);
-                loadFlashcardSets(); // Refresh the flashcard sets after deletion
-            } else {
-                alert("Error: " + data.message);
-            }
-        })
-        .catch(error => console.error('Error deleting flashcard set:', error));
-    }
-}
-
-// Function to delete an individual flashcard
-function deleteFlashcard(flashcardId) {
-    if (confirm("Are you sure you want to delete this flashcard?")) {
-        fetch(API_URL, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                type: 'delete_flashcard',
-                flashcard_id: flashcardId
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert(data.message);
-                // Refresh or remove the flashcard element from the DOM if needed
-            } else {
-                alert("Error: " + data.message);
-            }
-        })
-        .catch(error => console.error('Error deleting flashcard:', error));
-    }
 }
 
 // Load available courses to populate the dropdown
@@ -303,12 +212,20 @@ function loadFlashcardSets() {
 
             if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
                 const flashcardGrid = document.createElement('div');
-                flashcardGrid.classList.add('flashcard-grid');
+                flashcardGrid.classList.add('flashcard-set-grid');
                 
                 data.data.forEach(setData => {
                     const flashcardSet = new FlashcardSet(setData.set_id, setData.set_name, setData.course_name, setData.num_cards);
-                    flashcardGrid.appendChild(flashcardSet.render());
+                    const setElement = flashcardSet.render();
+
+                    // Set attributes directly
+                    setElement.setAttribute('data-set-id', setData.set_id);
+                    setElement.setAttribute('data-card-count', setData.num_cards);
+
+                    flashcardGrid.appendChild(setElement);
                 });
+
+
                 
                 flashcardSetsContainer.appendChild(flashcardGrid);
             } else {
@@ -325,59 +242,6 @@ function loadFlashcardSets() {
         .catch(error => console.error('Error loading flashcard sets:', error));
 }
 
-function loadFlashcards(setId) {
-
-    console.log(`Loading flashcards for set ID: ${setId}`); // Debugging log for set ID in loadFlashcards
-
-    fetch(`${FLASHCARDS_URL}&set_id=${setId}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log("Flashcards response:", data); // Log the JSON response
-             // Check if the response is successful and contains flashcards
-             if (data.status === 'success') {
-                if (data.data && data.data.length > 0) {
-                    window.currentFlashcards = data.data; // Store the array of flashcards
-                    window.currentFlashcardIndex = 0;
-                    
-                    const firstFlashcard = window.currentFlashcards[0];
-                    console.log("Displaying first flashcard:", firstFlashcard); // Debug log for first flashcard
-                    openFlashcardDisplayModal(firstFlashcard.question, firstFlashcard.answer);
-                } else {
-                    console.log("Flashcards array is empty for this set."); // Specific log for empty array
-                }
-            } else {
-                console.log("Failed to load flashcards, server response:", data);
-            }
-        })
-        .catch(error => console.error("Error loading flashcards:", error));
-}
-
-
-function editFlashcardSet(setId, setName, courseId) {
-
-    console.log("Editing set:", { setId, setName, courseId });
-
-    // Open the modal
-    document.getElementById("flashcardSetModal").style.display = "flex";
-    
-    
-    // Change the modal heading to "Edit Flashcard Set"
-    const modalHeading = document.querySelector("#flashcardSetModal h2");
-    modalHeading.textContent = "Edit Flashcard Set";
-    
-    // Populate the input fields with the current set data
-    document.getElementById("setNameInput").value = setName;
-   
-    // Load courses and set the selected course
-    loadCourses().then(() => {
-        document.getElementById("courseDropdown").value = courseId;
-    });
-    
-    // Save the setId for later use (e.g., in a hidden field or by setting a custom attribute)
-    document.getElementById("flashcardSetModal").setAttribute("data-edit-set-id", setId);
-}
-
-
 // Define the function to save a flashcard set
 function saveSet() {
     const setName = document.getElementById('setNameInput').value;
@@ -386,7 +250,7 @@ function saveSet() {
 
     if (!setName) {
         alert("Set name is required.");
-        return;
+        return Promise.reject("Set name is required."); // Return a rejected promise if validation fails
     }
 
     const requestData = {
@@ -399,7 +263,7 @@ function saveSet() {
 
     console.log("Saving set:", { setName, courseId }); // Debugging log
 
-    fetch(API_URL, {
+    return fetch(API_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -419,7 +283,333 @@ function saveSet() {
             document.getElementById("setNameInput").value = '';
             document.getElementById("courseDropdown").value = ''; // Reset to default
             document.getElementById("flashcardSetModal").removeAttribute("data-edit-set-id"); // Remove edit mode attribute
+
+            // Return the setId from the server's response
+            return data.set_id;
+        } else {
+            alert("Error: " + data.message);
+            return Promise.reject(data.message); // Return a rejected promise on failure
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        return Promise.reject(error); // Return a rejected promise for fetch errors
+    });
+}
+
+function editFlashcardSet(setId, setName, courseName) {
+
+    console.log("Editing set:", { setId, setName, courseName });
+
+    // Open the modal
+    document.getElementById("flashcardSetModal").style.display = "flex";
+    
+    
+    // Change the modal heading to "Edit Flashcard Set"
+    const modalHeading = document.querySelector("#flashcardSetModal h2");
+    modalHeading.textContent = "Edit Flashcard Set";
+    
+    // Populate the input fields with the current set data
+    document.getElementById("setNameInput").value = setName;
+   
+    // Load courses and set the selected course
+    loadCourses().then(() => {
+        const courseDropdown = document.getElementById("courseDropdown");
+
+        // Find and select the option matching courseName
+        const optionToSelect = Array.from(courseDropdown.options).find(
+            option => option.textContent === courseName
+        );
+
+        if (optionToSelect) {
+            courseDropdown.value = optionToSelect.value; // Set the selected course
+        } else {
+            console.warn(`Course name "${courseName}" not found in dropdown.`);
+        }
+    });
+    
+    // Save the setId for later use (e.g., in a hidden field or by setting a custom attribute)
+    document.getElementById("flashcardSetModal").setAttribute("data-edit-set-id", setId);
+}
+
+function deleteFlashcardSet(setId) {
+    console.log(`Deleting set with ID: ${setId}`);
+    // Implement deletion logic here
+    if (confirm("Are you sure you want to delete this flashcard set?")) {
+        fetch(API_URL, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'delete_set',
+                set_id: setId
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json(); // This should succeed if PHP returns valid JSON
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+                loadFlashcardSets(); // Refresh the flashcard sets after deletion
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => console.error('Error deleting flashcard set:', error));
+    }
+}
+
+document.getElementById("fileInput").addEventListener("change", function () {
+    const fileName = this.files[0]?.name || "No file chosen"; // Get the file name or fallback text
+    const fileNameDisplay = document.getElementById("fileName");
+
+    fileNameDisplay.textContent = fileName; // Set the file name in the span
+
+    // Change color based on whether a file is chosen
+    fileNameDisplay.style.color = this.files[0] ? "white" : "#666"; // White for a file, gray (default) otherwise
+});
+
+function validateFlashcardData(flashcards) {
+    return flashcards.every(row =>
+        Object.keys(row).length === 2 && // Ensure exactly two keys (columns)
+        row.Question?.trim() &&         // Ensure Question is non-empty
+        row.Answer?.trim()              // Ensure Answer is non-empty
+    );
+}
+
+
+function handleSetUpload() {
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0]; // Get the uploaded file, if any
+
+    if (file) {
+        // Parse the file with PapaParse
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: function (results) {
+                console.log("Parsed results:", results.data);
+
+                // Validate the headers
+                const expectedHeaders = ["Question", "Answer"];
+                const actualHeaders = results.meta.fields;
+
+                const hasValidHeaders = expectedHeaders.every(header => actualHeaders.includes(header));
+                if (!hasValidHeaders) {
+                    alert("Invalid file format. Ensure the file has headers: 'Question' and 'Answer'.");
+                    return;
+                }
+
+                // Filter and validate the parsed data
+                const filteredFlashcards = results.data.filter(row =>
+                    row.Question?.trim() || row.Answer?.trim()
+                );
+
+                if (!validateFlashcardData(filteredFlashcards)) {
+                    alert("Some rows are missing questions or answers.");
+                    return;
+                }
+
+                // Save the set, then process filtered flashcards
+                saveSet().then(async setId => {
+                    if (!setId || filteredFlashcards.length === 0) {
+                        console.error('Invalid data: No set ID or no flashcards to upload.');
+                        return;
+                    }
+
+                    console.log("Uploading flashcards in chunks...");
+
+                    // Split flashcards into chunks of 20 rows
+                    const chunkSize = 20;
+                    const chunks = [];
+                    for (let i = 0; i < filteredFlashcards.length; i += chunkSize) {
+                        chunks.push(filteredFlashcards.slice(i, i + chunkSize));
+                    }
+
+                    // Upload each chunk sequentially
+                    for (const chunk of chunks) {
+                        console.log("Uploading chunk:", chunk);
+                        try {
+                            const response = await fetch(API_URL, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: new URLSearchParams({
+                                    type: 'add_flashcards_bulk',
+                                    set_id: setId,
+                                    flashcards: JSON.stringify(chunk), // Send the current chunk as JSON
+                                }),
+                            });
+
+                            const data = await response.json();
+                            if (data.status === 'success') {
+                                console.log("Chunk uploaded successfully:");
+                                //alert("Flashcards uploaded successfully!");
+                                
+                            } else {
+                                console.error("Error uploading chunk:", data.message);
+                                alert("Error: " + data.message);
+                                break; // Stop processing if an error occurs
+                            }
+                        } catch (error) {
+                            console.error("Error uploading chunk:", error);
+                            alert("Error uploading flashcards. Please try again.");
+                            break; // Stop processing if an error occurs
+                        }
+                    }
+
+                    // Finalize the process
+                    
+                    loadFlashcardSets();
+                }).catch(error => {
+                    console.error("Error saving set:", error);
+                    alert("Error saving flashcard set. Please try again.");
+                });
+            },
+            error: function (error) {
+                console.error("Error parsing file:", error);
+                alert("Error processing file. Please try again.");
+            },
+        });
+    } else {
+        // No file uploaded, just save the set
+        saveSet().then(() => {
+            //alert("Flashcard set saved successfully!");
+            loadFlashcardSets();
+        }).catch(error => {
+            console.error("Error saving set:", error);
+            alert("Error saving flashcard set. Please try again.");
+        });
+    }
+}
+
+
+
+/* INDIVIDUAL FLASHCARDS FUNCTIONS */
+/* CRUD FLASHCARD FUNCTIONS */
+
+
+function openFlashcardModal(setId, flashcardId = null, question = '', answer = '') {
+    const modal = document.getElementById('flashcardModal');
+    const heading = document.getElementById('flashcardModalHeading');
+    const questionInput = document.getElementById('flashcardQuestion');
+    const answerInput = document.getElementById('flashcardAnswer');
+    const saveButton = document.getElementById('addFlashcardBtn');
+
+    // If editing, update the heading and populate fields
+    if (flashcardId) {
+        heading.textContent = 'Edit Flashcard';
+        questionInput.value = question;
+        answerInput.value = answer;
+        modal.setAttribute('data-edit-flashcard-id', flashcardId); // Set flashcard ID for editing
+        saveButton.textContent = 'Save Changes'; // Optional: Update button text
+    } else {
+        // For creating a new flashcard
+        heading.textContent = 'Create New Flashcard';
+        questionInput.value = '';
+        answerInput.value = '';
+        modal.removeAttribute('data-edit-flashcard-id'); // Clear any editing reference
+        saveButton.textContent = 'Add Flashcard'; // Reset button text
+    }
+
+    // Show the modal
+    modal.style.display = 'flex';
+    modal.setAttribute('data-set-id', setId); // Associate the modal with the flashcard set
+}
+
+function closeFlashcardModal() {
+    document.getElementById('flashcardModal').style.display = 'none';
+    document.getElementById('flashcardQuestion').value = '';
+    document.getElementById('flashcardAnswer').value = '';
+
+    // Refresh flashcard sets to show the updated card count after closing the modal
+    loadFlashcardSets();
+}
+
+// Define the function to save a flashcard
+function saveFlashcard(setId = null, question = null, answer = null) {
+
+    // Retrieve the question, answer, and (optional) flashcard ID for editing
+    // If question and answer are not provided, get them from the modal inputs
+    question = question || document.getElementById('flashcardQuestion').value;
+    answer = answer || document.getElementById('flashcardAnswer').value;
+
+    const flashcardId = document.getElementById("flashcardModal").getAttribute("data-edit-flashcard-id");
+    
+    // Use the provided setId, or fetch from the modal if not provided
+    const finalSetId = setId || document.getElementById("flashcardModal")?.getAttribute("data-set-id");
+
+    console.log('Save flashcard called with setId:', setId);
+    
+
+    // Validate inputs
+    if (!question || !answer) {
+        alert("Both question and answer are required.");
+        return;
+    }
+
+    // Determine the type of operation (new or edit)
+    const requestType = flashcardId ? 'edit_flashcard' : 'add_flashcard';
+
+    console.log("Saving flashcard:", { flashcardId, question, answer, setId, requestType });
+
+    // Construct the request payload
+    const requestData = {
+        type: requestType,
+        question: question,
+        answer: answer,
+        set_id: finalSetId, // Use finalSetId for saving flashcards
+    };
+    
+    // Include the flashcard ID for editing
+    if (flashcardId) {
+        requestData.flashcard_id = flashcardId;
+    }
+
+
+    fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Save flashcard response:", data); // Debugging log
+
+        if (data.status === 'success') {
+            alert(data.message);
+            document.getElementById('flashcardQuestion').value = '';
+            document.getElementById('flashcardAnswer').value = '';
+            document.getElementById("flashcardModal").removeAttribute("data-edit-flashcard-id");
+
+            // Refresh flashcards for the current set
+            // Correctly retrieve the setId for reloading
+            if (finalSetId) {
+                loadFlashcardSets();
+
+                // Check if the overview modal is open and refresh it
+                const overviewModal = document.getElementById('flashcardOverviewModal');
+                if (overviewModal.style.display === 'flex') {
+                    openOverviewModal(setId);
+                }
+                else{
+                    openFlashcardModal(setId);
+                }
+
+            } else {
+                console.error("Set ID missing when reloading flashcards.");
+            }
+
             
+
         } else {
             alert("Error: " + data.message);
         }
@@ -427,42 +617,320 @@ function saveSet() {
     .catch(error => console.error('Error:', error));
 }
 
-// Define the function to save a flashcard
-function saveFlashcard(setId) {
-    const question = document.getElementById('flashcardQuestion').value;
-    const answer = document.getElementById('flashcardAnswer').value;
+// Function to delete an individual flashcard
+function deleteFlashcard(flashcardId) {
 
-    if (!question || !answer) {
-        alert("Both question and answer are required.");
-        return;
+    const setId = document.getElementById("flashcardDisplayModal").getAttribute("data-set-id");
+
+    console.log('Set ID:', setId);
+
+    if (confirm("Are you sure you want to delete this flashcard?")) {
+        fetch(API_URL, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'delete_flashcard',
+                flashcard_id: flashcardId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Delete flashcard response:", data);
+            if (data.status === 'success') {
+                alert(data.message);
+
+                // Dynamically update the card count
+                
+                const flashcardSetElement = document.querySelector(`.flashcard-set[data-set-id="${setId}"]`);
+                
+                console.log('Flashcard Set Element:', flashcardSetElement);
+
+                if (flashcardSetElement) {
+                    let currentCount = parseInt(flashcardSetElement.getAttribute('data-card-count'), 10);
+                    if (!isNaN(currentCount)) {
+                        
+                        currentCount -= 1; // Decrement the count
+                        console.log('Current count:', currentCount);
+                        
+
+                        if (currentCount <= 0) {
+                            closeFlashcardDisplayModal(); // Close modal if no cards remain
+                        } else {
+                            showNextFlashcard(); // Show the next flashcard
+                        }
+
+                    }
+                }
+
+                // Refresh flashcard sets to reflect the updated card count
+                loadFlashcardSets();
+
+                // Refresh overview modal if it is open
+                const overviewModal = document.getElementById('flashcardOverviewModal');
+                if (overviewModal.style.display === 'flex') {
+                    openOverviewModal(setId); // Reload the overview modal with the updated set
+                }
+
+
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => console.error('Error deleting flashcard:', error));
+    }
+}
+
+/* DISPLAYING AND NAVIGATING FLASHCARDS FUNCTIONS */
+
+function loadFlashcards(setId) {
+    console.log(`Loading flashcards for set ID: ${setId}`);
+
+    fetch(`${FLASHCARDS_URL}&set_id=${setId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Flashcards response:", data);
+
+            if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
+                // Store flashcards and reset index
+                window.currentFlashcards = data.data.map(flashcardData => new Flashcard(
+                    flashcardData.flashcard_id,
+                    setId, // Pass the setId to the constructor
+                    flashcardData.question,
+                    flashcardData.answer
+                    
+                ));
+                window.currentFlashcardIndex = 0;
+
+                // Display the first flashcard
+                displayCard(window.currentFlashcards[0]);
+            } else {
+                console.log("Flashcards array is empty for this set.");
+                const modal = document.getElementById("flashcardDisplayModal");
+                modal.innerHTML = `<p>No flashcards found for this set.</p>`;
+                modal.style.display = "flex";
+            }
+        })
+        .catch(error => console.error("Error loading flashcards:", error));
+}
+
+
+function displayCard(flashcard) {
+
+    console.log(`Displaying card with Set ID: ${flashcard.setId}, Flashcard ID: ${flashcard.flashcardId}`);
+
+    const cardModal = document.getElementById('flashcardDisplayModal'); 
+
+    if (!cardModal) {
+        console.error("Modal element not found in the template.");
+        return; // Safely exit if the modal is missing in the template
     }
 
-    console.log("Saving new flashcard:", { question, answer, setId }); // Debugging log
+    // Set the data-set-id attribute for the modal
+    cardModal.setAttribute('data-set-id', flashcard.setId);
 
-    fetch(API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-            type: 'add_flashcard',
-            set_id: setId,
-            question: question,
-            answer: answer
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Save flashcard response:", data); // Debugging log
-        if (data.status === 'success') {
-            alert(data.message);
-            document.getElementById('flashcardQuestion').value = '';
-            document.getElementById('flashcardAnswer').value = '';
-        } else {
-            alert("Error: " + data.message);
+    // Populate the flashcard data
+    const questionElement = cardModal.querySelector('#displayQuestion');
+    const answerElement = cardModal.querySelector('#displayAnswer');
+    
+
+    questionElement.textContent = flashcard.question;
+    answerElement.textContent = flashcard.answer;
+
+    // Initially hide the answer
+    answerElement.style.display = 'none';
+
+    // Toggle Answer Button
+    const toggleButton = cardModal.querySelector('#toggleAnswerBtn');
+    if (toggleButton) {
+        toggleButton.onclick = () => {
+            if (answerElement.style.display === 'none') {
+                answerElement.style.display = 'block';
+                toggleButton.textContent = 'Hide Answer';
+            } else {
+                answerElement.style.display = 'none';
+                toggleButton.textContent = 'Show Answer';
+            }
+        };
+    }
+
+    // Edit Button
+    const editButton = cardModal.querySelector('#editFlashcardBtn');
+    if (editButton) {
+        editButton.onclick = () => {
+            openFlashcardModal(flashcard.setId, flashcard.flashcardId, flashcard.question, flashcard.answer);
+        };
+    }
+
+    // Delete Button
+    const deleteButton = cardModal.querySelector('#deleteFlashcardBtn');
+    if (deleteButton) {
+        deleteButton.onclick = () => {
+            
+            deleteFlashcard(flashcard.flashcardId);
+            
+        };
+    }
+
+    // Add event listener for Previous button
+    const prevButton = cardModal.querySelector('#prevFlashcardBtn');
+    prevButton.addEventListener('click', showPreviousFlashcard);
+
+    // Add event listener for Next button
+    const nextButton = cardModal.querySelector('#nextFlashcardBtn');
+    nextButton.addEventListener('click', showNextFlashcard);
+
+    // Add event listener for Close button
+    const closeButton = cardModal.querySelector('#closeCard');
+    closeButton.addEventListener('click', closeFlashcardDisplayModal);
+
+    // Show the modal
+    cardModal.style.display = 'flex';
+    
+}
+
+
+function closeFlashcardDisplayModal() {
+    document.getElementById("flashcardDisplayModal").style.display = "none";
+}
+
+function toggleFlashcardAnswer(direction = null) {
+    const answerElement = document.getElementById("displayAnswer");
+    const button = document.getElementById("toggleAnswerBtn");
+    if (answerElement.style.display === "none") {
+        answerElement.style.display = "block";
+        button.textContent = "Hide Answer";
+    } else {
+        answerElement.style.display = "none";
+        button.textContent = "Show Answer";
+
+        // Move to the next or previous card if a direction is specified
+        if (direction === "next") {
+            showNextFlashcard();
+        } else if (direction === "previous") {
+            showPreviousFlashcard();
         }
-    })
-    .catch(error => console.error('Error:', error));
+
+    }
+}
+
+function wrapIndex(index, length) {
+    return (index + length) % length;
+}
+
+function showNextFlashcard() {
+    if (window.currentFlashcards && window.currentFlashcards.length > 0) {
+        // Increment the index and wrap around if necessary
+        window.currentFlashcardIndex = wrapIndex(window.currentFlashcardIndex + 1, window.currentFlashcards.length);
+        const nextFlashcard = window.currentFlashcards[window.currentFlashcardIndex];
+
+        // Update the modal content with the next flashcard
+        const questionElement = document.getElementById('displayQuestion');
+        const answerElement = document.getElementById('displayAnswer');
+        const toggleButton = document.getElementById('toggleAnswerBtn');
+
+        questionElement.textContent = nextFlashcard.question;
+        answerElement.textContent = nextFlashcard.answer;
+
+        // Reset the answer visibility and toggle button text
+        answerElement.style.display = 'none';
+        toggleButton.textContent = 'Show Answer';
+    }
+}
+
+function showPreviousFlashcard() {
+    if (window.currentFlashcards && window.currentFlashcards.length > 0) {
+        // Decrement the index and wrap around if necessary
+        window.currentFlashcardIndex = wrapIndex(window.currentFlashcardIndex - 1, window.currentFlashcards.length);
+        const previousFlashcard = window.currentFlashcards[window.currentFlashcardIndex];
+
+        // Update the modal content with the previous flashcard
+        const questionElement = document.getElementById('displayQuestion');
+        const answerElement = document.getElementById('displayAnswer');
+        const toggleButton = document.getElementById('toggleAnswerBtn');
+
+        questionElement.textContent = previousFlashcard.question;
+        answerElement.textContent = previousFlashcard.answer;
+
+        // Reset the answer visibility and toggle button text
+        answerElement.style.display = 'none';
+        toggleButton.textContent = 'Show Answer';
+    }
+}
+
+function openOverviewModal(setId) {
+
+    console.log(`Opening overview modal for set ID: ${setId}`);
+    fetch(`${FLASHCARDS_URL}&set_id=${setId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
+                const modal = document.getElementById('flashcardOverviewModal');
+                const container = document.getElementById('flashcardOverviewContainer');
+
+                // Clear any existing content
+                container.innerHTML = '';
+
+                // Populate the modal with flashcard data
+                data.data.forEach(flashcard => {
+                    const flashcardPair = document.createElement('div');
+                    flashcardPair.classList.add('flashcard-pair');
+
+                    const questionDiv = document.createElement('div');
+                    questionDiv.textContent = `Q: ${flashcard.question}`;
+                    questionDiv.style.fontWeight = 'bold';
+
+                    const answerDiv = document.createElement('div');
+                    answerDiv.textContent = `A: ${flashcard.answer}`;
+
+                    flashcardPair.appendChild(questionDiv);
+                    flashcardPair.appendChild(answerDiv);
+
+                    // Add click event listener to open individual flashcard display
+                    flashcardPair.addEventListener('click', () => {
+                       // Ensure the currentFlashcards array and index are set
+                        window.currentFlashcards = data.data.map(flashcard => new Flashcard(
+                            flashcard.flashcard_id,
+                            setId, // Add the setId here
+                            flashcard.question,
+                            flashcard.answer
+                        ));
+                        window.currentFlashcardIndex = window.currentFlashcards.findIndex(
+                            card => card.flashcardId === flashcard.flashcard_id
+                        );
+
+                        // Display the selected flashcard
+                        displayCard(window.currentFlashcards[window.currentFlashcardIndex]); // Call the existing displayCard function
+                    });
+
+                    container.appendChild(flashcardPair);
+                });
+
+                // Show the modal
+                modal.style.display = 'flex';
+            } else {
+                alert('No flashcards found for this set.');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading flashcards for overview:', error);
+            alert('An error occurred while loading the flashcard overview.');
+        });
+}
+
+function closeOverviewModal() {
+    const modal = document.getElementById('flashcardOverviewModal');
+    modal.style.display = 'none';
+}
+
+/* GENERAL FUNCTIONS */
+
+// Function to close all dropdowns
+function closeAllDropdowns() {
+    document.querySelectorAll('.options-menu').forEach(menu => {
+        menu.style.display = 'none';
+    });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -472,12 +940,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Event listeners for modal buttons
     const saveSetButton = document.getElementById("saveSetBtn");
     const addFlashcardButton = document.getElementById("addFlashcardBtn");
-    const toggleAnswerButton = document.getElementById("toggleAnswerBtn"); // Ensure button is selected
-    const prevFlashcardButton = document.getElementById("prevFlashcardBtn"); // Previous button
-    const nextFlashcardButton = document.getElementById("nextFlashcardBtn"); // Next button
+    const closeButton = document.getElementById("closeOverviewModal");
+
+    if (closeButton) {
+        closeButton.addEventListener("click", closeOverviewModal);
+    }
+    
 
     if (saveSetButton) {
-        saveSetButton.addEventListener("click", saveSet);
+        saveSetButton.addEventListener("click", handleSetUpload);
     }
 
     if (addFlashcardButton) {
@@ -487,26 +958,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (toggleAnswerButton) {
-        toggleAnswerButton.addEventListener("click", toggleFlashcardAnswer);
-    }
-
-    if (prevFlashcardButton) {
-        prevFlashcardButton.addEventListener("click", showPreviousFlashcard);
-    }
-
-    if (nextFlashcardButton) {
-        nextFlashcardButton.addEventListener("click", showNextFlashcard);
-    }
-
-    /*// Event listener for each flashcard set clickable area
-    document.querySelectorAll(".flashcardSetClickable").forEach(setElement => {
-        setElement.addEventListener("click", function () {
-            const setId = setElement.getAttribute("data-set-id"); // Get the setId for the clicked set
-            console.log(`Click detected for flashcard set with ID: ${setId}`); // Debugging log
-            loadFlashcards(setId); // Load flashcards for this set and display them in the modal
-        });
-    });*/
 
     // Close dropdowns if clicking outside of any dropdown
     document.addEventListener('click', closeAllDropdowns);

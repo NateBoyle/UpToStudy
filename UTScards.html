@@ -10,8 +10,9 @@
 
     <!-- Flashcard page-specific styles -->
     <link rel="stylesheet" href="UTScards.css">
+    <link rel="stylesheet" href="UTScardsets.css">
 
-    <script src="UTSpassInitial.js"></script>
+    
 
     <style>
         @font-face {
@@ -66,41 +67,30 @@
             </div>
 
             <!-- Flashcard Content Area (Main Section) -->
-            <div class="flashcard-content">
+            <div class="flashcardpage-content">
 
                 
 
-                <div class="flashcard-header">
+                <div class="flashcardpage-header">
                     <!-- Search Bar -->
                     <div class="flashcard-search">
                         <input type="text" placeholder="Search flashcards...">
                     </div>
-                    
-                    <button class="create-set" onclick="openCreateSetModal()">Create Set</button>
-                </div>
 
-                <!-- Flashcard Container -->
-                <div id="flashcardSetsContainer" class="flashcardContainer">
-                    
-
-                    <!-- Flashcard Sets -->
-                    <div class="flashcard-grid">
-                        <div class="flashcard-set">
-                            
-                            <h2>Sample Set Name</h2>
-                            <br>
-                            <p>15 cards</p>
-                            
-                        </div>
+                    <div>
+                        <!-- Download Template Button -->
+                        <a href="UTS_Flashcards_Upload_Template.csv" download="UTS_Flashcards_Upload_Template.csv" >
+                            <button id="downloadTemplateButton" class="create-set">Download Template</button> 
+                        </a>
+                        
+                        <!-- Create Set Button -->
+                        <button id="createSetButton" class="create-set" onclick="openCreateSetModal()">Create Set</button>
                     </div>
 
-
                 </div>
 
-            
-
                 <!-- Modal for Creating Flashcard sets -->
-                <div id="flashcardSetModal">
+                <div id="flashcardSetModal" class="modal" role="dialog" aria-label="Flashcard Set Modal">
 
                     <div class="modal-content">
                         <span class="close" onclick="closeCreateSetModal()">&times;</span>
@@ -114,53 +104,78 @@
                             <option value="">No course / N/A</option>
                             <!-- Options will be populated dynamically -->
                         </select>
+
                         
+                        <label for="fileInput" class="upload-button">
+                            <span title="Please use template">Upload Flashcard File </span><span style="font-size: 10px; margin-top: 1px;"> (Optional)</span>
+                        </label>
+                        <input type="file" id="fileInput" accept=".csv" style="display: none;">
+                        <br><span id="fileName">No file chosen</span>
+                        
+
                         <button id="saveSetBtn">Save Set</button>
                     </div>
                 </div>
 
+                <!-- Flashcard Sets Container -->
+                <div id="flashcardSetsContainer" class="flashcardContainer">
+                    <!-- Flashcard sets will be dynamically appended here -->
+                    <p id="emptySetsMessage" style="display: none;">No flashcard sets available.</p>
+                </div>
+
+
                 <!-- Modal for Creating Individual Flashcards -->
                 <div id="flashcardModal" class="modal">
 
-
                     <div class="modal-content">
+
                         <span class="close" onclick="closeFlashcardModal()">&times;</span>
-                        <h2>Create Flashcard</h2>
+
+                        <h2 id="flashcardModalHeading">Create Flashcard</h2>
 
                         <input type="text" id="flashcardQuestion" placeholder="Question" required>
                         <input type="text" id="flashcardAnswer" placeholder="Answer" required>
 
                         <button id="addFlashcardBtn">Add Flashcard</button>
-                    </div>      
-          
-          
+
+                    </div>       
                 </div>
+                
 
                 <!-- Modal for Displaying Flashcards -->
+                
                 <div id="flashcardDisplayModal" class="modal">
                     <div class="modal-content">
-                        <span class="close" onclick="closeFlashcardDisplayModal()">&times;</span>
-
-                        <!-- Edit and Delete buttons positioned near the top left -->
+                        <!-- Static Options -->
+                        <span id="closeCard" class="close">&times;</span>
                         <div class="flashcard-options">
-                            <button onclick="editFlashcard()">Edit</button>
-                            <button onclick="deleteFlashcard()">Delete</button>
+                            <button id="editFlashcardBtn">Edit</button>
+                            <button id="deleteFlashcardBtn">Delete</button>
                         </div>
-
-                        <div class="flashcard-display">
-                            <button id="prevFlashcardBtn">&larr;</button>
-                            <div>
-                                <h2 id="displayQuestion">Question</h2>
-                                <p id="displayAnswer" style="display: none;">Answer</p>
-                            </div>
-                            <button id="nextFlashcardBtn">&rarr;</button>
-                            <button id="toggleAnswerBtn">Show Answer</button>
-                            
+                        <!-- Dynamic Content -->
+                        <div id="flashcardContent">
+                            <h2 id="displayQuestion"></h2>
+                            <p id="displayAnswer" style="display: none;"></p>
                         </div>
+                        <!-- Navigation and Toggle -->
+                        <button id="prevFlashcardBtn" >&larr;</button>
+                        <button id="nextFlashcardBtn" >&rarr;</button>
+                        <button id="toggleAnswerBtn" >Show Answer</button>
                     </div>
                 </div>
 
-
+                <!--Flashcard Overview Modal-->
+                <div id="flashcardOverviewModal" class="modal">
+                    <div class="modal-content">
+                        <span id="closeOverviewModal" class="close">&times;</span> <!-- Close Button -->
+                        <h2>Flashcard Overview</h2>
+                        <div id="flashcardOverviewContainer" class="scrollable-container">
+                            <!-- Flashcard pairs will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+                
+                
 
             </div>
 
@@ -172,6 +187,8 @@
     </div>
 
     <!-- Include JavaScript file at the end of body -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="UTSpassInitial.js"></script>
     <script src="UTScards.js"></script>
 
 </body>

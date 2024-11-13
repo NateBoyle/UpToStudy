@@ -1,0 +1,450 @@
+/* Sidebar Styling */
+.sidebar {
+    position: fixed;
+    top: 105px; /* Adjust to align with your header */
+    left: 0;
+    width: 20%;
+    height: calc(100vh - 105px); /* Full viewport height minus header height */
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #1a1a1a; /* Sidebar background color */
+    color: white;
+    border-right: 2px solid white;
+}
+
+/* Flashcard Content Area (Main Section) */
+.flashcardpage-content {
+    margin-left: 20%; /* Matches sidebar width */
+    width: 80%; /* Remaining space for the content */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Adjust Sidebar and Flashcard Alignment */
+.flashcardpage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.flashcardpage-header h2 {
+    flex-grow: 1; /* Allows the title to take up available space */
+    text-align: center; /* Center text within its area */
+    margin: 0; /* Remove default margins */
+}
+
+/* Create Set Button Styling */
+.create-set {
+    padding: 10px 20px;
+    background: #5DD770;
+    width: 200px;
+    height: 50px;
+    font-size: large;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#createSetButton,
+#downloadTemplateButton {
+    background-color: #5DD770; /* Green for Create Set */
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    font-size: large;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none; /* Remove underline for links */
+    display: inline-block; /* Ensures proper alignment for link */
+    height: 50px; /* Consistent height */
+    line-height: 30px; /* Centers text vertically */
+    text-align: center;
+    vertical-align: middle;
+    margin-right: 10px; /* Spacing between buttons */
+}
+
+#createSetButton:hover {
+    background-color: #4CAF5F; /* Darker green */
+}
+
+#downloadTemplateButton {
+    background-color: #007BFF; /* Blue for Download Template */
+}
+
+#downloadTemplateButton:hover {
+    background-color: #0056CC; /* Darker blue */
+}
+
+/* Flashcard Search Box */
+.flashcard-search {
+    
+    height: 50;
+    
+}
+.flashcard-search input {
+    padding: 10px 10px;
+    border-radius: 5px;
+    border: none;
+    top: 120;
+    z-index: 200;
+    font-size: 16px; /* Optionally increase the font size for better proportionality */
+    width: 400px;
+    /*box-sizing: border-box;  Ensure padding doesn't increase the element's size */
+}
+
+/* Flashcard Container Layout */
+.flashcardContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    width: 100%; /* Takes up full width of content area */
+    overflow-y: auto; /* Allows vertical scrolling */
+    border-radius: 15px;
+}
+
+/* Flashcard Set Grid Layout */
+.flashcard-set-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-row-gap: 23px; /* Reduced vertical gap */
+    grid-column-gap: 8px; /* Maintain current horizontal gap */
+    justify-items: center;
+    width: 95%;
+}
+
+/* Flashcard Set Styles */
+.flashcard-set {
+    position: relative; /* Enable absolute positioning within this container */
+    width: 450px;
+    height: 250px;
+    background: #2C2C2C;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    color: white;
+    display: flex;
+    flex-direction: column; /* Stacks h2 and p vertically */
+    align-items: center; /* Centers content horizontally */
+    justify-content: center; /* Centers content vertically */
+    text-align: center;
+}
+
+.flashcardSetClickable {
+    text-align: center;
+    padding: 20px;
+    /*background-color: rgba(0, 0, 0, 0.05);  Light overlay */
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.flashcard-set:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.flashcard-set.hover-effect {
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly lighter color */
+}
+
+
+.flashcard-set-header h2 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 10px; /* Adjusts the space between h2 and p */
+}
+
+.flashcard-set-header p {
+    font-size: 16px;
+    color: #DDDDDD;
+    margin-top: 0;
+}
+
+/* Modal Styles */
+#flashcardSetModal {
+    display: none; /* Flexbox to center content */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+/* Modal content */
+#flashcardSetModal div {
+    width:  400px;
+    height: 330px;
+    background: #2C2C2C;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: center;
+}
+
+.modal.show {
+    display: flex; /* To make modal visible when this class is added */
+}
+
+.modal-content {
+    width: 90%;
+    
+    background: #2C2C2C;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    color: white;
+    background-color: #333;
+    box-sizing: border-box;
+}
+
+#setNameInput::placeholder {
+    color: white; /* Sets the placeholder text color to white */
+    opacity: 1; /* Ensures full opacity for better visibility */
+}
+
+#courseDropdown {
+    width: 100%; /* Make it the same width as the Set Name input */
+    padding: 12px; /* Adjust padding to match other inputs */
+    border-radius: 5px; /* Same border radius as other inputs */
+    background-color: #333; /* Black background */
+    color: white; /* White text */
+    border: none; /* Remove border for a clean look */
+    font-size: 16px; /* Match font size */
+    margin-bottom: 15px; /* Add bottom margin to create space */
+    box-sizing: border-box; /* Ensures padding doesn’t affect width */
+}
+
+#courseDropdown option {
+    background-color: #333; /* Black background for dropdown options */
+    color: white; /* White text for dropdown options */
+}
+
+/* Custom File Upload */
+.custom-file-upload {
+    display: flex;
+    align-items: center;
+    gap: 0px 10px;
+    
+}
+
+/* Upload Button */
+.upload-button {
+    background-color: #007BFF; /* Blue for the button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    left: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-decoration: none; /* Remove link styles */
+}
+
+.upload-button:hover {
+    background-color: #0056CC; /* Darker blue for hover */
+}
+
+/* File Name Display */
+#fileName {
+    font-size: 14px;
+    margin-top: 20px;
+    color: #666; /* Neutral gray for file name text */
+    overflow: hidden; /* Prevent long file names from breaking layout */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-grow: 1;
+}
+
+/* Save Set Button */
+#saveSetBtn {
+    width: 100%;
+    padding: 20px;
+    margin-top: 20px;
+    background: #5DD770;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#saveSetBtn:hover {
+    background: #4fb963;
+}
+
+/* Close Button */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Flashcard Creation Modal Styling */
+#flashcardModal {
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1300;
+}
+
+#flashcardModal .modal-content {
+    width: 400px;
+    background: #2C2C2C;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+#flashcardModal h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+#flashcardModal input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    background-color: #333;
+    color: white;
+}
+
+#flashcardModal input[type="text"]::placeholder {
+    color: white;
+    opacity: 1;
+}
+
+#addFlashcardBtn {
+    width: 100%;
+    padding: 12px;
+    background: #5DD770;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#addFlashcardBtn:hover {
+    background: #4fb963;
+}
+
+.options-button-container {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+}
+
+.options-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px; /* Smaller ellipsis */
+    cursor: pointer;
+}
+
+.options-menu {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    width: 150px; /* Wider dropdown menu */
+    text-align: center;
+    justify-content: center;
+}
+
+.options-menu button {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    padding: 5px 0;
+    font-size: 14px; /* Smaller font for dropdown options */
+}
+
+.options-menu button:hover {
+    background-color: #444;
+}
+
+#emptySetsMessage, #emptyCardsMessage {
+    text-align: center;
+    font-size: 18px;
+    color: #ddd;
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .flashcard-set-grid {
+        grid-template-columns: repeat(2, 1fr); /* Two columns for smaller screens */
+        gap: 15px; /* Reduce gap */
+    }
+
+    .flashcard-set {
+        width: 100%; /* Full width for smaller screens */
+        height: auto; /* Adjust height */
+    }
+
+    .flashcardpage-header {
+        flex-direction: column; /* Stack elements vertically */
+        gap: 10px; /* Add space between stacked items */
+    }
+}

@@ -1,0 +1,279 @@
+/* Layout: Content */
+.content {
+    display: flex;
+    gap: 1.5%;
+    margin-top: 130px;
+    height: calc(100vh - 130px);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Sidebar */
+.sidebar {
+    flex: 0 0 26.5%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Sidebar Buttons */
+.sidebar-button-container {
+    display: flex; /* Flexbox layout for the buttons */
+    justify-content: space-between; /* Space evenly between buttons */
+    gap: 0.3rem; /* Spacing between buttons */
+    margin-bottom: 0.5rem; /* Space below the buttons */
+}
+
+.sidebar-button {
+    flex: 1; /* Make buttons evenly sized */
+    background: #2EA0F3;
+    color: white;
+    font-size: 0.9rem; /* Adjust font size */
+    font-weight: 600;
+    padding: 0.6rem 0.5rem; /* Adjust padding for smaller buttons */
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    width: 6rem;
+}
+
+.sidebar-button:hover {
+    background: #1C81C2;
+}
+
+/* Modal Background */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed to viewport, ignores parent */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+    z-index: 2000; /* Ensures modal appears on top */
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    overflow: auto; /* Ensures the modal stays accessible with lots of content */
+}
+
+/* Modal Content */
+.modal-content {
+    width: 400px; /* Fixed width for modal */
+    background: #2C2C2C; /* Black background for modal */
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Adds depth */
+    position: relative;
+}
+
+#defineSemesterForm {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack items vertically */
+    gap: 15px; /* Add space between form items */
+}
+
+/* Inputs inside the Modal */
+.modal-content input, 
+.modal-content button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    color: white;
+    background-color: #333;
+    box-sizing: border-box;
+}
+
+/* Placeholder text styling */
+.modal-content input::placeholder {
+    color: white;
+    opacity: 1;
+}
+
+/* Save Button */
+#saveSemesterBtn {
+    background: #5DD770;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#saveSemesterBtn:hover {
+    background: #4fb963;
+}
+
+/* Close Button */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+}
+
+.assignment-list,
+.todo-list {
+    background: #2C2C2C;
+    border-radius: 15px;
+    padding: 1.2rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.assignment-list-title,
+.todo-list-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #424FC6;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.list-item.green {
+    background: #77B942;
+}
+
+.list-item.blue {
+    background: #424FC6;
+}
+
+/* Calendar Container */
+.calendar {
+    flex: 0 0 70%; /* Keep the 70% width */
+    background: #2C2C2C;
+    border-radius: 15px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    height: 97%; /* Ensure it stretches to fill the available space */
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center; /* Center align items vertically */
+    justify-content: space-between; /* Space between titles and buttons */
+    padding: 0.5rem 1rem; /* Reduce padding */
+    margin-bottom: 0.5rem; /* Reduce spacing below the header */
+    background: #2C2C2C;
+    border-radius: 10px;
+}
+
+.calendar-titles {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: flex-start;
+}
+
+.calendar-header h1 {
+    margin: 0; /* Remove extra margins */
+    font-size: 1.4rem; /* Reduce font size */
+    font-weight: 600;
+    color: white;
+}
+
+.calendar-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.calendar-button {
+    background: #5DD970;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.calendar-button:hover {
+    background: #77B942;
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    display: grid; /* Use grid layout */
+    grid-template-columns: repeat(7, 1fr); /* 7 columns for days of the week */
+    grid-auto-rows: minmax(110px, auto); /* Adjusted row height for vertical expansion */
+    grid-gap: 10px; /* Space between grid items */
+    padding: 10px; /* Space inside the grid */
+    background-color: #252525; /* Background color */
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Optional: Subtle shadow */
+    flex-grow: 1; /* Allow the grid to fill available height */
+}
+
+.calendar-cell {
+    background: #2C2C2C; /* Dark background for cells */
+    color: white; /* Text color for contrast */
+    border-radius: 10px; /* Rounded corners */
+    display: flex;
+    flex-direction: column; /* Allow stacking of content if needed */
+    justify-content: flex-start; /* Align content to the top */
+    align-items: flex-start; /* Align content to the left */
+    font-size: 1.2rem; /* Adjust font size */
+    font-weight: 600; /* Make text bold */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Subtle shadow effect */
+    padding: 10px; /* Add padding to control spacing inside the cell */
+    cursor: pointer; /* Change cursor to pointer */
+    transition: background 0.3s ease; /* Smooth background transition */
+    position: relative; /* Ensure proper positioning for content */
+}
+
+.inactive-cell {
+    color: #999999; /* Gray out inactive days */
+    background: #1E1E1E; /* Slightly darker background */
+    cursor: default; /* Remove pointer cursor */
+}
+
+.calendar-cell.today {
+    border: 2px solid #5DD970; /* Highlight today's date */
+    border-radius: 10px;
+    background: #2C2C2C; /* Ensure it matches other cells */
+    color: white;
+    font-weight: bold;
+}
+
+.calendar-cell:hover {
+    background: #424242;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+    }
+
+    .calendar,
+    .sidebar {
+        flex: 1 0 auto;
+    }
+
+    .calendar-grid {
+        grid-auto-rows: minmax(80px, auto);
+    }
+}
