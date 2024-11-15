@@ -248,6 +248,30 @@ class CourseManager {
 
 let courseManager;
 
+// Function to populate the color dropdown with swatches
+/*function populateColorDropdown() {
+    const colorDropdown = document.getElementById('courseColor');
+
+    const colorOptions = Array.from(document.querySelectorAll('#courseColor option')).map(option => ({
+        value: option.value,
+        label: option.textContent
+    }));
+
+    console.log(colorOptions);
+
+    // Clear existing options
+    colorDropdown.innerHTML = '';
+
+    colorOptions.forEach(option => {
+        const swatchOption = document.createElement('option');
+        swatchOption.value = option.value;
+        swatchOption.textContent = option.label;
+        swatchOption.style.backgroundColor = option.value;
+        swatchOption.style.color = '#FFF'; // Ensure text is visible
+        colorDropdown.appendChild(swatchOption);
+    });
+}*/
+
 document.addEventListener("DOMContentLoaded", () => {
 
     //const
@@ -264,6 +288,10 @@ document.addEventListener("DOMContentLoaded", () => {
         addCourseForm.reset();
         addCourseBtn.textContent = "Add Course";
         addCourseBtn.onclick = handleAddCourse;
+
+        // Populate the color dropdown when the modal is rendered
+        //populateColorDropdown();
+
         modal.style.display = 'flex';
     });
 

@@ -184,13 +184,39 @@
     align-items: center;
     gap: 0.5rem;
     justify-content: flex-start;
+    width: 220px; /* Fixed width for the titles container */
 }
+
+.calendar-titles h1 {
+    margin: 0; /* Remove extra margins */
+    font-size: 1.4rem; /* Reduce font size */
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    width: 120px; /* Fixed width for each title */
+    white-space: nowrap; /* Prevent wrapping */
+
+}
+
+.calendar-titles button {
+    background: transparent; /* Blends into the header */
+    border: none;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%; /* Circular buttons */
+    transition: background-color 0.3s ease;
+}
+
 
 .calendar-header h1 {
     margin: 0; /* Remove extra margins */
     font-size: 1.4rem; /* Reduce font size */
     font-weight: 600;
     color: white;
+
 }
 
 .calendar-buttons {

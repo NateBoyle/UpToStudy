@@ -10,7 +10,6 @@
 
     <link rel="stylesheet" href="UTScourses.css">
 
-    <script src="UTSpassInitial.js"></script>
 
     <style>
         @font-face {
@@ -56,48 +55,42 @@
 
         </div>
         
-        <!-- Course Container -->
-        <div id="courseContainer" style=" left: 150px; right: 150px; top: 171px; position: absolute;">
             
-            <!-- Hardcoded Course 1 
-            <div class="course-card">
-                <div class="course-header" style="background: linear-gradient(90deg, #7F1313 0%, #E52222 100%);">
-                    <h2>ENGLISH 101</h2>
-                </div>
-                <div class="course-content">
-                    <p>Professor Name</p>
-                    <p>Time: 10:50-12:05</p>
-                    <p>Days: Tue, Thu, Fri</p>
-                </div>
+
+
+        <!-- Container for Sidebar and Course Content -->
+        <div style="display: flex; top: 105px; position: relative;">    
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h2>TERM - SEMESTER</h2>
+                <button class="filter-btn">Filter by Semester</button>
             </div>
 
-             Hardcoded Course 2 
-            <div class="course-card">
-                <div class="course-header" style="background: linear-gradient(90deg, #7DBC4B 0%, #3C6C2B 100%);">
-                    <h2>BIOLOGY 190</h2>
-                </div>
-                <div class="course-content">
-                    <p>Professor Name</p>
-                    <p>Time: 10:50-12:05</p>
-                    <p>Days: Tue, Thu, Fri</p>
-                </div>
-            </div>-->
+            <!-- Course Container -->
+            <div id="courseContainer" >
 
-            <!-- "Add Course" Button Styled as a Card inside the courseContainer -->
-            <div class="add-course" id="showModalBtn" >
-                Add Course
+                <!-- "Add Course" Button Styled as a Card inside the courseContainer -->
+                <div class="add-course" id="showModalBtn" >
+                    Add Course
+                </div>
+
             </div>
+
+
+
+            
 
         </div>
 
         <!-- Modal Popup for Adding Courses -->
-        <div id="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; z-index: 1000;">
+        <div id="modal" >
             <div style="width: 450px; background: #2C2C2C; padding: 20px; border-radius: 10px; position: relative; color: white;">
                 
                 <h2 id="modalHeading" style="text-align: center; margin-bottom: 10px;">Add New Course</h2>
 
                 <!-- Form element starts here -->
-                 <form id="addCourseForm">
+                <form id="addCourseForm">
 
                     <input type="text" id="courseName" name="courseName" placeholder="Course Name" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
                     <span class="error" id="courseNameError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
@@ -160,12 +153,13 @@
                     <!-- New Dropdown for Color Selection -->
                     <label for="courseColor" style="display: block; margin-bottom: 5px;">Course Label Color</label>
                     <select id="courseColor" name="courseColor" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
-                        <option value="#7DBC4B">Green</option>
-                        <option value="#E52222">Red</option>
-                        <option value="#4B90D0">Blue</option>
-                        <option value="#E5BA22">Yellow</option>
-                        <option value="#9A4BB3">Purple</option>
-                        <option value="#FF8C00">Orange</option>
+                        <option value="" disabled selected style="background-color: white; color: black;">Pick a color</option>
+                        <option value="#7DBC4B" style="background-color: #7DBC4B; color: white;">Green</option>
+                        <option value="#E52222" style="background-color: #E52222; color: white;">Red</option>
+                        <option value="#4B90D0" style="background-color: #4B90D0; color: white;">Blue</option>
+                        <option value="#E5BA22" style="background-color: #E5BA22; color: black;">Yellow</option>
+                        <option value="#9A4BB3" style="background-color: #9A4BB3; color: white;">Purple</option>
+                        <option value="#FF8C00" style="background-color: #FF8C00; color: white;">Orange</option>
                     </select>
                     <span class="error" id="courseColorError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
 
@@ -179,15 +173,11 @@
         </div>
         
 
-        <!--<script>
-        // JavaScript to handle future course additions can go here
-        document.getElementById('addCourseBtn').addEventListener('click', function() {
-            alert('Add Course clicked! Implement the logic here.');
-        });
-        </script>-->
+    
 
 
     </div>
 
+    <script src="UTSsessionManager.js"></script>
     <script src="UTScourseManager.js?v=1.0"></script>
 </body>

@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="UTScss.css">
     <link rel="stylesheet" href="UTScalendar.css">
 
-    <script src="UTSpassInitial.js"></script>
 
     <style>
         @font-face {
@@ -65,10 +64,13 @@
             <div class="calendar">
                 <div class="calendar-header">
                     <div class="calendar-titles">
+                        <button id="prevMonthBtn">&#8592;</button> <!-- Previous month -->
                         <h1 id="year">Year</h1>
                         <h1>|</h1>
                         <h1 id="month">Month</h1>
+                        <button id="nextMonthBtn">&#8594;</button> <!-- Next month -->
                     </div>
+                    <h2 id="currentSemesterLabel">Current Semester: Loading...</h2>
                     <div class="calendar-buttons">
                         <button class="calendar-button">Week</button>
                         <button class="calendar-button">New Event</button>
@@ -90,20 +92,20 @@
                 <!-- Define Semester Modal -->
                 <div id="defineSemesterModal" class="modal">
                     <div class="modal-content">
-                    <span class="close" id="closeDefineSemester">&times;</span>
-                    <h2>Define Semester</h2>
-                    <form id="defineSemesterForm">
-                        <label for="semesterName">Semester Name:</label>
-                        <input type="text" id="semesterName" name="semesterName" required>
-                        
-                        <label for="startDate">Start Date:</label>
-                        <input type="date" id="startDate" max="2999-12-31" name="startDate" required>
-                        
-                        <label for="endDate">End Date:</label>
-                        <input type="date" id="endDate" max="2999-12-31" name="endDate" required>
-                        
-                        <button type="submit" id="saveSemesterBtn">Save Semester</button>
-                    </form>
+                        <span class="close" id="closeDefineSemester">&times;</span>
+                        <h2>Define Semester</h2>
+                        <form id="defineSemesterForm">
+                            <label for="semesterName">Semester Name:</label>
+                            <input type="text" id="semesterName" name="semester_name" required>
+                            
+                            <label for="startDate">Start Date:</label>
+                            <input type="date" id="startDate" max="2999-12-31" name="start_date" required>
+                            
+                            <label for="endDate">End Date:</label>
+                            <input type="date" id="endDate" max="2999-12-31" name="end_date" required>
+                            
+                            <button type="submit" id="saveSemesterBtn">Save Semester</button>
+                        </form>
                     </div>
                 </div>
 
@@ -135,6 +137,8 @@
 
     </div>        
 
-    <script src="UTScalendar.js" defer></script>
+    <script src="UTSsessionManager.js"></script>
+    <script type="module" src="UTScalendar.js" defer></script>
+    <script type="module" src="UTSdefineSemester.js"></script>
 
 </body>

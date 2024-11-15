@@ -1,28 +1,9 @@
 <?php
 
-// Enable error reporting for debugging (use only in development)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+require 'UTSbootstrap.php';
 
-// Secure Cookie Settings (configure before starting session)
-ini_set('session.cookie_httponly', true);
-ini_set('session.cookie_secure', true); // Ensure HTTPS in production
-ini_set('session.use_strict_mode', true);
 
-// Start session only if none is active
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Set Content-Type header to JSON (if returning JSON response)
-header('Content-Type: application/json');
-
-// HTTP Security Headers (for enhanced security)
-header("Content-Security-Policy: default-src 'self';");
-header("X-Frame-Options: DENY");
-header("X-Content-Type-Options: nosniff");
-header("X-XSS-Protection: 1; mode=block");
+global $conn; // Explicitly use the global $conn
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -33,20 +14,6 @@ if (!isset($_SESSION['user_id'])) {
 // Get the user_id from the session
 $user_id = $_SESSION['user_id'];
 
-// Database connection variables
-$host = "localhost";
-$username = "root";
-$password = "";
-$database = "utsdb"; // Replace with your actual database name
-
-// Create a connection to the database
-$conn = new mysqli($host, $username, $password, $database);
-
-// Check the connection
-if ($conn->connect_error) {
-    echo json_encode(['status' => 'error', 'message' => 'Database connection failed: ' . $conn->connect_error]);
-    exit;
-}
 
 // Handle DELETE request for course deletion
 if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
@@ -228,5 +195,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 }
 
-$conn->close();
 ?>

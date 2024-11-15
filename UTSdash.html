@@ -8,8 +8,6 @@
 
     <link rel="stylesheet" href="UTScss.css">
 
-    <script src="UTSpassInitial.js"></script>
-
     <style>
         @font-face {
             font-family: UTSfont;
@@ -284,32 +282,7 @@
         </div>
     </div>
 
-    <!--<script>
+    <script src="UTSsessionManager.js"></script>
 
-        function getQueryParams() {
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const firstLetter = urlParams.get('firstLetter');
-            return { firstLetter };
-
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            // Get the first letter from query parameters and display it
-            const { firstLetter } = getQueryParams();
-            console.log("Received firstLetter:", firstLetter); // Debug log
-
-            if (firstLetter) {
-
-                document.getElementById('userInitial').textContent = firstLetter;
-
-            } else {
-
-                document.getElementById('userInitial').textContent = 'N/A';
-
-            }
-        });
-
-    </script>-->
 
 </body>

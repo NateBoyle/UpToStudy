@@ -20,8 +20,31 @@ async function fallbackLogout() {
     }
 }
 
+// Function to check authentication status
+function checkAuthStatus() {
+    fetch('UTSauth_check.php') // Call the PHP file
+        .then(response => {
+            console.log('Auth Check Response:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Parsed Data:', data);
+            if (!data.authenticated) {
+                // If not authenticated, redirect to the welcome page
+                window.location.href = 'UTSwelcome.html';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking authentication:', error);
+        });
+}
+
 // Executes when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", function () {
+
+    // Call the function to check authentication when the page loads
+    checkAuthStatus();
+
     // Reset the internal navigation flag on page load
     isInternalNavigation = false;
     console.log("isInternalNavigation reset to:", isInternalNavigation);
@@ -107,33 +130,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Handles logout for external navigation or closing the tab
-    /*window.addEventListener('beforeunload', async () => {
-        const navigationEntry = performance.getEntriesByType("navigation")[0];
-        const navigationType = navigationEntry ? navigationEntry.type : "navigate"; // Default to "navigate"
-
-        console.log("Beforeunload triggered.");
-        console.log("Navigation type:", navigationType); // Logs the type of navigation
-        console.log("isInternalNavigation:", isInternalNavigation); // Logs the internal navigation flag
-
-        if (!isInternalNavigation && navigationType !== "reload") {
-            if (navigationType !== "reload") {
-                console.log("External navigation or tab close detected. Triggering logout.");
-                try {
-                    console.log("Triggering logout for external navigation or tab close.");
-                    if (!navigator.sendBeacon('UTSlogin.php?action=logout')) {
-                        console.log("Fallback to async logout due to sendBeacon failure.");
-                        await fallbackLogout(); // Calls the async fallback if sendBeacon fails
-                    }
-                } catch (error) {
-                    console.error("Error using sendBeacon:", error);
-                    await fallbackLogout(); // Ensures fallback is used in case of errors
-                }
-            } else {
-                console.log("Page reload detected, skipping logout."); // Skips logout on page refresh
-            }
-        } else {
-            console.log("Internal navigation detected. Skipping logout.");
-        }
-    });*/
 });

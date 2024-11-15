@@ -12,6 +12,14 @@
     z-index: 1100;
 }
 
+#flashcardOverviewModal {
+    z-index: 1050; /* Lower priority modal */
+}
+
+#flashcardDisplayModal {
+    z-index: 1100; /* Higher priority modal */
+}
+
 /* Flashcard Display Modal */
 #flashcardDisplayModal .modal-content {
     width: 400px;
@@ -25,6 +33,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    z-index: auto; /* No need for explicit z-index here */
+    
 }
 
 /* Flashcard Content Styling */
@@ -125,6 +135,7 @@
     text-align: left;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
     overflow-y: auto;
+    z-index: auto; /* No need for explicit z-index here */
 }
 
 .scrollable-container {

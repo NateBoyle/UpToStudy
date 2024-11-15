@@ -1,76 +1,82 @@
+$(document).ready(function () {
+    console.log("jQuery is loaded"); // Confirm that jQuery is working
 
-$(document).ready(function() {
-    console.log("jQuery is loaded"); // Check if this prints
-    
-
-    $("#loginForm").on("submit", function(event) {
+    $("#loginForm").on("submit", function (event) {
         console.log("Login button clicked");
         event.preventDefault(); // Prevent default form submission
-        
 
         // Disable submit button to prevent multiple submissions
         $("input[type=submit]").attr("disabled", true);
 
-        /// Clear any previous success or error messages
+        // Clear any previous success or error messages
         $("#result").html(""); // Clear previous success message
         $(".error").html(""); // Clear any previous error messages
 
+        // Send the login request via AJAX
         $.ajax({
-            url: 'UTSlogin.php',
+            url: 'UTSloginLogout.php', // Update to match the new PHP file name
             type: 'POST',
-            data: $(this).serialize(),
-            success: function(response) {
-                // No need to parse response; it's already a JavaScript object
-                var data = response;
-                
-                if (data.status === "success") {
-                    
-                    //get username
-                    const username = document.getElementById('username').value;
+            dataType: 'json', // Expect JSON response
+            data: $(this).serialize(), // Serialize the form data for the request
+            success: function (response) {
+                console.log("Raw server response:", response);
 
-                    
-                    
-                    $("#loginForm")[0].reset(); // Reset the form
-                    $("#result").html(data.message); // Show success message
+                if (response.status === "success") {
+                    console.log("Login successful:", response.message);
 
-                    //get first letter
-                    const initial = username.charAt(0);
+                    // Reset the form
+                    $("#loginForm")[0].reset();
 
-                    // Debug log to confirm the first letter is being captured
-                    console.log("First letter of username:", initial);
+                    // Show a success message
+                    $("#result")
+                        .html(response.message)
+                        .css("color", "green");
 
-                    // Create query string with only the first letter of the name
-                    const param = new URLSearchParams({firstLetter: initial}).toString();
-                    
-                    // Redirect to a new webpage with the form data as query parameters
-                    window.location.href = 'UTSdash.html?' + param;
+                    // Redirect to the dashboard
+                    window.location.href = 'UTSdash.html'; // No query parameters needed
+                } else if (response.status === "error") {
+                    console.log("Login error:", response.message);
 
-                } else if (data.status === "error") {
-                     // Show general error message in the result span
-                    if (data.message) {
-                        $("#result").html(data.message).css("color", "red"); // Display the error message
-                    } else {
-                        // Display field-specific error messages
-                        if (data.errors.username) {
-                            console.log("Username Error:", data.errors.username);
-                            $("#usernameError").html(data.errors.username);
+                    // Show a general error message
+                    if (response.message) {
+                        $("#result")
+                            .html(response.message)
+                            .css("color", "red"); // Display the error message
+                    }
+
+                    // Display field-specific error messages, if provided
+                    if (response.errors) {
+                        if (response.errors.username) {
+                            console.log("Username Error:", response.errors.username);
+                            $("#usernameError").html(response.errors.username);
                         }
-                        if (data.errors.password) {
-                            console.log("Password Error:", data.errors.password);
-                            $("#passwordError").html(data.errors.password);
+                        if (response.errors.password) {
+                            console.log("Password Error:", response.errors.password);
+                            $("#passwordError").html(response.errors.password);
                         }
                     }
                 }
             },
-            error: function(jqXHR, textStatus, errorThrown) {
-                $("#result").html("An error occurred: " + textStatus); // Show error message if something goes wrong
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("AJAX error:", textStatus, errorThrown);
+
+                // Attempt to parse responseText as JSON
+                let errorMessage = "An unknown error occurred.";
+                try {
+                    const errorData = JSON.parse(jqXHR.responseText);
+                    if (errorData.message) {
+                        errorMessage = errorData.message;
+                    }
+                } catch (e) {
+                    errorMessage = jqXHR.responseText; // Fallback to raw responseText
+                }
+
+                $("#result").html("An error occurred: " + errorMessage).css("color", "red");
             },
-            complete: function() {
+            complete: function () {
                 // Re-enable the submit button after the request is complete
                 $("input[type=submit]").attr("disabled", false);
-            }
+            },
         });
     });
-
-
 });

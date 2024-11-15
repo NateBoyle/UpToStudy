@@ -13,7 +13,8 @@
     overflow-x: auto; /* Allows horizontal scrolling */
     overflow-y: hidden; /* Hides vertical scroll */
     white-space: nowrap; /* Prevents wrapping */
-    margin: 0 auto; /* Centers the container itself */
+    margin-left: 22%; /* Centers the container itself */
+    margin-top: 20px; /* Ensure it starts right below the sidebar */
     border: 2px solid white; /* Adds a white border around the container */
     border-radius: 15px; /* Optional: adds rounded corners to the border */
 }
@@ -59,6 +60,7 @@
 
 /* Content area inside each course card */
 .course-content {
+    
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -151,6 +153,7 @@
     background: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
+    z-index: 5000;
 }
 
 /* Modal content */
@@ -203,4 +206,41 @@
     font-size: 24px;
     border: none;
     cursor: pointer;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    position: fixed;
+    top: 105px; /* Align with header */
+    left: 0;
+    width: 20%;
+    height: calc(100vh - 105px); /* Full height minus header */
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #1a1a1a;
+    color: white;
+    border-right: 2px solid white;
+}
+
+.sidebar h2 {
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.filter-btn {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #5DD770;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-btn:hover {
+    background-color: #4CAF50;
 }

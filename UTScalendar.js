@@ -1,8 +1,11 @@
+import { fetchSemesters } from './UTSdefineSemester.js';
+
+let currentDate = new Date(); // Tracks the currently displayed month
+
 // Function to populate the calendar
 function populateCalendar() {
     const calendarGrid = document.querySelector(".calendar-grid");
 
-    const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth(); // Keeps the month as a number for calculations
 
@@ -65,34 +68,75 @@ function populateCalendar() {
         cell.textContent = day; // Fill in dates from the next month
         calendarGrid.appendChild(cell);
     }
+
+    // Update the current semester label
+    updateSemesterLabel();
+
+}
+
+// Function to fetch and update the semester label
+async function updateSemesterLabel() {
+    const semesterLabel = document.getElementById("currentSemesterLabel");
+
+    try {
+        const semesters = await fetchSemesters();
+
+        if (!semesters || semesters.length === 0) {
+            semesterLabel.textContent = "No semesters available.";
+            return;
+        }
+
+        // Get the month and year of the current date
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+
+        // Determine the semester for the currently displayed month
+        const currentSemester = semesters.find(semester => {
+            const start = new Date(semester.start_date);
+            const end = new Date(semester.end_date);
+
+           // Extract month and year for comparison
+           const startMonth = start.getMonth();
+           const startYear = start.getFullYear();
+           const endMonth = end.getMonth();
+           const endYear = end.getFullYear();
+
+           // Check if the current month/year falls within the semester's range
+           return (
+               (currentYear > startYear || (currentYear === startYear && currentMonth >= startMonth)) &&
+               (currentYear < endYear || (currentYear === endYear && currentMonth <= endMonth))
+           );
+           
+        });
+
+        if (currentSemester) {
+            semesterLabel.textContent = `Current Semester: ${currentSemester.name}`;
+        } else {
+            semesterLabel.textContent = "Current Semester: None";
+        }
+    } catch (error) {
+        console.error("Error fetching semesters:", error);
+        semesterLabel.textContent = "Error loading semester data.";
+    }
+}
+
+// Function to navigate to the previous month
+function goToPreviousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1); // Decrement the month
+    populateCalendar(); // Re-populate the calendar
+}
+
+// Function to navigate to the next month
+function goToNextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1); // Increment the month
+    populateCalendar(); // Re-populate the calendar
 }
 
 // Event listener to populate the calendar on page load
 document.addEventListener("DOMContentLoaded", () => {
 
-    
-
-    // Get modal elements
-    const defineSemesterModal = document.getElementById('defineSemesterModal');
-    const closeDefineSemester = document.getElementById('closeDefineSemester');
-    const defineSemesterBtn = document.getElementById('defineSemesterBtn'); // This is your "Define Semester" button
-
-    // Show modal
-    defineSemesterBtn.addEventListener('click', () => {
-        defineSemesterModal.style.display = 'flex';
-    });
-
-    // Hide modal
-    closeDefineSemester.addEventListener('click', () => {
-        defineSemesterModal.style.display = 'none';
-    });
-
-    // Close modal when clicking outside of it
-    window.addEventListener('click', (event) => {
-        if (event.target === defineSemesterModal) {
-        defineSemesterModal.style.display = 'none';
-        }
-    });
+    document.getElementById("prevMonthBtn").addEventListener("click", goToPreviousMonth);
+    document.getElementById("nextMonthBtn").addEventListener("click", goToNextMonth);
 
     populateCalendar();
 

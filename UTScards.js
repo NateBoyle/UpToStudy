@@ -69,7 +69,7 @@ class FlashcardSet {
         optionsMenu.style.display = "none"; // Hidden by default
         optionsMenu.innerHTML = `
             <button onclick="openFlashcardModal(${this.setId})">Add Cards Manually</button>
-            <button onclick="editFlashcardSet(${this.setId}, '${this.setName}', '${this.courseName}')">Edit Name/Course</button>
+            <button onclick="editFlashcardSet(${this.setId}, '${this.setName}', '${this.courseName}')">Edit/Upload Set</button>
             <button onclick="deleteFlashcardSet(${this.setId})">Delete Set</button>
             <button onclick="openOverviewModal(${this.setId})">View All</button>
         `;
