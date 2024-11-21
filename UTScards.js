@@ -16,13 +16,15 @@ class FlashcardSet {
      * @param {string} setName - The name of the flashcard set.
      * @param {string} courseName - The name of the associated course (or "N/A").
      * @param {number} numCards - The number of flashcards in the set.
+     * * @param {number} cardsMastered - The number of mastered flashcards in the set.
      */
 
-    constructor(setId, setName, courseName, numCards) {
+    constructor(setId, setName, courseName, numCards, cardsMastered = 0) {
         this.setId = setId;
         this.setName = setName;
         this.courseName = courseName;
         this.numCards = numCards;
+        this.cardsMastered = cardsMastered;
     }
 
     /**
@@ -41,7 +43,7 @@ class FlashcardSet {
                 <h2>${this.setName}</h2>
             </div>
             <p>Course: ${this.courseName || 'N/A'}</p>
-            <p>${this.numCards || 0} cards</p>
+            <p>${this.numCards || 0}&nbsp; cards &nbsp;&nbsp;|&nbsp;&nbsp; ${this.cardsMastered || 0}&nbsp; mastered</p>
         `;
 
         // Add click event to the center area
@@ -215,12 +217,21 @@ function loadFlashcardSets() {
                 flashcardGrid.classList.add('flashcard-set-grid');
                 
                 data.data.forEach(setData => {
-                    const flashcardSet = new FlashcardSet(setData.set_id, setData.set_name, setData.course_name, setData.num_cards);
+                    // Pass cardsMastered to the FlashcardSet constructor
+                    const flashcardSet = new FlashcardSet(
+                        setData.set_id, 
+                        setData.set_name, 
+                        setData.course_name, 
+                        setData.num_cards,
+                        setData.cards_mastered // New field for cards mastered
+                    );
+
                     const setElement = flashcardSet.render();
 
                     // Set attributes directly
                     setElement.setAttribute('data-set-id', setData.set_id);
                     setElement.setAttribute('data-card-count', setData.num_cards);
+                    setElement.setAttribute('data-cards-mastered', setData.cards_mastered)
 
                     flashcardGrid.appendChild(setElement);
                 });
@@ -234,7 +245,7 @@ function loadFlashcardSets() {
                 sampleSet.innerHTML = `
                     <h2>Sample Set Name</h2>
                     <p>Course: N/A</p>
-                    <p>15 cards</p>
+                    <p>15 cards  |  0 mastered</p>
                 `;
                 flashcardSetsContainer.appendChild(sampleSet);
             }

@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     } elseif (isset($_GET['type']) && $_GET['type'] === 'flashcard_sets') {
         // Retrieve flashcard sets with associated course names
-        $query = "SELECT fs.set_id, fs.set_name, fs.course_id, fs.num_cards, c.course_name 
+        $query = "SELECT fs.set_id, fs.set_name, fs.course_id, fs.num_cards, fs.cards_mastered, c.course_name 
                   FROM flashcard_sets AS fs
                   LEFT JOIN courses AS c ON fs.course_id = c.course_id
                   WHERE fs.user_id = ?";
