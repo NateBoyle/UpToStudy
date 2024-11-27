@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
         if ($setId) {
             // Prepare and execute the query to get flashcards in the set
-            $query = "SELECT flashcard_id, question, answer FROM flashcards WHERE set_id = ?";
+            $query = "SELECT flashcard_id, question, answer, is_mastered  FROM flashcards WHERE set_id = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("i", $setId);
             $stmt->execute();
@@ -266,6 +266,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         $updateStmt->close(); // Close the statement
 
+    } elseif ($_POST['type'] === 'mark_mastered') {
+        // Mark a flashcard as mastered
+        $flashcardId = $_POST['flashcard_id'] ?? null;
+        $mastered = $_POST['mastered'] ?? null;
+
+        // Validate required fields
+        if (empty($flashcardId) || !isset($mastered)) {
+            echo json_encode(['status' => 'error', 'message' => 'Flashcard ID and mastered status are required.']);
+            exit;
+        }
+
+        // Update the mastered status of the flashcard
+        $updateQuery = "UPDATE flashcards SET is_mastered = ? WHERE flashcard_id = ?";
+        $updateStmt = $conn->prepare($updateQuery);
+        $updateStmt->bind_param("ii", $mastered, $flashcardId);
+
+        if ($updateStmt->execute()) {
+            $statusMessage = $mastered ? 'Flashcard marked as mastered successfully.' : 'Flashcard marked as unmastered successfully.';
+            echo json_encode(['status' => 'success', 'message' => $statusMessage]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to update flashcard: ' . $conn->error]);
+        }
+
+        $updateStmt->close(); // Close the statement
     }
 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {

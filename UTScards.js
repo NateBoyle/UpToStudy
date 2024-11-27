@@ -32,8 +32,13 @@ class FlashcardSet {
      * @returns {HTMLElement} - The rendered flashcard set element.
      */
     render() {
+
         const setCard = document.createElement('div');
         setCard.classList.add('flashcard-set');
+
+
+        // Calculate the mastered percentage
+        const masteredPercentage = this.numCards > 0 ? (this.cardsMastered / this.numCards) * 100 : 0;
 
         // Clickable area in the center of the set
         const clickableCenter = document.createElement('div');
@@ -44,6 +49,9 @@ class FlashcardSet {
             </div>
             <p>Course: ${this.courseName || 'N/A'}</p>
             <p>${this.numCards || 0}&nbsp; cards &nbsp;&nbsp;|&nbsp;&nbsp; ${this.cardsMastered || 0}&nbsp; mastered</p>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: ${masteredPercentage}%;"></div>
+            </div>
         `;
 
         // Add click event to the center area
@@ -98,32 +106,33 @@ class FlashcardSet {
 
 // Flashcard class for individual flashcards within a set
 class Flashcard {
-
     /**
      * Constructor to initialize a Flashcard instance
      * @param {number} flashcardId - The unique ID for the flashcard.
      * @param {number} setId - The ID of the set this flashcard belongs to.
      * @param {string} question - The question text for the flashcard.
      * @param {string} answer - The answer text for the flashcard.
+     * @param {boolean} isMastered - The mastered status of the flashcard.
      */
-    constructor(flashcardId, setId, question, answer) {
+    constructor(flashcardId, setId, question, answer, isMastered) {
         this.flashcardId = flashcardId;
-        this.setId = setId; // Add setId to the class
+        this.setId = setId;
         this.question = question;
         this.answer = answer;
-        
+        this.isMastered = isMastered; // New property
     }
 
     /**
-     * Converts the flashcard instance to a display object for rendering
-     * @returns {Object} - The structured flashcard data for display
+     * Converts the flashcard instance to a structured data object for rendering
+     * @returns {Object} - The flashcard data, including mastered state
      */
-    toDisplayCard() {
+    toDisplayObject() {
         return {
             flashcardId: this.flashcardId,
-            setId: this.setId, // Include setId
+            setId: this.setId,
             question: this.question,
             answer: this.answer,
+            isMastered: this.isMastered, // Include the mastered state
         };
     }
 }
@@ -693,6 +702,63 @@ function deleteFlashcard(flashcardId) {
     }
 }
 
+function toggleMasterStatus(flashcardId) {
+    // Validate the flashcard ID
+    if (!flashcardId) {
+        console.error("Flashcard ID is required to toggle master status.");
+        return;
+    }
+
+    // Get the button element
+    const masterButton = document.getElementById(`masterFlashcardBtn`);
+    if (!masterButton) {
+        console.error("Master button not found.");
+        return;
+    }
+
+    // Determine the current state based on button text
+    const isCurrentlyMastered = masterButton.innerText === 'Unmaster';
+
+    // Prepare the request payload
+    const requestData = {
+        type: 'mark_mastered',
+        flashcard_id: flashcardId,
+        mastered: isCurrentlyMastered ? 0 : 1 // Toggle the state
+    };
+
+    // Make the API call
+    fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Toggle Master Status response:", data);
+
+        if (data.status === 'success') {
+            alert(data.message);
+
+            // Update button text based on the new state
+            masterButton.innerText = isCurrentlyMastered ? 'Master' : 'Unmaster';
+
+            // Refresh flashcard sets and overview modal if needed
+            loadFlashcardSets(); // Refresh to update mastered counts in the set
+
+            const overviewModal = document.getElementById('flashcardOverviewModal');
+            if (overviewModal.style.display === 'flex') {
+                openOverviewModal(setId); // Reload the overview modal with the updated set
+            }
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+
 /* DISPLAYING AND NAVIGATING FLASHCARDS FUNCTIONS */
 
 function loadFlashcards(setId) {
@@ -709,7 +775,8 @@ function loadFlashcards(setId) {
                     flashcardData.flashcard_id,
                     setId, // Pass the setId to the constructor
                     flashcardData.question,
-                    flashcardData.answer
+                    flashcardData.answer,
+                    !!flashcardData.is_mastered // Convert to boolean
                     
                 ));
                 window.currentFlashcardIndex = 0;
@@ -784,6 +851,21 @@ function displayCard(flashcard) {
         };
     }
 
+    // **Master Button**
+    const masterButton = cardModal.querySelector('#masterFlashcardBtn');
+    if (masterButton) {
+        // Set initial button text based on `isMastered`
+        masterButton.textContent = flashcard.isMastered ? 'Unmaster' : 'Master';
+
+        masterButton.onclick = () => {
+            toggleMasterStatus(flashcard.flashcardId);
+
+            // Update the button text dynamically
+            flashcard.isMastered = !flashcard.isMastered; // Toggle the state
+            masterButton.textContent = flashcard.isMastered ? 'Unmaster' : 'Master';
+        };
+    }
+
     // Add event listener for Previous button
     const prevButton = cardModal.querySelector('#prevFlashcardBtn');
     prevButton.addEventListener('click', showPreviousFlashcard);
@@ -840,6 +922,7 @@ function showNextFlashcard() {
         const questionElement = document.getElementById('displayQuestion');
         const answerElement = document.getElementById('displayAnswer');
         const toggleButton = document.getElementById('toggleAnswerBtn');
+        const masterButton = document.getElementById('masterFlashcardBtn'); // Master button
 
         questionElement.textContent = nextFlashcard.question;
         answerElement.textContent = nextFlashcard.answer;
@@ -847,6 +930,17 @@ function showNextFlashcard() {
         // Reset the answer visibility and toggle button text
         answerElement.style.display = 'none';
         toggleButton.textContent = 'Show Answer';
+
+        // Update the Master button text and click handler
+        if (masterButton) {
+            masterButton.textContent = nextFlashcard.isMastered ? 'Unmaster' : 'Master';
+            masterButton.onclick = () => {
+                toggleMasterStatus(nextFlashcard.flashcardId);
+                nextFlashcard.isMastered = !nextFlashcard.isMastered; // Toggle state
+                masterButton.textContent = nextFlashcard.isMastered ? 'Unmaster' : 'Master';
+            };
+        }
+
     }
 }
 
@@ -860,6 +954,7 @@ function showPreviousFlashcard() {
         const questionElement = document.getElementById('displayQuestion');
         const answerElement = document.getElementById('displayAnswer');
         const toggleButton = document.getElementById('toggleAnswerBtn');
+        const masterButton = document.getElementById('masterFlashcardBtn'); // Master button
 
         questionElement.textContent = previousFlashcard.question;
         answerElement.textContent = previousFlashcard.answer;
@@ -867,6 +962,17 @@ function showPreviousFlashcard() {
         // Reset the answer visibility and toggle button text
         answerElement.style.display = 'none';
         toggleButton.textContent = 'Show Answer';
+
+        // Update the Master button text and click handler
+        if (masterButton) {
+            masterButton.textContent = previousFlashcard.isMastered ? 'Unmaster' : 'Master';
+            masterButton.onclick = () => {
+                toggleMasterStatus(previousFlashcard.flashcardId);
+                previousFlashcard.isMastered = !previousFlashcard.isMastered; // Toggle state
+                masterButton.textContent = previousFlashcard.isMastered ? 'Unmaster' : 'Master';
+            };
+        }
+
     }
 }
 
@@ -882,6 +988,15 @@ function openOverviewModal(setId) {
 
                 // Clear any existing content
                 container.innerHTML = '';
+
+                // Ensure the currentFlashcards array and index are set
+                window.currentFlashcards = data.data.map(flashcard => new Flashcard(
+                    flashcard.flashcard_id,
+                    setId,
+                    flashcard.question,
+                    flashcard.answer,
+                    !!flashcard.is_mastered // Include isMastered for consistency
+                ));
 
                 // Populate the modal with flashcard data
                 data.data.forEach(flashcard => {
@@ -900,13 +1015,7 @@ function openOverviewModal(setId) {
 
                     // Add click event listener to open individual flashcard display
                     flashcardPair.addEventListener('click', () => {
-                       // Ensure the currentFlashcards array and index are set
-                        window.currentFlashcards = data.data.map(flashcard => new Flashcard(
-                            flashcard.flashcard_id,
-                            setId, // Add the setId here
-                            flashcard.question,
-                            flashcard.answer
-                        ));
+                       
                         window.currentFlashcardIndex = window.currentFlashcards.findIndex(
                             card => card.flashcardId === flashcard.flashcard_id
                         );

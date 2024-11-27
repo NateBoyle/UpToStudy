@@ -135,10 +135,14 @@
 .flashcardSetClickable {
     text-align: center;
     padding: 20px;
-    /*background-color: rgba(0, 0, 0, 0.05);  Light overlay */
     border-radius: 8px;
     transition: background-color 0.2s;
     cursor: pointer;
+
+    /* Add the following properties */
+    width: 350px; /* Or another value based on your layout */
+    margin: 0 auto;   /* Center the clickable area within the card */
+    text-align: center; /* Ensure text remains centered */
 }
 
 .flashcard-set:hover {
@@ -161,6 +165,23 @@
     font-size: 16px;
     color: #DDDDDD;
     margin-top: 0;
+}
+
+.progress-bar-container {
+    max-width: 250px; /* Full width of the card */
+    height: 10px; /* Height of the progress bar */
+    background-color: #292828; /* Light gray background */
+    border-radius: 5px; /* Rounded edges */
+    overflow: hidden; /* Ensure the progress bar stays within bounds */
+    border: 2px solid white; /* Add white border */
+    margin: 0 auto; /* Center the container */
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4caf50; /* Green bar */
+    transition: width 0.3s ease; /* Smooth transition */
+    border-radius: 5px; /* Match container edges */
 }
 
 /* Modal Styles */
