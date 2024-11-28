@@ -63,17 +63,27 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h2>TERM - SEMESTER</h2>
-                <button class="filter-btn">Filter by Semester</button>
+ 
+                <h2>CREATE - OPTIONS</h2>
+                <button class="createBtn" id="showModalBtn" >Add Course</button>
+                <button class="createBtn" id="defineSemesterBtn" >Define Semester</button>
+                
+
+                <h2>FILTER - OPTIONS</h2>
+                
+                <button class="filter-btn" id="allSemestersBtn">All Semesters</button>
+                <div id="semesterButtonsContainer">
+                    <!-- Semester buttons will be dynamically added here -->
+                </div>
+                
+
+
             </div>
 
             <!-- Course Container -->
             <div id="courseContainer" >
 
-                <!-- "Add Course" Button Styled as a Card inside the courseContainer -->
-                <div class="add-course" id="showModalBtn" >
-                    Add Course
-                </div>
+                
 
             </div>
 
@@ -85,46 +95,42 @@
 
         <!-- Modal Popup for Adding Courses -->
         <div id="modal" >
-            <div style="width: 450px; background: #2C2C2C; padding: 20px; border-radius: 10px; position: relative; color: white;">
+            <div id="modalContent" >
                 
-                <h2 id="modalHeading" style="text-align: center; margin-bottom: 10px;">Add New Course</h2>
+                <h2 id="modalHeading">Add New Course</h2>
 
                 <!-- Form element starts here -->
                 <form id="addCourseForm">
 
-                    <input type="text" id="courseName" name="courseName" placeholder="Course Name" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
-                    <span class="error" id="courseNameError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
+                    <input type="text" id="courseName" name="courseName" placeholder="Course Name">
+                    <span class="error" id="courseNameError"></span>
                     
-                    <input type="text" id="subject" name="subject" placeholder="Subject" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+                    <input type="text" id="subject" name="subject" placeholder="Subject">
                     
-                    <input type="text" id="professorName" name="professorName" placeholder="Professor Name" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+                    <input type="text" id="professorName" name="professorName" placeholder="Professor Name">
                     
                     <!-- Total Points Input -->
-                    <input type="number" id="totalPoints" name="totalPoints" placeholder="Total Points Possible" min="0" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+                    <input type="number" id="totalPoints" name="totalPoints" placeholder="Total Points Possible" min="0">
                 
                     <!-- Split time inputs -->
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <div id="timeInputs">
                         <label for="startTime" style="color: white; display: block; margin-bottom: 5px;">Start Time</label>
-                        <input type="time" id="startTime" name="startTime" placeholder="Start Time" style="width: 48%; padding: 10px; border-radius: 5px;">
+                        <input type="time" id="startTime" name="startTime" placeholder="Start Time">
                         <label for="endTime" style="color: white; display: block; margin-bottom: 5px;">End Time</label>
-                        <input type="time" id="endTime" name="endTime" placeholder="End Time" style="width: 48%; padding: 10px; border-radius: 5px;">
+                        <input type="time" id="endTime" name="endTime" placeholder="End Time">
                     </div>
-                    <span class="error" id="timeError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
+                    <span class="error" id="timeError"></span>
 
 
-                    <!-- Start date and end date inputs -->
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <label for="startDate" style="color: white; display: block; margin-bottom: 5px;">Start Date</label>
-                        <input type="date" id="startDate" name="startDate" placeholder="Start Date" max="2999-12-31" style="width: 48%; padding: 10px; border-radius: 5px;">
-                        <label for="endDate" style="color: white; display: block; margin-bottom: 5px;">End Date</label>
-                        <input type="date" id="endDate" name="endDate" placeholder="End Date" max="2999-12-31" style="width: 48%; padding: 10px; border-radius: 5px;">
-                    </div>
-                    <span class="error" id="dateError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
+                    <label id="semesterDropdownLabel" for="semesterDropdown">Select Semester</label>
+                    <select id="semesterDropdown" name="semester">
+                        <!-- Options will be populated dynamically -->
+                    </select>
 
 
 
                     <!-- Days of the Week Checkboxes -->
-                    <div style="display: flex; justify-content: space-around; margin-bottom: 10px;">
+                    <div id="daysOfTheWeek">
                         <label style="color: white;">
                             <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Mon"> Mon
                         </label>
@@ -147,12 +153,12 @@
                             <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Sun"> Sun
                         </label>
                     </div>
-                    <span class="error" id="daysError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
+                    <span class="error" id="daysError"></span>
 
 
                     <!-- New Dropdown for Color Selection -->
-                    <label for="courseColor" style="display: block; margin-bottom: 5px;">Course Label Color</label>
-                    <select id="courseColor" name="courseColor" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+                    <label id="courseColorLabel" for="courseColor">Course Label Color</label>
+                    <select id="courseColor" name="courseColor">
                         <option value="" disabled selected style="background-color: white; color: black;">Pick a color</option>
                         <option value="#7DBC4B" style="background-color: #7DBC4B; color: white;">Green</option>
                         <option value="#E52222" style="background-color: #E52222; color: white;">Red</option>
@@ -163,12 +169,32 @@
                     </select>
                     <span class="error" id="courseColorError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
 
-                    <button id="addCourseBtn" style="width: 100%; padding: 10px; background: #5DD770; border: none; color: white; font-size: 18px; border-radius: 5px;">Add Course</button>
+                    <button id="addCourseBtn">Add Course</button>
                 
                 </form>
                 <!-- Form element ends here -->
 
-                <button type="button" id="closeModalBtn" style="position: absolute; top: 10px; right: 10px; background: transparent; color: white; font-size: 24px; border: none; cursor: pointer;">&times;</button>
+                <button type="button" id="closeModalBtn">&times;</button>
+            </div>
+        </div>
+
+        <!-- Define Semester Modal -->
+        <div id="defineSemesterModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeDefineSemester">&times;</span>
+                <h2>Define Semester</h2>
+                <form id="defineSemesterForm">
+                    <label for="semesterName">Semester Name:</label>
+                    <input type="text" id="semesterName" name="semester_name" required>
+                    
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" max="2999-12-31" name="start_date" required>
+                    
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate" max="2999-12-31" name="end_date" required>
+                    
+                    <button type="submit" id="saveSemesterBtn">Save Semester</button>
+                </form>
             </div>
         </div>
         
@@ -180,4 +206,5 @@
 
     <script src="UTSsessionManager.js"></script>
     <script src="UTScourseManager.js?v=1.0"></script>
+    <script type="module" src="UTSdefineSemester.js"></script>
 </body>

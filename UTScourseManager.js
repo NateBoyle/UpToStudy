@@ -1,24 +1,20 @@
 class Course {
 
-    constructor(name, subject, professor, startTime, endTime, startDate, endDate, days, color, totalPoints, course_id) {
+    constructor(name, subject, professor, semester_id, semester_name, startTime, endTime, days, color, totalPoints, course_id) {
         this.name = name;
         this.subject = subject;
         this.professor = professor;
+        this.semester_id = semester_id;
+        this.semester_name = semester_name;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.startDate = startDate;
-        this.endDate = endDate;
         this.days = days;
         this.color = color;
         this.totalPoints = totalPoints;
         this.course_id = course_id;
+        
     }
 
-    formatDate(date) {
-        if (!date) return "Unknown";
-        const [year, month, day] = date.split("-");
-        return `${month}-${day}-${year}`;
-    }
 
     formatTimeTo12Hour(time) {
         let [hour, minute] = time.split(':');
@@ -52,9 +48,8 @@ class Course {
             <div class="course-content">
                 <p>Subject: ${this.subject}</p>
                 <p>Professor: ${this.professor}</p>
+                <p>Semester: ${this.semester_name || "Unassigned"}</p>
                 <p>Time: ${startTimeFormatted} - ${endTimeFormatted}</p>
-                <p>Start Date: ${this.formatDate(this.startDate)}</p>
-                <p>End Date: ${this.formatDate(this.endDate)}</p>
                 <p>Days: ${formattedDays}</p>
                 <p>Total Points: ${this.totalPoints}</p>
             </div>
@@ -106,10 +101,9 @@ function editCourse(courseId) {
     document.getElementById('courseName').value = course.name;
     document.getElementById('subject').value = course.subject;
     document.getElementById('professorName').value = course.professor;
+    document.getElementById('semesterDropdown').value = course.semester_id || "";
     document.getElementById('startTime').value = course.startTime;
     document.getElementById('endTime').value = course.endTime;
-    document.getElementById('startDate').value = course.startDate;
-    document.getElementById('endDate').value = course.endDate;
     document.getElementById('totalPoints').value = course.totalPoints;
     document.getElementById('courseColor').value = course.color;
 
@@ -164,20 +158,6 @@ function handleSaveCourseChanges(courseId) {
             displayErrors(data.errors || { general: "Unknown error occurred" });
         }
     })
-    /*.then(text => {
-        console.log("Response Text:", text); // Log response text to inspect HTML error message
-        try {
-            const data = JSON.parse(text); // Attempt to parse JSON
-            if (data.status === "success") {
-                alert("Course updated successfully!");
-                location.reload();
-            } else {
-                displayErrors(data.errors || { general: "Unknown error occurred" });
-            }
-        } catch (error) {
-            console.error("Error parsing JSON:", error, "Response Text:", text); // Log parsing error
-        }
-    })*/
     .catch(error => console.error("Error updating course:", error));
 }
 
@@ -219,9 +199,21 @@ class CourseManager {
         this.container.appendChild(courseElement);
     }
 
-    loadCoursesFromDatabase() {
-        fetch('UTScoursehandler.php')
-            .then(response => response.json())
+    loadCoursesFromDatabase(semester_id = null) {
+
+        // Clear the current courses from the container
+        this.container.innerHTML = '';
+
+        // Prepare the request URL
+        const url = semester_id
+        ? `UTScoursehandler.php?semester_id=${semester_id}`
+        : `UTScoursehandler.php`;
+
+        fetch(url)
+            .then(response => {
+                console.log("Raw Response:", response);
+                return response.json(); // Parse the JSON response
+            })
             .then(courses => {
                 console.log("Courses loaded:", courses); // Check the data being loaded
                 courses.forEach(courseData => {
@@ -229,10 +221,10 @@ class CourseManager {
                         courseData.name,
                         courseData.subject,
                         courseData.professor,
+                        courseData.semester_id || null,
+                        courseData.semester_name || "Unassigned",
                         courseData.start_time || "N/A",
                         courseData.end_time || "N/A",
-                        courseData.start_date || "Unknown",
-                        courseData.end_date || "Unknown",
                         courseData.days,
                         courseData.color,
                         courseData.total_points || 0,
@@ -248,66 +240,101 @@ class CourseManager {
 
 let courseManager;
 
-// Function to populate the color dropdown with swatches
-/*function populateColorDropdown() {
-    const colorDropdown = document.getElementById('courseColor');
+async function loadSemesters() {
 
-    const colorOptions = Array.from(document.querySelectorAll('#courseColor option')).map(option => ({
-        value: option.value,
-        label: option.textContent
-    }));
+    const dropdown = document.getElementById('semesterDropdown');
+    dropdown.innerHTML = ''; // Clear existing options
 
-    console.log(colorOptions);
+    const defaultOption = document.createElement('option');
+    defaultOption.value = "";
+    defaultOption.textContent = "Select a Semester";
+    dropdown.appendChild(defaultOption);
 
-    // Clear existing options
-    colorDropdown.innerHTML = '';
+    try {
+        console.log('Attempting to fetch semesters from UTSdefineSemester.php...');
+        const response = await fetch('UTSdefineSemester.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'fetch' }),
+        });
 
-    colorOptions.forEach(option => {
-        const swatchOption = document.createElement('option');
-        swatchOption.value = option.value;
-        swatchOption.textContent = option.label;
-        swatchOption.style.backgroundColor = option.value;
-        swatchOption.style.color = '#FFF'; // Ensure text is visible
-        colorDropdown.appendChild(swatchOption);
-    });
-}*/
+        console.log('Response received:', response);
 
-document.addEventListener("DOMContentLoaded", () => {
+        if (!response.ok) {
+            console.error('Network error:', response.statusText);
+            dropdown.innerHTML = '<option value="">Error loading semesters</option>';
+            return;
+        }
 
-    //const
-    courseManager = new CourseManager('courseContainer');
-    courseManager.loadCoursesFromDatabase();
+        const data = await response.json();
+        console.log('Parsed response data:', data);
 
-    const addCourseForm = document.getElementById('addCourseForm');
-    const modal = document.getElementById('modal');
-    const showModalBtn = document.getElementById('showModalBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const addCourseBtn = document.getElementById('addCourseBtn');
+        if (data.success) {
+            console.log('Fetched semesters:', data.data);
+            // Populate the dropdown with the fetched semesters
+            data.data.forEach(semester => {
+                const option = document.createElement('option');
+                option.value = semester.semester_id;
+                option.textContent = semester.name; // Adjust to match your PHP response field
+                dropdown.appendChild(option);
+            });
+        } else {
+            console.warn('Failed to fetch semesters:', data.message);
+            dropdown.innerHTML = '<option value="">No semesters available</option>';
+        }
+    } catch (error) {
+        console.error('Error loading semesters:', error);
+        dropdown.innerHTML = '<option value="">Error loading semesters</option>';
+    }
+}
 
-    showModalBtn.addEventListener('click', () => {
-        addCourseForm.reset();
-        addCourseBtn.textContent = "Add Course";
-        addCourseBtn.onclick = handleAddCourse;
+async function populateSemesterButtons() {
+    const container = document.getElementById('semesterButtonsContainer');
+    container.innerHTML = ''; // Clear any existing buttons
 
-        // Populate the color dropdown when the modal is rendered
-        //populateColorDropdown();
+    try {
+        const response = await fetch('UTSdefineSemester.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'fetch' }),
+        });
 
-        modal.style.display = 'flex';
-    });
+        if (!response.ok) throw new Error('Network response was not ok');
 
-    closeModalBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-});
+        const data = await response.json();
+        if (data.success && data.data.length > 0) {
+            data.data.forEach((semester) => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn'; // Apply the filter-btn class
+                button.textContent = semester.name;
+                button.setAttribute('data-semester-id', semester.semester_id);
+
+                // Append the button to the container
+                container.appendChild(button);
+            });
+        } else {
+            // Show a placeholder message if no semesters are available
+            const message = document.createElement('p');
+            message.textContent = 'No semesters defined';
+            message.style.color = 'white'; // Optional: Style to match your theme
+            container.appendChild(message);
+        }
+    } catch (error) {
+        console.error('Error fetching semesters:', error);
+        const errorMessage = document.createElement('p');
+        errorMessage.textContent = 'Error loading semesters';
+        errorMessage.style.color = 'red';
+        container.appendChild(errorMessage);
+    }
+}
+
 
 function handleAddCourse(e) {
     e.preventDefault();
 
     const formData = new FormData(document.getElementById('addCourseForm'));
 
-    // Log startTime and endTime to confirm their values
-    console.log("Start Time:", document.getElementById("startTime").value);
-    console.log("End Time:", document.getElementById("endTime").value);
+    formData.append('semester', document.getElementById('semesterDropdown').value);
 
     const days = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(checkbox => checkbox.value);
     formData.set('daysOfWeek', JSON.stringify(days));
@@ -340,3 +367,51 @@ function displayErrors(errors) {
         });
     }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    //const
+    courseManager = new CourseManager('courseContainer');
+    courseManager.loadCoursesFromDatabase();
+
+    const addCourseForm = document.getElementById('addCourseForm');
+    const modal = document.getElementById('modal');
+    const showModalBtn = document.getElementById('showModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const addCourseBtn = document.getElementById('addCourseBtn');
+
+    // Populate semester buttons dynamically
+    populateSemesterButtons().then(() => {
+        // Add event listeners to dynamically created semester buttons
+        document.querySelectorAll('.filter-btn[data-semester-id]').forEach(button => {
+            button.addEventListener('click', () => {
+                const semesterId = button.getAttribute('data-semester-id');
+                courseManager.loadCoursesFromDatabase(semesterId);
+            });
+        });
+    });
+
+    // Add event listener for the "All Semesters" button (if always in static HTML)
+    document.getElementById('allSemestersBtn').addEventListener('click', () => {
+        courseManager.loadCoursesFromDatabase(); // Fetch all courses
+    });
+
+    showModalBtn.addEventListener('click', () => {
+        
+        document.getElementById('modalHeading').textContent =  "Add New Course";
+        
+        addCourseForm.reset();
+        addCourseBtn.textContent = "Add Course";
+        addCourseBtn.onclick = handleAddCourse;
+
+        // Call loadSemesters to populate the semester dropdown
+        loadSemesters();
+        
+
+        modal.style.display = 'flex';
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+});

@@ -54,12 +54,30 @@ if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
 // Handle GET request to retrieve courses
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     
-    $query = "SELECT course_id, course_name AS name, subject, professor, total_points, start_time, end_time, start_date, end_date, 
-                     monday, tuesday, wednesday, thursday, friday, saturday, sunday, course_color AS color 
-              FROM courses 
-              WHERE user_id = ?";
+    // Get semester_id from the request, if provided
+    $semester_id = isset($_GET['semester_id']) ? $_GET['semester_id'] : null;
+
+    $query = "SELECT c.course_id, c.course_name AS name, c.subject, c.professor, c.total_points, c.start_time, c.end_time, 
+                     c.monday, c.tuesday, c.wednesday, c.thursday, c.friday, c.saturday, c.sunday, c.course_color AS color, 
+                     s.semester_id, s.name AS semester_name
+              FROM courses c
+              LEFT JOIN semesters s ON c.semester_id = s.semester_id
+              WHERE c.user_id = ?";
+
+    // Add semester filter if semester_id is provided
+    if ($semester_id !== null) {
+        $query .= " AND c.semester_id = ?";
+    }
+
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $user_id);
+    
+    // Bind parameters based on whether semester_id is provided
+    if ($semester_id !== null) {
+        $stmt->bind_param("ii", $user_id, $semester_id);
+    } else {
+        $stmt->bind_param("i", $user_id);
+    }
+    
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -98,8 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $start_time = $_POST['startTime'] . ':00' ?? '';
     $end_time = $_POST['endTime'] . ':00' ?? '';
     error_log("End Time received in PHP: " . $_POST['endTime']);
-    $start_date = $_POST['startDate'] ?? '';
-    $end_date = $_POST['endDate'] ?? '';
+    $semester_id = isset($_POST['semester']) ? intval($_POST['semester']) : null;
     $grade = NULL;
     $days_selected = isset($_POST['daysOfWeek']) ? json_decode($_POST['daysOfWeek'], true) : []; // Decode JSON string to array
     $course_color = isset($_POST['courseColor']) && !empty(trim($_POST['courseColor'])) ? trim($_POST['courseColor']) : '#7DBC4B'; // Set default to green
@@ -114,8 +131,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($start_time) || empty($end_time)) {
         $errors['time'] = "Start and end times are required.";
     }
-    if (empty($start_date) || empty($end_date)) {
-        $errors['date'] = "Start and end dates are required.";
+    if (empty($semester_id)) {
+        $errors['semester'] = "Semester is required.";
     }
     if (empty($days_selected)) {
         $errors['days'] = "At least one day of the week must be selected.";
@@ -149,13 +166,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Prepare the SQL statement to update the course
         $query = "UPDATE courses SET course_name = ?, subject = ?, professor = ?, total_points = ?, 
-                  start_time = ?, end_time = ?, start_date = ?, end_date = ?,
-                  monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, saturday = ?, sunday = ?, course_color = ?
+                  start_time = ?, end_time = ?, monday = ?, tuesday = ?, wednesday = ?, 
+                  thursday = ?, friday = ?, saturday = ?, sunday = ?, course_color = ?, semester_id = ?
                   WHERE course_id = ? AND user_id = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("sssissssiiiiiiisii", $course_name, $subject, $professor_name, $total_points,
-                            $start_time, $end_time, $start_date, $end_date, 
-                            $mon, $tue, $wed, $thu, $fri, $sat, $sun, $course_color, $courseId, $user_id);
+        $stmt->bind_param("sssissiiiiiiisiii", $course_name, $subject, $professor_name, $total_points,
+                            $start_time, $end_time, $mon, $tue, $wed, $thu, $fri, $sat, $sun, 
+                            $course_color, $semester_id, $courseId, $user_id);
 
         if ($stmt->execute()) {
             echo json_encode(['status' => 'success', 'message' => 'Course updated successfully!']);
@@ -171,13 +188,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Prepare the SQL statement to insert the course into the database
         $stmt = $conn->prepare(
-            "INSERT INTO courses (user_id, course_name, subject, professor, total_points, start_time, end_time, start_date, end_date, grade, monday, tuesday, wednesday, thursday, friday, saturday, sunday, course_color) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO courses (user_id, course_name, subject, professor, total_points, start_time, end_time, grade, monday, tuesday, wednesday, thursday, friday, saturday, sunday, course_color, semester_id) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            "isssissssdiiiiiiis", 
-            $user_id, $course_name, $subject, $professor_name, $total_points, $start_time, $end_time, $start_date, $end_date, 
-            $grade, $mon, $tue, $wed, $thu, $fri, $sat, $sun, $course_color
+            "isssissdiiiiiiisi", 
+            $user_id, $course_name, $subject, $professor_name, $total_points, $start_time, $end_time, $grade, 
+            $mon, $tue, $wed, $thu, $fri, $sat, $sun, $course_color, $semester_id
         );
 
         // Execute the statement and check if it was successful
