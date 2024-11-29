@@ -166,7 +166,11 @@
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    height: 97%; /* Ensure it stretches to fill the available space */
+    height: auto; /* Allow dynamic height for the calendar container */
+    min-height: 600px; /* Set a minimum height for larger content */
+    overflow-y: auto; /* Allow scrolling for taller content */
+    overflow-x: hidden; /* Prevent horizontal scrolling if unnecessary */
+    position: relative; /* Keep content aligned properly */
 }
 
 .calendar-header {
@@ -174,7 +178,7 @@
     align-items: center; /* Center align items vertically */
     justify-content: space-between; /* Space between titles and buttons */
     padding: 0.5rem 1rem; /* Reduce padding */
-    margin-bottom: 0.5rem; /* Reduce spacing below the header */
+    margin-bottom: 0.2rem; /* Reduce spacing below the header */
     background: #2C2C2C;
     border-radius: 10px;
 }
@@ -221,7 +225,7 @@
 
 .calendar-buttons {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
     justify-content: flex-end;
 }
 
@@ -230,14 +234,69 @@
     color: white;
     font-size: 1rem;
     font-weight: 600;
-    padding: 0.8rem 1.5rem;
+    padding: 0.8rem 1.0rem;
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    width: 120px; /* Fixed width for this specific button */
 }
 
 .calendar-button:hover {
-    background: #77B942;
+    background: #4bb362;
+}
+
+#weekMonthBtn {
+    
+    text-align: center; /* Center-align the text */
+    padding: 0.8rem 0; /* Adjust padding for a balanced look */
+    font-size: 1rem; /* Keep font size consistent */
+    font-weight: 600; /* Make the text bold */
+}
+
+.days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 equal columns */
+    text-align: center; /* Center-align the day names */
+    font-weight: bold; /* Make the text bold */
+    font-size: 1rem; /* Adjust font size */
+    color: white; /* Text color for contrast */
+    padding: 5px 0; /* Add spacing inside the header */
+    border-radius: 10px; /* Match the calendar's rounded corners */
+    margin-bottom: 10px; /* Add space below the header */
+}
+
+.days-header .day {
+    display: flex; /* Flex layout for vertical stacking */
+    flex-direction: column; /* Stack name and number vertically */
+    align-items: center;
+    justify-content: center; /* Center content within the day cell */
+    padding: 5px;
+    text-transform: uppercase; /* Keep day names uppercase */
+}
+
+.day-name {
+    font-size: inherit; /* Default font size in month view */
+    margin-bottom: 0; /* Remove extra spacing in month view */
+}
+
+.day-number {
+    display: none; /* Hide day numbers in month view */
+}
+
+/* Week View Overrides */
+.week-view .days-header {
+    font-size: 0.9rem; /* Slightly smaller font size for week view */
+}
+
+.week-view .day-name {
+    font-size: 0.8rem; /* Smaller day name font size in week view */
+    margin-bottom: 2px; /* Add spacing below the day name */
+}
+
+.week-view .day-number {
+    display: block; /* Show day numbers in week view */
+    font-size: 0.8rem; /* Smaller font size for day numbers */
+    color: lightgrey; /* Subtle color for contrast */
 }
 
 /* Calendar Grid */
@@ -251,6 +310,25 @@
     border-radius: 15px; /* Rounded corners */
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Optional: Subtle shadow */
     flex-grow: 1; /* Allow the grid to fill available height */
+    box-sizing: border-box; /* Ensure padding doesn't affect dimensions */
+}
+
+/* Month View: 5 Rows */
+.calendar-grid:not(.week-view) {
+    grid-template-rows: repeat(5, 1fr); /* 5 rows for month view */
+    grid-auto-rows: minmax(100px, auto); /* Flexible row height */
+}
+
+.calendar-grid.week-view {
+    grid-template-rows: 1fr; /* Only one row */
+    /*grid-auto-rows: minmax(50px, auto);  Adjust for desired row height */
+    max-height: 600px !important; /* Limit grid height for scrollability */
+    height: 600px; /* Explicit height for the week view */
+    overflow-y: scroll !important; /* Enable vertical scrolling */
+    position: relative; /* Keep content within bounds */
+    scrollbar-width: thin; /* Optional: Make scrollbar thinner */
+    z-index: 1; /* Ensure the grid is above other elements */
+    
 }
 
 .calendar-cell {
@@ -268,6 +346,7 @@
     cursor: pointer; /* Change cursor to pointer */
     transition: background 0.3s ease; /* Smooth background transition */
     position: relative; /* Ensure proper positioning for content */
+    z-index: 1; /* Ensure cells are above the grid background */
 }
 
 .inactive-cell {
@@ -277,16 +356,93 @@
 }
 
 .calendar-cell.today {
-    border: 2px solid #5DD970; /* Highlight today's date */
+    /*border: 2px solid #5DD970;  Highlight today's date */
     border-radius: 10px;
+    outline: 3px solid #5DD970; /* Replace border with outline */
+    
     background: #2C2C2C; /* Ensure it matches other cells */
     color: white;
     font-weight: bold;
 }
 
+.calendar-grid.week-view .calendar-cell {
+    position: relative; /* Ensure lines are positioned inside the cell */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Evenly space the lines */
+    padding: 0; /* Remove extra padding to fit lines properly */
+    height: 1200px; /* Total height for all 24 slots (50px per slot * 24 slots) */
+    overflow: hidden; /* Prevent time-slot hover effect from overriding */
+}
+
 .calendar-cell:hover {
     background: #424242;
 }
+
+/* Disable Entire Day Hover for Week View */
+.calendar-grid.week-view .calendar-cell:hover {
+    background-color: #2C2C2C; /* Prevent the whole column from highlighting */
+}
+
+/* Time Slot Styling */
+.time-slot {
+    height: calc(100% / 24); /* Divide the calendar cell into 24 equal parts */
+    width: 100%; /* Ensure the slot spans the entire width of the cell */
+    
+    border-top: 1px solid lightgrey; /* Light divider between time slots */
+    position: relative; /* Allows positioning of events inside */
+    box-sizing: border-box; /* Include borders in height calculation */
+}
+
+
+
+/* Optional: Highlight the current time slot */
+.time-slot.current {
+    border-top: 2.5px solid #5DD970; /* Top border in light green */
+    border-bottom: 2.5px solid #5DD970; /* Bottom border in light green */
+    position: relative; /* Ensure proper stacking context */
+    z-index: 300;
+    height: calc(100%/ 24 + 5px);  /*Slightly increase height */
+    margin-top: -2px;
+    margin-bottom: -3px;
+}
+
+/* Hover Effect for Time Slots */
+.time-slot:hover {
+    background-color: #424242; /* Same as the current day hover effect */
+    cursor: pointer; /* Show pointer for interactivity */
+}
+
+/* Base styles for event blocks (Month View) */
+.event-block {
+    position: relative; /* Positioned within the day cell */
+    width: auto; /* Full width of the day cell */
+    height: auto; /* Adapt to content or multiple events */
+    box-sizing: border-box;
+    padding: 5px;
+    color: white;
+    background-color: var(--event-color, #424FC6); /* Fallback for dynamic course/event color */
+    border-radius: 5px;
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 3px; /* Space between stacked events */
+    z-index: 500;
+}
+
+/* Specific styles for Week View */
+.calendar-grid.week-view .event-block {
+    position: absolute; /* Positioned within the time slot */
+    width: 90%; /* Ensure it fits within the time slot */
+    height: 100%; /* Match the height of the time slot */
+    top: 0; /* Start at the top of the time slot */
+    left: 5%; /* Center horizontally in the time slot */
+    border-radius: 5px;
+    font-size: 0.9rem; /* Slightly larger font for week view */
+    margin: 0; /* Remove extra spacing in week view */
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
