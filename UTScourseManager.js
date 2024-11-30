@@ -101,7 +101,14 @@ function editCourse(courseId) {
     document.getElementById('courseName').value = course.name;
     document.getElementById('subject').value = course.subject;
     document.getElementById('professorName').value = course.professor;
-    document.getElementById('semesterDropdown').value = course.semester_id || "";
+    
+    // Call loadSemesters to populate the dropdown
+    loadSemesters().then(() => {
+        // After semesters are loaded, set the selected value
+        const semesterDropdown = document.getElementById('semesterDropdown');
+        semesterDropdown.value = course.semester_id || "";
+    });
+
     document.getElementById('startTime').value = course.startTime;
     document.getElementById('endTime').value = course.endTime;
     document.getElementById('totalPoints').value = course.totalPoints;
@@ -127,9 +134,14 @@ function editCourse(courseId) {
 }
 
 function handleSaveCourseChanges(courseId) {
+
     console.log("Attemping to save changes to course with ID:", courseId); // Debugging line
     const formData = new FormData(document.getElementById('addCourseForm'));
     formData.append("courseId", String(courseId));
+
+    // Convert empty semester value to NULL
+    const semesterValue = document.getElementById('semesterDropdown').value;
+    formData.append('semester', semesterValue === "" ? null : semesterValue);
 
     const days = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(checkbox => checkbox.value);
     formData.set('daysOfWeek', JSON.stringify(days));
@@ -245,6 +257,13 @@ async function loadSemesters() {
     const dropdown = document.getElementById('semesterDropdown');
     dropdown.innerHTML = ''; // Clear existing options
 
+    // Add the "No Semester" option
+    const noSemesterOption = document.createElement('option');
+    noSemesterOption.value = ""; // Use a specific value for "No Semester"
+    noSemesterOption.textContent = "No Semester";
+    dropdown.appendChild(noSemesterOption);
+
+    // Add the default "Select a Semester" option
     const defaultOption = document.createElement('option');
     defaultOption.value = "";
     defaultOption.textContent = "Select a Semester";

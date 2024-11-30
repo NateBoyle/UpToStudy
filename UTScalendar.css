@@ -168,7 +168,7 @@
     flex-direction: column;
     height: auto; /* Allow dynamic height for the calendar container */
     min-height: 600px; /* Set a minimum height for larger content */
-    overflow-y: auto; /* Allow scrolling for taller content */
+    overflow-y: hidden; /* Allow scrolling for taller content */
     overflow-x: hidden; /* Prevent horizontal scrolling if unnecessary */
     position: relative; /* Keep content aligned properly */
 }
@@ -317,18 +317,26 @@
 .calendar-grid:not(.week-view) {
     grid-template-rows: repeat(5, 1fr); /* 5 rows for month view */
     grid-auto-rows: minmax(100px, auto); /* Flexible row height */
+    position: relative;
+    overflow: visible;
 }
 
 .calendar-grid.week-view {
-    grid-template-rows: 1fr; /* Only one row */
-    /*grid-auto-rows: minmax(50px, auto);  Adjust for desired row height */
-    max-height: 600px !important; /* Limit grid height for scrollability */
-    height: 600px; /* Explicit height for the week view */
-    overflow-y: scroll !important; /* Enable vertical scrolling */
-    position: relative; /* Keep content within bounds */
-    scrollbar-width: thin; /* Optional: Make scrollbar thinner */
-    z-index: 1; /* Ensure the grid is above other elements */
-    
+    display: flex;
+    flex-direction: column; /* Aligns the nested grid vertically */
+    height: 100%; /* Let the parent container handle height */
+    overflow-y: auto; /* Enable vertical scrolling for the week grid */
+    scrollbar-width: thin; /* Optional: Thinner scrollbars */
+}
+
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 columns for days */
+    grid-template-rows: repeat(24, 50px); /* 24 rows for hours */
+    max-height: calc(100vh - 200px); /* Constrain grid to fit viewport */
+    overflow-y: auto; /* Enable vertical scrolling for the week grid */
+    scrollbar-width: thin; /* Optional: Thinner scrollbars */
+    grid-auto-flow: column; /* Ensure items fill top-to-bottom in columns */
 }
 
 .calendar-cell {
@@ -339,14 +347,16 @@
     flex-direction: column; /* Allow stacking of content if needed */
     justify-content: flex-start; /* Align content to the top */
     align-items: flex-start; /* Align content to the left */
-    font-size: 1.2rem; /* Adjust font size */
-    font-weight: 600; /* Make text bold */
+    font-size: 1rem; /* Adjust font size */
+    font-weight: 500; /* Make text bold */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Subtle shadow effect */
-    padding: 10px; /* Add padding to control spacing inside the cell */
+    padding: 7px; /* Add padding to control spacing inside the cell */
     cursor: pointer; /* Change cursor to pointer */
     transition: background 0.3s ease; /* Smooth background transition */
     position: relative; /* Ensure proper positioning for content */
     z-index: 1; /* Ensure cells are above the grid background */
+    position: relative;
+    overflow: visible !important;
 }
 
 .inactive-cell {
@@ -359,24 +369,18 @@
     /*border: 2px solid #5DD970;  Highlight today's date */
     border-radius: 10px;
     outline: 3px solid #5DD970; /* Replace border with outline */
-    
     background: #2C2C2C; /* Ensure it matches other cells */
     color: white;
     font-weight: bold;
+    
 }
 
-.calendar-grid.week-view .calendar-cell {
-    position: relative; /* Ensure lines are positioned inside the cell */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Evenly space the lines */
-    padding: 0; /* Remove extra padding to fit lines properly */
-    height: 1200px; /* Total height for all 24 slots (50px per slot * 24 slots) */
-    overflow: hidden; /* Prevent time-slot hover effect from overriding */
-}
 
 .calendar-cell:hover {
     background: #424242;
+    font-weight: bold;
+    z-index: 1000;
+    
 }
 
 /* Disable Entire Day Hover for Week View */
@@ -385,26 +389,31 @@
 }
 
 /* Time Slot Styling */
-.time-slot {
-    height: calc(100% / 24); /* Divide the calendar cell into 24 equal parts */
-    width: 100%; /* Ensure the slot spans the entire width of the cell */
-    
+.week-grid .time-slot {
+    width: 100%; /* Ensure the slot spans the full width of the day column */
+    font-size: 0.7rem; /* Adjust font size */
+    color: gray; /* Default text color */
+    text-align: left;
+    text-indent: 3px;
+    padding-top: 2px;
     border-top: 1px solid lightgrey; /* Light divider between time slots */
+    border-right: 0.5px solid lightgrey;
     position: relative; /* Allows positioning of events inside */
     box-sizing: border-box; /* Include borders in height calculation */
+    overflow: visible;
+    border-radius: 3px;
 }
-
 
 
 /* Optional: Highlight the current time slot */
 .time-slot.current {
-    border-top: 2.5px solid #5DD970; /* Top border in light green */
-    border-bottom: 2.5px solid #5DD970; /* Bottom border in light green */
+    border: 2.5px solid #5DD970; /* Bottom border in light green */
     position: relative; /* Ensure proper stacking context */
     z-index: 300;
-    height: calc(100%/ 24 + 5px);  /*Slightly increase height */
     margin-top: -2px;
-    margin-bottom: -3px;
+    margin-bottom: -2px;
+    border-radius: 5px; /* Slightly rounds the edges of the time slot */
+    box-shadow: 0px 0px 10px rgba(93, 215, 112, 0.8); /* Adds a glowing effect */
 }
 
 /* Hover Effect for Time Slots */
@@ -414,33 +423,74 @@
 }
 
 /* Base styles for event blocks (Month View) */
-.event-block {
-    position: relative; /* Positioned within the day cell */
-    width: auto; /* Full width of the day cell */
-    height: auto; /* Adapt to content or multiple events */
-    box-sizing: border-box;
-    padding: 5px;
+.event-bar {
+    background-color: #424FC6;
     color: white;
-    background-color: var(--event-color, #424FC6); /* Fallback for dynamic course/event color */
-    border-radius: 5px;
-    font-size: 0.8rem;
+    padding: 2px 2px;
+    font-size: 12px;
+    margin-top: 2px;
+    border-radius: 4px;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-bottom: 3px; /* Space between stacked events */
-    z-index: 500;
+    cursor: pointer; /* Show pointer for tooltips */
+    width: 100%;
 }
 
+.event-bar:hover {
+    opacity: 0.9;
+}
+
+/* Tooltip Styling */
+.event-tooltip {
+    position: absolute;
+    top: 27%; 
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-size: 12px;
+    pointer-events: none; /* Prevent tooltip from interfering with hover */
+    z-index: 5000;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    overflow-wrap: break-word;
+}
+
+/* Tooltip Arrow 
+.event-tooltip::after {
+    content: '';
+    position: absolute;
+    top: -5px; 
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+}*/
+
 /* Specific styles for Week View */
-.calendar-grid.week-view .event-block {
-    position: absolute; /* Positioned within the time slot */
-    width: 90%; /* Ensure it fits within the time slot */
-    height: 100%; /* Match the height of the time slot */
-    top: 0; /* Start at the top of the time slot */
-    left: 5%; /* Center horizontally in the time slot */
-    border-radius: 5px;
+/* Week View Event Blocks */
+.week-grid .time-slot .event-block {
+    position: absolute; /* Ensure placement within the grid */
+    width: 70%;  /*Constrain width within the grid column */
+    top: 0; /* Align to the top of the grid row */
+    left: 12%; /* Center horizontally (95% width with 2.5% left offset) */
+    background-color: var(--event-color, #424FC6); /* Default color */
+    color: white; /* Text color */
     font-size: 0.9rem; /* Slightly larger font for week view */
-    margin: 0; /* Remove extra spacing in week view */
+    padding: 5px; /* Inner padding for text */
+    border-radius: 5px; /* Optional: rounded corners */
+    text-overflow: ellipsis; /* Add ellipsis for long text */
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Ensure content stays within the block */
+    box-sizing: border-box; /* Include padding and borders in dimensions */
+    z-index: 100; /* Ensure it's above other elements */
 }
 
 

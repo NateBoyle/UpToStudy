@@ -15,7 +15,7 @@
     white-space: nowrap; /* Prevents wrapping */
     margin-left: 22%; /* Centers the container itself */
     margin-top: 20px; /* Ensure it starts right below the sidebar */
-    border: 2px solid white; /* Adds a white border around the container */
+    /*border: 2px solid white; /* Adds a white border around the container */
     border-radius: 15px; /* Optional: adds rounded corners to the border */
 }
 
@@ -27,6 +27,7 @@
     max-height: 350px;
     flex-shrink: 0; /* Prevents shrinking */
     background: #2C2C2C;
+    border: 2px lightgray;
     border-radius: 20px;
     color: white;
     font-family: UTSfont;
@@ -71,6 +72,7 @@
     height: calc(100% - 86px);
     padding: 10px 0; /* Minimal padding for consistent height */
     box-sizing: border-box;
+    border: 2px lightgray;
 }
 
 /* Adjust individual paragraph styles inside course-content */
