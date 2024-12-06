@@ -19,27 +19,7 @@ $userId = $_SESSION['user_id'];
 // Check if the request is for retrieving courses or inserting a flashcard set
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-    if (isset($_GET['type']) && $_GET['type'] === 'courses') {
-        // Retrieve courses for the user
-
-        // Prepare and execute the SQL statement
-        $query = "SELECT course_id, course_name FROM courses WHERE user_id = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        $courses = [];
-        while ($row = $result->fetch_assoc()) {
-            $courses[] = $row;
-        }
-
-        // Output the courses as a JSON response
-        echo json_encode(['status' => 'success', 'data' => $courses]);
-
-        $stmt->close(); // Close the statement
-
-    } elseif (isset($_GET['type']) && $_GET['type'] === 'flashcard_sets') {
+    if (isset($_GET['type']) && $_GET['type'] === 'flashcard_sets') {
         // Retrieve flashcard sets with associated course names
         $query = "SELECT fs.set_id, fs.set_name, fs.course_id, fs.num_cards, fs.cards_mastered, c.course_name 
                   FROM flashcard_sets AS fs

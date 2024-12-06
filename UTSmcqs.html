@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>UpToStudy</title>
+
+    <link rel="icon" type="image/x-icon" href="UTSicon2.png">
+
+    <link rel="stylesheet" href="UTScss.css">
+
+    <!-- MCQ (andFlashcard) page-specific styles -->
+    <link rel="stylesheet" href="UTSstudy.css">
+    <link rel="stylesheet" href="UTSmcqs.css">
+
+    
+
+    <style>
+        @font-face {
+            font-family: UTSfont;
+            src: url(PlusJakartaSans-Medium.TTF);
+        }
+    </style>
+
+</head>
+<body>
+
+    
+    <div style="width: 100%; height: 100%; position: relative; border-radius: 15px">
+        
+        <!-- Header Container -->
+        <div class="header">
+              
+            <!-- Left Side: Logo -->
+            <a href="UTStemplate.html">
+                <img src="UTSicon2.png" alt="UpToStudy Logo">
+            </a>
+
+            
+
+            <!-- Center: Navigation Links -->
+            <div class="nav-links">
+                <a href="UTSdash.html" class="nav-item">Dashboard</a>
+                <a href="UTScalendar.html" class="nav-item">Calendar</a>
+                <a href="UTScourses.html" class="nav-item">Courses</a>
+                <a href="UTScards.html" class="nav-item active">Study</a>
+                <a href="UTSgoals.html" class="nav-item">Goals</a>
+            </div>
+
+            <!-- Right Side: User Initial -->
+            <div class="user-initial" id="userInitial">N</div>
+
+            <!-- Dropdown Modal for Profile Options -->
+            <div id="profileDropdown" class="profile-dropdown">
+                <button class="dropdown-option" id="editProfileBtn">Edit Profile</button>
+                <button class="dropdown-option" id="logoutBtn">Logout</button>
+            </div>
+
+        </div>
+
+        <!-- Container for Sidebar, Search, and Flashcard Management -->
+        <div style="display: flex; top: 105px; position: relative;">
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h2>TERM - SEMESTER</h2>
+                <button class="see-past-courses">See Past Courses</button>
+            </div>
+
+            <!-- Flashcard Content Area (Main Section) -->
+            <div class="studypage-content">
+
+                
+
+                <div class="studypage-header">
+                    <!-- Search Bar -->
+                    <div class="studypage-search">
+                        <input type="text" placeholder="Search questions...">
+                    </div>
+
+                    <div>
+                        <!-- Download Template Button -->
+                        <a href="UTS_MCQ_Upload_Template.csv" download="UTS_MCQ_Upload_Template.csv">
+                            <button id="downloadMCQTemplateButton" class="create-set">Download Template</button>
+                        </a>
+
+                        <!-- Create Set Button -->
+                        <button id="createMCQSetButton" class="create-set" onclick="openCreateMCQSetModal()">Create MCQ Set</button>
+
+                        <!-- Go to Flashcards Button -->
+                         <a href="UTScards.html">
+                            <button id="FCButton" class="create-set">Flashcards</button>
+                        </a>
+
+                    </div>
+
+                </div>
+
+                <!-- Modal for Creating MCQ Sets -->
+                <div id="setCreationModal" class="setModal" role="dialog" aria-label="MCQ Set Modal">
+
+                    <div class="setCreationModal-content">
+                        <!-- Close Button -->
+                        <span class="closeButton" onclick="closeCreateMCQSetModal()">&times;</span>
+                        <h2>Create New MCQ Set</h2>
+
+                        <!-- Set Name Input -->
+                        <input type="text" id="setNameInput" placeholder="Set Name">
+
+                        <!-- Course Dropdown -->
+                        <select id="courseDropdown" placeholder="Select Course">
+                            <option value="" disabled selected>Select Course</option>
+                            <option value="">No course / N/A</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+
+                        <!-- File Upload -->
+                        <label for="fileInput" class="upload-button">
+                            <span title="Please use template">Upload MCQ File</span>
+                            <span style="font-size: 10px; margin-top: 1px;">(Optional)</span>
+                        </label>
+                        <input type="file" id="fileInput" accept=".csv" style="display: none;">
+                        <br><span id="fileName">No file chosen</span>
+
+                        <!-- Save Button -->
+                        <button id="saveSetBtn">Save Set</button>
+                    </div>
+                </div>
+
+                <!-- MCQ Sets Container -->
+                <div id="mcqSetsContainer" class="studySetContainer">
+                    <!-- MCQ sets will be dynamically appended here -->
+                    <p id="emptySetsMessage" style="display: none;">No MCQ sets available.</p>
+                </div>
+
+
+                <!-- Modal for Creating Individual MCQs -->
+                <div id="mcqCreationModal" class="mcqModal">
+
+                    <div class="mcqModal-content">
+
+                        <!-- Close Button -->
+                        <span class="closeButton" onclick="closeMCQModal()">&times;</span>
+
+                        <!-- Modal Heading -->
+                        <h2 id="mcqCreationModalHeading">Create MCQ</h2>
+
+                        <!-- Question Input -->
+                        <input type="text" id="mcqQuestionInput" placeholder="Question" required>
+
+                        <!-- Options Inputs -->
+                        
+                        <input type="text" id="mcqOption1" placeholder="Option A" required>
+                        <input type="text" id="mcqOption2" placeholder="Option B" required>
+                        <input type="text" id="mcqOption3" placeholder="Option C" required>
+                        <input type="text" id="mcqOption4" placeholder="Option D" required>
+
+                        <!-- Instruction Text -->
+                        <p class="instruction-text">Please check the correct answers:</p>
+
+                        <!-- Correct Option Checkboxes -->
+                        <div class="mcq-correct-options">
+                            <label>
+                                A.<input type="checkbox" id="mcqCorrectOption1" value="1"> 
+                            </label>
+                            <label>
+                                B.<input type="checkbox" id="mcqCorrectOption2" value="2"> 
+                            </label>
+                            <label>
+                                C.<input type="checkbox" id="mcqCorrectOption3" value="3"> 
+                            </label>
+                            <label>
+                                D.<input type="checkbox" id="mcqCorrectOption4" value="4"> 
+                            </label>
+                        </div>
+
+                        <!-- Add Button -->
+                        <button id="addMCQBtn">Add MCQ</button>
+
+                    </div>       
+                </div>
+                
+
+                <!-- Modal for Displaying MCQs -->
+                <div id="mcqDisplayModal" class="mcqModal">
+                    <div class="mcqModal-content">
+                        <!-- Static Options -->
+                        <span id="closeMCQ" class="closeButton">&times;</span>
+                        <div class="mcq-options">
+                            <button id="editMCQBtn">Edit</button>
+                            <button id="deleteMCQBtn">Delete</button>
+                            <button id="masterMCQBtn">Master</button>
+                        </div>
+                        <!-- Dynamic Content -->
+                        <div id="mcqContent">
+                            <h2 id="mcqQuestionDisplay"></h2>
+                            <div id="mcqOptionsContainer">
+                                <!-- Options will be dynamically rendered here -->
+                            </div>
+                        </div>
+                        <!-- Navigation and Toggle -->
+                        <button id="prevMCQBtn">&larr;</button>
+                        <button id="nextMCQBtn">&rarr;</button>
+                        <button id="showMCQAnswerBtn">Show Answer</button>
+                    </div>
+                </div>
+
+                <!-- MCQ Overview Modal -->
+                <div id="mcqOverviewModal" class="mcqModal">
+                    <div class="mcqModal-content">
+                        <!-- Close Button -->
+                        <span id="closeMCQOverviewModal" class="closeButton">&times;</span>
+                        <h2>MCQ Overview</h2>
+                        <div id="mcqOverviewContainer" class="scrollable-container">
+                            <!-- MCQ items will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+                
+                
+
+            </div>
+
+
+        </div>
+        
+
+
+    </div>
+
+    <!-- Include JavaScript file at the end of body -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="UTSsessionManager.js"></script>
+    <script type="module" src="UTSmcqs.js"></script>
+
+</body>

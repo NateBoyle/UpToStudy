@@ -10,7 +10,8 @@
 
     <!-- Flashcard page-specific styles -->
     <link rel="stylesheet" href="UTScards.css">
-    <link rel="stylesheet" href="UTScardsets.css">
+    <!--<link rel="stylesheet" href="UTScardsets.css">-->
+    <link rel="stylesheet" href="UTSstudy.css">
 
     
 
@@ -42,7 +43,7 @@
                 <a href="UTSdash.html" class="nav-item">Dashboard</a>
                 <a href="UTScalendar.html" class="nav-item">Calendar</a>
                 <a href="UTScourses.html" class="nav-item">Courses</a>
-                <a href="UTScards.html" class="nav-item active">Flashcards</a>
+                <a href="UTScards.html" class="nav-item active">Study</a>
                 <a href="UTSgoals.html" class="nav-item">Goals</a>
             </div>
 
@@ -67,13 +68,12 @@
             </div>
 
             <!-- Flashcard Content Area (Main Section) -->
-            <div class="flashcardpage-content">
+            <div class="studypage-content">
 
-                
 
-                <div class="flashcardpage-header">
+                <div class="studypage-header">
                     <!-- Search Bar -->
-                    <div class="flashcard-search">
+                    <div class="studypage-search">
                         <input type="text" placeholder="Search flashcards...">
                     </div>
 
@@ -85,15 +85,21 @@
                         
                         <!-- Create Set Button -->
                         <button id="createSetButton" class="create-set" onclick="openCreateSetModal()">Create Set</button>
+
+                        <!-- Go to MCQ Button -->
+                        <a href="UTSmcqs.html">
+                            <button id="MCQButton" class="create-set">Multiple Choice</button>
+                        </a> 
+
                     </div>
 
                 </div>
 
                 <!-- Modal for Creating Flashcard sets -->
-                <div id="flashcardSetModal" class="modal" role="dialog" aria-label="Flashcard Set Modal">
+                <div id="setCreationModal" class="setModal" role="dialog" aria-label="Flashcard Set Modal">
 
-                    <div class="modal-content">
-                        <span class="close" onclick="closeCreateSetModal()">&times;</span>
+                    <div class="setCreationModal-content">
+                        <span class="closeButton" onclick="closeCreateSetModal()">&times;</span>
                         <h2>Create New Flashcard Set</h2>
                         
                         <input type="text" id="setNameInput" placeholder="Set Name">
@@ -104,7 +110,6 @@
                             <option value="">No course / N/A</option>
                             <!-- Options will be populated dynamically -->
                         </select>
-
                         
                         <label for="fileInput" class="upload-button">
                             <span title="Please use template">Upload Flashcard File </span><span style="font-size: 10px; margin-top: 1px;"> (Optional)</span>
@@ -118,20 +123,20 @@
                 </div>
 
                 <!-- Flashcard Sets Container -->
-                <div id="flashcardSetsContainer" class="flashcardContainer">
+                <div id="flashcardSetsContainer" class="studySetContainer">
                     <!-- Flashcard sets will be dynamically appended here -->
                     <p id="emptySetsMessage" style="display: none;">No flashcard sets available.</p>
                 </div>
 
 
                 <!-- Modal for Creating Individual Flashcards -->
-                <div id="flashcardModal" class="modal">
+                <div id="fcCreationModal" class="fcModal">
 
-                    <div class="modal-content">
+                    <div class="fcModal-content">
 
-                        <span class="close" onclick="closeFlashcardModal()">&times;</span>
+                        <span class="closeButton" onclick="closeFlashcardModal()">&times;</span>
 
-                        <h2 id="flashcardModalHeading">Create Flashcard</h2>
+                        <h2 id="fcCreationModalHeading">Create Flashcard</h2>
 
                         <input type="text" id="flashcardQuestion" placeholder="Question" required>
                         <input type="text" id="flashcardAnswer" placeholder="Answer" required>
@@ -144,10 +149,10 @@
 
                 <!-- Modal for Displaying Flashcards -->
                 
-                <div id="flashcardDisplayModal" class="modal">
-                    <div class="modal-content">
+                <div id="flashcardDisplayModal" class="fcModal">
+                    <div class="fcModal-content">
                         <!-- Static Options -->
-                        <span id="closeCard" class="close">&times;</span>
+                        <span id="closeCard" class="closeButton">&times;</span>
                         <div class="flashcard-options">
                             <button id="editFlashcardBtn">Edit</button>
                             <button id="deleteFlashcardBtn">Delete</button>
@@ -166,9 +171,9 @@
                 </div>
 
                 <!--Flashcard Overview Modal-->
-                <div id="flashcardOverviewModal" class="modal">
-                    <div class="modal-content">
-                        <span id="closeOverviewModal" class="close">&times;</span> <!-- Close Button -->
+                <div id="flashcardOverviewModal" class="fcModal">
+                    <div class="fcModal-content">
+                        <span id="closeOverviewModal" class="closeButton">&times;</span> <!-- Close Button -->
                         <h2>Flashcard Overview</h2>
                         <div id="flashcardOverviewContainer" class="scrollable-container">
                             <!-- Flashcard pairs will be dynamically inserted here -->
@@ -190,6 +195,6 @@
     <!-- Include JavaScript file at the end of body -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="UTSsessionManager.js"></script>
-    <script src="UTScards.js"></script>
+    <script type="module" src="UTScards.js"></script>
 
 </body>

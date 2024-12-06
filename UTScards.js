@@ -1,7 +1,8 @@
+import { fetchCourses } from './UTSutils.js';
+
 // Constants for API endpoints
 const API_URL = 'UTScards.php';
 const FLASHCARD_SETS_URL = `${API_URL}?type=flashcard_sets`;
-const COURSES_URL = `${API_URL}?type=courses`;
 const FLASHCARDS_URL = `${API_URL}?type=flashcards`; // New constant for flashcards
 
 
@@ -34,7 +35,7 @@ class FlashcardSet {
     render() {
 
         const setCard = document.createElement('div');
-        setCard.classList.add('flashcard-set');
+        setCard.classList.add('study-set');
 
 
         // Calculate the mastered percentage
@@ -42,9 +43,9 @@ class FlashcardSet {
 
         // Clickable area in the center of the set
         const clickableCenter = document.createElement('div');
-        clickableCenter.classList.add('flashcardSetClickable');
+        clickableCenter.classList.add('studySetClickable');
         clickableCenter.innerHTML = `
-            <div class="flashcard-header">
+            <div class="study-set-header">
                 <h2>${this.setName}</h2>
             </div>
             <p>Course: ${this.courseName || 'N/A'}</p>
@@ -145,7 +146,7 @@ class Flashcard {
 // Function to open the modal for creating a new flashcard set
 function openCreateSetModal() {
     // Reset the modal heading and inputs
-    const modalHeading = document.querySelector("#flashcardSetModal h2");
+    const modalHeading = document.querySelector("#setCreationModal h2");
     const setNameInput = document.getElementById("setNameInput");
     const courseDropdown = document.getElementById("courseDropdown");
 
@@ -160,14 +161,15 @@ function openCreateSetModal() {
     loadCourses();
 
     // Display the modal
-    document.getElementById("flashcardSetModal").style.display = "flex";
+    document.getElementById("setCreationModal").style.display = "flex";
 }
+window.openCreateSetModal = openCreateSetModal;
 
 // Define the function to close the modal
 function closeCreateSetModal() {
     
     // Hide the modal
-    document.getElementById("flashcardSetModal").style.display = "none";
+    document.getElementById("setCreationModal").style.display = "none";
 
     // Reset the file input and filename
     const fileInput = document.getElementById("fileInput");
@@ -180,37 +182,50 @@ function closeCreateSetModal() {
     }
 
 }
+window.closeCreateSetModal = closeCreateSetModal;
 
-// Load available courses to populate the dropdown
-function loadCourses() {
-    return fetch(COURSES_URL)
-        .then(response => response.json())
-        .then(data => {
-            const courseDropdown = document.getElementById('courseDropdown');
-            courseDropdown.innerHTML = '';
-            
-            const placeholderOption = document.createElement('option');
-            placeholderOption.value = '';
-            placeholderOption.textContent = 'Select Course';
-            placeholderOption.disabled = true;
-            placeholderOption.selected = true;
-            courseDropdown.appendChild(placeholderOption);
-             
-            const noCourseOption = document.createElement('option');
-            noCourseOption.value = '';
-            noCourseOption.textContent = 'No course / N/A';
-            courseDropdown.appendChild(noCourseOption);
+async function loadCourses() {
+    try {
+        const courseDropdown = document.getElementById('courseDropdown');
+        courseDropdown.innerHTML = '';
 
-            if (data.status === 'success' && Array.isArray(data.data)) {
-                data.data.forEach(course => {
-                    const option = document.createElement('option');
-                    option.value = course.course_id;
-                    option.textContent = course.course_name;
-                    courseDropdown.appendChild(option);
-                });
-            }
-        })
-        .catch(error => console.error('Error loading courses:', error));
+        // Add placeholder and default "No Course" options
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select Course';
+        placeholderOption.disabled = true;
+        placeholderOption.selected = true;
+        placeholderOption.style.color = 'white'; // Ensure white font color
+        courseDropdown.appendChild(placeholderOption);
+
+        const noCourseOption = document.createElement('option');
+        noCourseOption.value = '';
+        noCourseOption.textContent = 'No course / N/A';
+        courseDropdown.appendChild(noCourseOption);
+
+        // Fetch courses via the utility function
+        const courses = await fetchCourses();
+
+        // Populate the dropdown with fetched courses
+        courses.forEach(course => {
+            console.log("Course ID:", course.course_id, "Course Name:", course.course_name);
+            const option = document.createElement('option');
+            option.value = course.course_id;
+            option.textContent = course.name;
+            option.style.color = 'white'; // Ensure white font color
+            courseDropdown.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading courses:', error);
+
+        // Optionally, handle error state for the dropdown
+        const errorOption = document.createElement('option');
+        errorOption.value = '';
+        errorOption.textContent = 'Error loading courses';
+        errorOption.disabled = true;
+        errorOption.style.color = 'white'; // Ensure white font color
+        courseDropdown.appendChild(errorOption);
+    }
 }
 
 // Load flashcard sets from the database and render them
@@ -223,7 +238,7 @@ function loadFlashcardSets() {
 
             if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
                 const flashcardGrid = document.createElement('div');
-                flashcardGrid.classList.add('flashcard-set-grid');
+                flashcardGrid.classList.add('study-set-grid');
                 
                 data.data.forEach(setData => {
                     // Pass cardsMastered to the FlashcardSet constructor
@@ -250,7 +265,7 @@ function loadFlashcardSets() {
                 flashcardSetsContainer.appendChild(flashcardGrid);
             } else {
                 const sampleSet = document.createElement('div');
-                sampleSet.classList.add('flashcard-set');
+                sampleSet.classList.add('study-set');
                 sampleSet.innerHTML = `
                     <h2>Sample Set Name</h2>
                     <p>Course: N/A</p>
@@ -266,7 +281,7 @@ function loadFlashcardSets() {
 function saveSet() {
     const setName = document.getElementById('setNameInput').value;
     const courseId = document.getElementById('courseDropdown').value;
-    const setId = document.getElementById("flashcardSetModal").getAttribute("data-edit-set-id"); // Check if editing
+    const setId = document.getElementById("setCreationModal").getAttribute("data-edit-set-id"); // Check if editing
 
     if (!setName) {
         alert("Set name is required.");
@@ -295,14 +310,14 @@ function saveSet() {
         console.log("Save set response:", data); // Debugging log
         if (data.status === 'success') {
             alert(data.message);
-            document.getElementById("flashcardSetModal").removeAttribute("data-edit-set-id");
+            document.getElementById("setCreationModal").removeAttribute("data-edit-set-id");
             closeCreateSetModal();
             loadFlashcardSets();
 
             // Reset inputs to default values
             document.getElementById("setNameInput").value = '';
             document.getElementById("courseDropdown").value = ''; // Reset to default
-            document.getElementById("flashcardSetModal").removeAttribute("data-edit-set-id"); // Remove edit mode attribute
+            document.getElementById("setCreationModal").removeAttribute("data-edit-set-id"); // Remove edit mode attribute
 
             // Return the setId from the server's response
             return data.set_id;
@@ -322,11 +337,11 @@ function editFlashcardSet(setId, setName, courseName) {
     console.log("Editing set:", { setId, setName, courseName });
 
     // Open the modal
-    document.getElementById("flashcardSetModal").style.display = "flex";
+    document.getElementById("setCreationModal").style.display = "flex";
     
     
     // Change the modal heading to "Edit Flashcard Set"
-    const modalHeading = document.querySelector("#flashcardSetModal h2");
+    const modalHeading = document.querySelector("#setCreationModal h2");
     modalHeading.textContent = "Edit Flashcard Set";
     
     // Populate the input fields with the current set data
@@ -349,8 +364,9 @@ function editFlashcardSet(setId, setName, courseName) {
     });
     
     // Save the setId for later use (e.g., in a hidden field or by setting a custom attribute)
-    document.getElementById("flashcardSetModal").setAttribute("data-edit-set-id", setId);
+    document.getElementById("setCreationModal").setAttribute("data-edit-set-id", setId);
 }
+window.editFlashcardSet = editFlashcardSet;
 
 function deleteFlashcardSet(setId) {
     console.log(`Deleting set with ID: ${setId}`);
@@ -383,6 +399,7 @@ function deleteFlashcardSet(setId) {
         .catch(error => console.error('Error deleting flashcard set:', error));
     }
 }
+window.deleteFlashcardSet = deleteFlashcardSet;
 
 document.getElementById("fileInput").addEventListener("change", function () {
     const fileName = this.files[0]?.name || "No file chosen"; // Get the file name or fallback text
@@ -516,8 +533,8 @@ function handleSetUpload() {
 
 
 function openFlashcardModal(setId, flashcardId = null, question = '', answer = '') {
-    const modal = document.getElementById('flashcardModal');
-    const heading = document.getElementById('flashcardModalHeading');
+    const modal = document.getElementById('fcCreationModal');
+    const heading = document.getElementById('fcCreationModalHeading');
     const questionInput = document.getElementById('flashcardQuestion');
     const answerInput = document.getElementById('flashcardAnswer');
     const saveButton = document.getElementById('addFlashcardBtn');
@@ -542,15 +559,17 @@ function openFlashcardModal(setId, flashcardId = null, question = '', answer = '
     modal.style.display = 'flex';
     modal.setAttribute('data-set-id', setId); // Associate the modal with the flashcard set
 }
+window.openFlashcardModal = openFlashcardModal;
 
 function closeFlashcardModal() {
-    document.getElementById('flashcardModal').style.display = 'none';
+    document.getElementById('fcCreationModal').style.display = 'none';
     document.getElementById('flashcardQuestion').value = '';
     document.getElementById('flashcardAnswer').value = '';
 
     // Refresh flashcard sets to show the updated card count after closing the modal
     loadFlashcardSets();
 }
+window.closeFlashcardModal = closeFlashcardModal;
 
 // Define the function to save a flashcard
 function saveFlashcard(setId = null, question = null, answer = null) {
@@ -663,7 +682,7 @@ function deleteFlashcard(flashcardId) {
 
                 // Dynamically update the card count
                 
-                const flashcardSetElement = document.querySelector(`.flashcard-set[data-set-id="${setId}"]`);
+                const flashcardSetElement = document.querySelector(`.study-set[data-set-id="${setId}"]`);
                 
                 console.log('Flashcard Set Element:', flashcardSetElement);
 
@@ -785,9 +804,7 @@ function loadFlashcards(setId) {
                 displayCard(window.currentFlashcards[0]);
             } else {
                 console.log("Flashcards array is empty for this set.");
-                const modal = document.getElementById("flashcardDisplayModal");
-                modal.innerHTML = `<p>No flashcards found for this set.</p>`;
-                modal.style.display = "flex";
+                alert("No flashcards found for this set."); // Show an alert message
             }
         })
         .catch(error => console.error("Error loading flashcards:", error));
@@ -907,6 +924,7 @@ function toggleFlashcardAnswer(direction = null) {
 
     }
 }
+window.toggleFlashcardAnswer = toggleFlashcardAnswer;
 
 function wrapIndex(index, length) {
     return (index + length) % length;
@@ -1038,11 +1056,13 @@ function openOverviewModal(setId) {
             alert('An error occurred while loading the flashcard overview.');
         });
 }
+window.openOverviewModal = openOverviewModal;
 
 function closeOverviewModal() {
     const modal = document.getElementById('flashcardOverviewModal');
     modal.style.display = 'none';
 }
+window.closeOverviewModal = closeOverviewModal;
 
 /* GENERAL FUNCTIONS */
 
@@ -1073,7 +1093,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (addFlashcardButton) {
         addFlashcardButton.addEventListener("click", () => {
-            const setId = document.getElementById('flashcardModal').getAttribute('data-set-id');
+            const setId = document.getElementById('fcCreationModal').getAttribute('data-set-id');
             saveFlashcard(setId);
         });
     }

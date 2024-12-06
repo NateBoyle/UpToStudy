@@ -1,24 +1,4 @@
 
-export async function fetchSemesters() {
-    try {
-        const response = await fetch('UTSdefineSemester.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ action: 'fetch' }),
-        });
-        const data = await response.json();
-        if (data.success) {
-            return data.data; // Return the list of semesters
-        } else {
-            console.error('Failed to fetch semesters:', data.message);
-            return [];
-        }
-    } catch (error) {
-        console.error('Error fetching semesters:', error);
-        return [];
-    }
-}
-
 function doesOverlap(existingSemesters, newStartDate, newEndDate) {
     const newStart = new Date(newStartDate);
     const newEnd = new Date(newEndDate);

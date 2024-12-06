@@ -1,4 +1,4 @@
-import { fetchSemesters } from './UTSdefineSemester.js';
+import { fetchSemesters } from './UTSutils.js';
 
 const todaysDate = new Date(); // Always represents today's date
 let currentDate = new Date(); // Tracks the currently displayed month

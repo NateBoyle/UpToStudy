@@ -1,6 +1,8 @@
+import { fetchSemesters, fetchCourses } from './UTSutils.js';
+
 class Course {
 
-    constructor(name, subject, professor, semester_id, semester_name, startTime, endTime, days, color, totalPoints, course_id) {
+    constructor(name, subject, professor, semester_id, semester_name, startTime, endTime, days, color, totalPoints, course_id, prefix, course_number) {
         this.name = name;
         this.subject = subject;
         this.professor = professor;
@@ -12,6 +14,8 @@ class Course {
         this.color = color;
         this.totalPoints = totalPoints;
         this.course_id = course_id;
+        this.prefix = prefix;
+        this.course_number = course_number;
         
     }
 
@@ -38,7 +42,7 @@ class Course {
 
         courseCard.innerHTML = `
             <div class="course-header" style="background: ${this.color};">
-                <h2>${this.name}</h2>
+                <h2>${this.prefix} ${this.course_number}</h2>
                 <button class="options-button">&#8942;</button>
                 <div class="options-menu">
                     <button onclick="editCourse(${this.course_id})">Edit</button>
@@ -46,12 +50,12 @@ class Course {
                 </div>
             </div>
             <div class="course-content">
-                <p>Subject: ${this.subject}</p>
-                <p>Professor: ${this.professor}</p>
+                
+                <p>Name: ${this.name}</p>
                 <p>Semester: ${this.semester_name || "Unassigned"}</p>
                 <p>Time: ${startTimeFormatted} - ${endTimeFormatted}</p>
                 <p>Days: ${formattedDays}</p>
-                <p>Total Points: ${this.totalPoints}</p>
+                
             </div>
         `;
 
@@ -70,8 +74,48 @@ class Course {
             optionsMenu.style.display = 'none';
         });
 
+        // Attach click event to course-content only
+        const courseContent = courseCard.querySelector('.course-content');
+        courseContent.addEventListener('click', () => this.showDetailsModal());
+
         return courseCard;
     }
+
+    showDetailsModal() {
+        const modal = document.getElementById('courseDetailsModal');
+        const modalContent = document.getElementById('courseDetailsContentWrapper'); // Target modal content
+
+        const modalContentElement = document.getElementById('courseDetailsContent');
+
+        // Populate the modal content with course details
+        modalContentElement.innerHTML = `
+            <p><strong>Course Name:</strong> ${this.name}</p>
+            <p><strong>Prefix:</strong> ${this.prefix || "N/A"}</p>
+            <p><strong>Course Number:</strong> ${this.course_number || "N/A"}</p>
+            <p><strong>Subject:</strong> ${this.subject}</p>
+            <p><strong>Professor:</strong> ${this.professor}</p>
+            <p><strong>Semester:</strong> ${this.semester_name || "Unassigned"}</p>
+            <p><strong>Time:</strong> ${this.formatTimeTo12Hour(this.startTime)}&nbsp;-&nbsp;${this.formatTimeTo12Hour(this.endTime)}</p>
+            <p><strong>Days:</strong> ${this.days.join(', ')}</p>
+            <p><strong>Total Points:</strong> ${this.totalPoints}</p>
+            <p><strong>Color:</strong> <span id="colorBox"  style="background: ${this.color};"></span></p>
+        `;
+
+        // Apply the course's color to the modal border
+        modalContent.style.border = `4px solid ${this.color}`;
+        modalContent.style.borderRadius = '10px'; // Optional: Add rounded corners
+        modal.style.display = 'flex';
+
+        console.log("Modal Content Element:", modalContent);
+        console.log("Border Color:", this.color);
+
+        // Add close functionality
+        const closeModal = document.getElementById('closeCourseDetailsModal');
+        closeModal.onclick = () => {
+            modal.style.display = 'none';
+        };
+    }
+
 }
 
 
@@ -101,6 +145,8 @@ function editCourse(courseId) {
     document.getElementById('courseName').value = course.name;
     document.getElementById('subject').value = course.subject;
     document.getElementById('professorName').value = course.professor;
+    document.getElementById('prefix').value = course.prefix || ""; 
+    document.getElementById('courseNumber').value = course.course_number || "";
     
     // Call loadSemesters to populate the dropdown
     loadSemesters().then(() => {
@@ -133,6 +179,9 @@ function editCourse(courseId) {
 
 }
 
+// Attach to global window object
+window.editCourse = editCourse;
+
 function handleSaveCourseChanges(courseId) {
 
     console.log("Attemping to save changes to course with ID:", courseId); // Debugging line
@@ -146,9 +195,10 @@ function handleSaveCourseChanges(courseId) {
     const days = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(checkbox => checkbox.value);
     formData.set('daysOfWeek', JSON.stringify(days));
 
-    // Log courseColor to verify its value
-    const courseColor = document.getElementById('courseColor').value;
-    console.log("Course Color:", courseColor);
+    console.log("FormData contents:");
+    for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
 
     fetch("UTScoursehandler.php", {
         method: "POST",
@@ -198,8 +248,10 @@ function deleteCourse(courseId) {
     }
 }
 
-class CourseManager {
+// Attach to global window object
+window.deleteCourse = deleteCourse;
 
+class CourseManager {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.courses = [];
@@ -211,23 +263,17 @@ class CourseManager {
         this.container.appendChild(courseElement);
     }
 
-    loadCoursesFromDatabase(semester_id = null) {
-
+    async loadCoursesFromDatabase(semester_id = null) {
         // Clear the current courses from the container
         this.container.innerHTML = '';
 
-        // Prepare the request URL
-        const url = semester_id
-        ? `UTScoursehandler.php?semester_id=${semester_id}`
-        : `UTScoursehandler.php`;
+        try {
+            // Use fetchCourses utility to retrieve courses
+            const courses = await fetchCourses(semester_id);
 
-        fetch(url)
-            .then(response => {
-                console.log("Raw Response:", response);
-                return response.json(); // Parse the JSON response
-            })
-            .then(courses => {
-                console.log("Courses loaded:", courses); // Check the data being loaded
+            
+
+            if (courses.length > 0) {
                 courses.forEach(courseData => {
                     const loadedCourse = new Course(
                         courseData.name,
@@ -240,20 +286,26 @@ class CourseManager {
                         courseData.days,
                         courseData.color,
                         courseData.total_points || 0,
-                        courseData.course_id
+                        courseData.course_id,
+                        courseData.prefix || "",
+                        courseData.course_number || ""
                     );
                     this.addCourse(loadedCourse);
                 });
-                console.log(courseManager.courses); // Check if courses are populated
-            })
-            .catch(error => console.error('Error loading courses:', error));
+            } else {
+                console.warn('No courses available for the selected semester.');
+            }
+
+        } catch (error) {
+            console.error('Error loading courses:', error);
+            // Optionally display an error message to the user
+        }
     }
 }
 
 let courseManager;
 
 async function loadSemesters() {
-
     const dropdown = document.getElementById('semesterDropdown');
     dropdown.innerHTML = ''; // Clear existing options
 
@@ -270,35 +322,20 @@ async function loadSemesters() {
     dropdown.appendChild(defaultOption);
 
     try {
-        console.log('Attempting to fetch semesters from UTSdefineSemester.php...');
-        const response = await fetch('UTSdefineSemester.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ action: 'fetch' }),
-        });
+        console.log('Attempting to fetch semesters...');
+        const semesters = await fetchSemesters(); // Use the utility function to fetch semesters
+        console.log('Fetched semesters:', semesters);
 
-        console.log('Response received:', response);
-
-        if (!response.ok) {
-            console.error('Network error:', response.statusText);
-            dropdown.innerHTML = '<option value="">Error loading semesters</option>';
-            return;
-        }
-
-        const data = await response.json();
-        console.log('Parsed response data:', data);
-
-        if (data.success) {
-            console.log('Fetched semesters:', data.data);
+        if (semesters.length > 0) {
             // Populate the dropdown with the fetched semesters
-            data.data.forEach(semester => {
+            semesters.forEach(semester => {
                 const option = document.createElement('option');
                 option.value = semester.semester_id;
                 option.textContent = semester.name; // Adjust to match your PHP response field
                 dropdown.appendChild(option);
             });
         } else {
-            console.warn('Failed to fetch semesters:', data.message);
+            console.warn('No semesters available');
             dropdown.innerHTML = '<option value="">No semesters available</option>';
         }
     } catch (error) {
@@ -312,17 +349,11 @@ async function populateSemesterButtons() {
     container.innerHTML = ''; // Clear any existing buttons
 
     try {
-        const response = await fetch('UTSdefineSemester.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ action: 'fetch' }),
-        });
+        // Fetch semesters using the utility function
+        const semesters = await fetchSemesters();
 
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        const data = await response.json();
-        if (data.success && data.data.length > 0) {
-            data.data.forEach((semester) => {
+        if (semesters.length > 0) {
+            semesters.forEach((semester) => {
                 const button = document.createElement('button');
                 button.className = 'filter-btn'; // Apply the filter-btn class
                 button.textContent = semester.name;
@@ -345,6 +376,7 @@ async function populateSemesterButtons() {
         errorMessage.style.color = 'red';
         container.appendChild(errorMessage);
     }
+
 }
 
 
@@ -378,14 +410,6 @@ function handleAddCourse(e) {
     .catch(error => console.error('Error:', error));
 }
 
-function displayErrors(errors) {
-    if (errors) {
-        Object.entries(errors).forEach(([key, message]) => {
-            const errorSpan = document.getElementById(`${key}Error`);
-            if (errorSpan) errorSpan.textContent = message;
-        });
-    }
-}
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -394,10 +418,11 @@ document.addEventListener("DOMContentLoaded", () => {
     courseManager.loadCoursesFromDatabase();
 
     const addCourseForm = document.getElementById('addCourseForm');
-    const modal = document.getElementById('modal');
+    const addCourseModal = document.getElementById('modal');
     const showModalBtn = document.getElementById('showModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const addCourseBtn = document.getElementById('addCourseBtn');
+    const detailsModal = document.getElementById('courseDetailsModal');
 
     // Populate semester buttons dynamically
     populateSemesterButtons().then(() => {
@@ -430,7 +455,13 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.style.display = 'flex';
     });
 
+    window.addEventListener('click', (e) => {
+        if (e.target === addCourseModal || e.target === detailsModal) { // Handle both modals
+            e.target.style.display = 'none';
+        }
+    });
+
     closeModalBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
+        addCourseModal.style.display = 'none';
     });
 });

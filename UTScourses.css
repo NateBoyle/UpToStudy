@@ -61,16 +61,16 @@
 
 /* Content area inside each course card */
 .course-content {
-    
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 400;
     width: 100%;
     height: calc(100% - 86px);
-    padding: 10px 0; /* Minimal padding for consistent height */
+    padding: 20px 0; /* Minimal padding for consistent height */
     box-sizing: border-box;
     border: 2px lightgray;
 }
@@ -78,7 +78,7 @@
 /* Adjust individual paragraph styles inside course-content */
 .course-content p {
     margin: 5px 0; /* Tighter margins for less spacing between items */
-    line-height: 1.2; /* Adjust line height for tighter spacing */
+    line-height: 2.3; /* Adjust line height for tighter spacing */
 }
 
 /* Responsive adjustments for smaller screens (optional) */
@@ -171,6 +171,8 @@
 
 /* Input Fields (Common Styles) */
 #courseName,
+#prefix,
+#courseNumber,
 #subject,
 #professorName,
 #totalPoints,
@@ -197,6 +199,12 @@
     width: 48%;
     padding: 10px;
     border-radius: 5px;
+}
+
+#prefixError, #courseNumberError {
+    font-size: 10px;
+    color: red;
+    margin-bottom: 10px;
 }
 
 /* Time Error */
@@ -408,4 +416,14 @@
 
 .filter-btn:hover {
     background-color: #1C81C2;
+}
+
+/* Course Details Styling*/
+#colorBox {
+    display: inline-block;
+    width: 50px; /* Width of the color box */
+    height: 20px; /* Height of the color box */
+    border-radius: 4px; /* Optional: Rounded corners */
+    margin-left: 5px; /* Space between the label and the box */
+    vertical-align: middle; /* Aligns with the text */
 }

@@ -40,7 +40,7 @@
                 <a href="UTSdash.html" class="nav-item">Dashboard</a>
                 <a href="UTScalendar.html" class="nav-item">Calendar</a>
                 <a href="UTScourses.html" class="nav-item active">Courses</a>
-                <a href="UTScards.html" class="nav-item">Flashcards</a>
+                <a href="UTScards.html" class="nav-item">Study</a>
                 <a href="UTSgoals.html" class="nav-item">Goals</a>
             </div>
 
@@ -104,6 +104,12 @@
 
                     <input type="text" id="courseName" name="courseName" placeholder="Course Name">
                     <span class="error" id="courseNameError"></span>
+
+                    <input type="text" id="prefix" name="prefix" placeholder="Enter Course Prefix" />
+                    <span class="error" id="prefixError"></span>
+
+                    <input type="text" id="courseNumber" name="courseNumber" placeholder="Enter Course Number" />
+                    <span class="error" id="courseNumberError"></span>
                     
                     <input type="text" id="subject" name="subject" placeholder="Subject">
                     
@@ -197,6 +203,17 @@
                 </form>
             </div>
         </div>
+
+        <!-- Course Details Modal -->
+        <div id="courseDetailsModal" class="modal">
+            <div id="courseDetailsContentWrapper" class="modal-content">
+                <span class="close" id="closeCourseDetailsModal">&times;</span>
+                <h2 id="courseDetailsHeading">Course Details</h2>
+                <div id="courseDetailsContent">
+                    <!-- Course details will be dynamically populated here -->
+                </div>
+            </div>
+        </div>
         
 
     
@@ -205,6 +222,6 @@
     </div>
 
     <script src="UTSsessionManager.js"></script>
-    <script src="UTScourseManager.js?v=1.0"></script>
+    <script type="module" src="UTScourseManager.js?v=1.0"></script>
     <script type="module" src="UTSdefineSemester.js"></script>
 </body>

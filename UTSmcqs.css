@@ -1,5 +1,5 @@
 /* General Modal Styling */
-.fcModal {
+.mcqModal {
     display: none; /* Hidden by default */
     justify-content: center;
     align-items: center;
@@ -12,8 +12,8 @@
     z-index: 1100;
 }
 
-/*** INDIVIDUAL FC CREATION STYLING ***/
-#fcCreationModal {
+/*** INDIVIDUAL MCQ CREATION STYLING ***/ 
+#mcqCreationModal {
     display: none; /* Hidden by default */
     justify-content: center;
     align-items: center;
@@ -26,8 +26,9 @@
     z-index: 1300;
 }
 
-#fcCreationModal .fcModal-content {
+#mcqCreationModal .mcqModal-content {
     width: 400px;
+
     background: #2C2C2C;
     padding: 20px;
     border-radius: 10px;
@@ -37,15 +38,15 @@
     position: relative;
 }
 
-#flashcardModalHeading {
+#mcqCreationModalHeading {
     font-size: 20px;
     margin-bottom: 20px;
 }
 
-#fcCreationModal input[type="text"] {
+#mcqCreationModal input[type="text"] {
     width: 90%;
     padding: 12px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     border-radius: 5px;
     border: none;
     font-size: 16px;
@@ -53,14 +54,29 @@
     color: white;
 }
 
-#fcCreationModal input[type="text"]::placeholder {
+#mcqCreationModal input[type="text"]::placeholder {
     color: white;
     opacity: 1;
 }
 
-#addFlashcardBtn {
+.instruction-text {
+    font-size: 14px;
+    color: white; /* Adjust color as needed */
+    margin-bottom: 10px;
+}
+
+.mcq-correct-options {
+    display: flex; /* Use flexbox for horizontal alignment */
+    gap: 25px; /* Add horizontal spacing between checkboxes */
+    justify-content: center; /* Center the checkboxes within the parent container */
+    margin-top: 10px; /* Optional: Add some spacing above the group */
+    font-size: 20px;
+}
+
+#addMCQBtn {
     width: 100%;
     padding: 12px;
+    margin-top: 15px;
     background: #5DD770;
     border: none;
     color: white;
@@ -70,15 +86,15 @@
     transition: background-color 0.3s ease;
 }
 
-#addFlashcardBtn:hover {
+#addMCQBtn:hover {
     background: #4fb963;
 }
 
 /*** INDIVIDUAL MCQ DISPLAY STYLING ***/ 
-#flashcardDisplayModal .fcModal-content {
+#mcqDisplayModal .mcqModal-content {
     position: relative;
-    width: 400px;
-    height: 300px;
+    width: 600px;
+    height: 600px;
     background: #2C2C2C;
     padding: 20px;
     border-radius: 10px;
@@ -92,8 +108,8 @@
     
 }
 
-/* Flashcard Content Styling */
-#flashcardContent {
+/* MCQ Content Styling */
+#mcqContent {
     padding: 20px;
     text-align: center;
     word-wrap: break-word;
@@ -103,19 +119,53 @@
     max-width: calc(100% - 60px);
 }
 
-#flashcardContent h2 {
-    font-size: 20px;
-    margin: 10px 0;
+#mcqContent h2 {
+    position: relative; /* Keeps the question within the flow */
+    top: 0; /* Ensures it stays at the top of the modal */
+    margin-bottom: 30px; /* Add consistent spacing below the question */
+    font-size: 1.2em; /* Maintain visibility */
+    font-weight: bold; /* Make the question stand out */
+    text-align: center; /* Center-align the question text */
+    line-height: 1.5; /* Improve readability */
 }
 
-#flashcardContent p {
+#mcqContent div {
     font-size: 18px;
     line-height: 1.5;
-    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Options container styling */
+#mcqOptionsContainer {
+    max-height: 300px;
+    display: flex;
+    flex-direction: column; /* Stack options vertically */
+    align-items: flex-start; /* Align options to the left */
+    gap: 10px; /* Add spacing between options */
+    margin-top: 10px; /* Optional: Add some margin to separate from other elements */
+    margin-left: 40px;
+    word-wrap: break-word; /* Allow long words to wrap */
+    text-align: left; /* Ensure text starts from the left */
+    line-height: 1.5; /* Improve readability for multiple lines */
+}
+
+/* Individual option styling */
+.mcq-option {
+
+    border: 2px solid #2C2C2C; /* Optional: Add a light border */
+    border-radius: 5px; /* Rounded corners for a polished look */
+    padding: 5px;  /*Optional: Inner spacing for better appearance */
+
+}
+
+.highlight-correct {
+    border: 2.5px solid #5DD770; /* Green border */
+    border-radius: 5px; /* Optional: Rounded corners */
+    display: inline-block; /* Optional: Keeps the element neatly aligned */
 }
 
 /* Navigation Buttons for Flashcards */
-#prevFlashcardBtn, #nextFlashcardBtn {
+#prevMCQBtn, #nextMCQBtn {
     background: none;
     border: none;
     color: white;
@@ -126,16 +176,16 @@
     transform: translateY(-50%);
 }
 
-#prevFlashcardBtn {
+#prevMCQBtn {
     left: 10px;
 }
 
-#nextFlashcardBtn {
+#nextMCQBtn {
     right: 10px;
 }
 
 /* Toggle Answer Button */
-#toggleAnswerBtn {
+#showMCQAnswerBtn {
     position: absolute;
     bottom: 20px;
     align-self: center;
@@ -150,12 +200,14 @@
     transition: background-color 0.3s ease;
 }
 
-#toggleAnswerBtn:hover {
+#showMCQAnswerBtn:hover {
     background: #4fb963;
 }
 
-/* Flashcard Options (Edit/Delete) */
-.flashcard-options {
+
+
+/* MCQ Options (Edit/Delete) */
+.mcq-options {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -166,7 +218,7 @@
     align-items: flex-start;
 }
 
-.flashcard-options button {
+.mcq-options button {
     background: none;
     border: none;
     color: white;
@@ -175,13 +227,13 @@
     padding: 5px 10px;
 }
 
-.flashcard-options button:hover {
+.mcq-options button:hover {
     color: #ddd;
     text-decoration: underline;
 }
 
 /*** MCQ OVERVIEW MODAL STYLING ***/
-#flashcardOverviewModal .fcModal-content {
+#mcqOverviewModal .mcqModal-content {
     position: relative;
     width: 50%;
     max-height: 80%;
@@ -203,8 +255,8 @@
     border-radius: 5px;
 }
 
-/* Flashcard Pair Styling */
-.flashcard-pair {
+/* MCQ GROUP Styling */
+.mcq-group {
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -219,16 +271,16 @@
     transition: background-color 0.2s ease;
 }
 
-.flashcard-pair:hover {
+.mcq-group:hover {
     background-color: rgba(255, 255, 255, 0.078);
 }
 
-.flashcard-pair:last-child {
+.mcq-group:last-child {
     border-bottom: none;
 }
 
 /* Close Button for Overview Modal */
-#closeOverviewModal {
+#closeMCQOverviewModal {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -237,4 +289,12 @@
     color: white;
     font-size: 24px;
     cursor: pointer;
+}
+
+#mcqOverviewModal {
+    z-index: 1050; /* Lower priority modal */
+}
+
+#mcqDisplayModal {
+    z-index: 1100; /* Higher priority modal */
 }

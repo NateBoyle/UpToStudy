@@ -4,6 +4,7 @@ require 'UTSbootstrap.php';
 
 global $conn;
 
+// Ensure the user is logged in
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'User not logged in.']);
     exit;
@@ -16,39 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate action
     $action = $_POST['action'] ?? null;
-    $validActions = ['fetch', 'save'];
+    $validActions = ['save', 'update', 'delete'];
 
     if (!in_array($action, $validActions)) {
         echo json_encode(['success' => false, 'message' => 'Invalid action specified.']);
         exit;
     }
 
-    if ($action === 'fetch') {
-        // Fetch existing semesters for the logged-in user
-        $query = "SELECT semester_id, name, start_date, end_date 
-                  FROM semesters 
-                  WHERE user_id = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $user_id);
-
-        if (!$stmt->execute()) {
-            error_log("SQL Error (fetch): " . $stmt->error);
-            echo json_encode(['success' => false, 'message' => 'Failed to fetch semesters.']);
-            exit;
-        }
-
-        $result = $stmt->get_result();
-        $semesters = $result->fetch_all(MYSQLI_ASSOC);
-        echo json_encode(['success' => true, 'data' => $semesters, 'user_id' => $user_id]); // Include user_id
-        $stmt->close();
-
-    } elseif ($action === 'save') {
-        // Save a new semester or validate overlaps
+    if ($action === 'save') {
+        // Save a new semester
         $semester_name = $_POST['semester_name'] ?? null;
         $start_date = $_POST['start_date'] ?? null;
         $end_date = $_POST['end_date'] ?? null;
 
-        // Validate required fields
         if (!$semester_name || !$start_date || !$end_date) {
             echo json_encode(['success' => false, 'message' => 'All fields are required (name, start_date, end_date).']);
             exit;
@@ -74,22 +55,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($row['overlap_count'] > 0) {
             echo json_encode(['success' => false, 'message' => 'The semester overlaps with an existing one.']);
             exit;
-        } else {
-            // Insert the new semester
-            $insertQuery = "INSERT INTO semesters (user_id, name, start_date, end_date)
-                            VALUES (?, ?, ?, ?)";
-            $insertStmt = $conn->prepare($insertQuery);
-            $insertStmt->bind_param("isss", $user_id, $semester_name, $start_date, $end_date);
-
-            if ($insertStmt->execute()) {
-                echo json_encode(['success' => true, 'message' => 'Semester saved successfully.']);
-            } else {
-                error_log("SQL Error (insert): " . $insertStmt->error);
-                echo json_encode(['success' => false, 'message' => 'Failed to save semester.']);
-            }
-            $insertStmt->close();
         }
-        $stmt->close();
+
+        // Insert the new semester
+        $insertQuery = "INSERT INTO semesters (user_id, name, start_date, end_date)
+                        VALUES (?, ?, ?, ?)";
+        $insertStmt = $conn->prepare($insertQuery);
+        $insertStmt->bind_param("isss", $user_id, $semester_name, $start_date, $end_date);
+
+        if ($insertStmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Semester saved successfully.']);
+        } else {
+            error_log("SQL Error (insert): " . $insertStmt->error);
+            echo json_encode(['success' => false, 'message' => 'Failed to save semester.']);
+        }
+        $insertStmt->close();
+
+    } elseif ($action === 'update') {
+        // Update an existing semester
+        $semester_id = $_POST['semester_id'] ?? null;
+        $semester_name = $_POST['semester_name'] ?? null;
+        $start_date = $_POST['start_date'] ?? null;
+        $end_date = $_POST['end_date'] ?? null;
+
+        if (!$semester_id || !$semester_name || !$start_date || !$end_date) {
+            echo json_encode(['success' => false, 'message' => 'All fields are required (semester_id, name, start_date, end_date).']);
+            exit;
+        }
+
+        $updateQuery = "UPDATE semesters
+                        SET name = ?, start_date = ?, end_date = ?
+                        WHERE semester_id = ? AND user_id = ?";
+        $updateStmt = $conn->prepare($updateQuery);
+        $updateStmt->bind_param("sssii", $semester_name, $start_date, $end_date, $semester_id, $user_id);
+
+        if ($updateStmt->execute() && $updateStmt->affected_rows > 0) {
+            echo json_encode(['success' => true, 'message' => 'Semester updated successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update semester or no changes made.']);
+        }
+        $updateStmt->close();
+
+    } elseif ($action === 'delete') {
+        // Delete an existing semester
+        $semester_id = $_POST['semester_id'] ?? null;
+
+        if (!$semester_id) {
+            echo json_encode(['success' => false, 'message' => 'Semester ID is required for deletion.']);
+            exit;
+        }
+
+        $deleteQuery = "DELETE FROM semesters WHERE semester_id = ? AND user_id = ?";
+        $deleteStmt = $conn->prepare($deleteQuery);
+        $deleteStmt->bind_param("ii", $semester_id, $user_id);
+
+        if ($deleteStmt->execute() && $deleteStmt->affected_rows > 0) {
+            echo json_encode(['success' => true, 'message' => 'Semester deleted successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to delete semester or semester not found.']);
+        }
+        $deleteStmt->close();
     }
 }
 
