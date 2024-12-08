@@ -1,4 +1,3 @@
-
 function doesOverlap(existingSemesters, newStartDate, newEndDate) {
     const newStart = new Date(newStartDate);
     const newEnd = new Date(newEndDate);

@@ -195,13 +195,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
         // Prepare the SQL statement to insert the course into the database
+        // Prepare the SQL statement to insert the course into the database (without grade)
         $stmt = $conn->prepare(
-            "INSERT INTO courses (user_id, course_name, subject, professor, prefix, course_number, total_points, start_time, end_time, grade, monday, tuesday, wednesday, thursday, friday, saturday, sunday, course_color, semester_id) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO courses (user_id, course_name, subject, professor, prefix, course_number, total_points, start_time, end_time, monday, tuesday, wednesday, thursday, friday, saturday, sunday, course_color, semester_id) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            "isssssissdiiiiiiisi", 
-            $user_id, $course_name, $subject, $professor_name, $prefix, $course_number, $total_points, $start_time, $end_time, $grade, 
+            "isssssdssiiiiiiisi", 
+            $user_id, $course_name, $subject, $professor_name, $prefix, $course_number, $total_points, $start_time, $end_time, 
             $mon, $tue, $wed, $thu, $fri, $sat, $sun, $course_color, $semester_id
         );
 

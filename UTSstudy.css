@@ -24,6 +24,89 @@
     background-color: #1a1a1a; /* Sidebar background color */
     color: white;
     border-right: 2px solid white;
+    overflow-y: auto; /* Add scroll if content overflows */
+}
+
+/* Sidebar H2 Styling */
+.sidebar h2 {
+    margin-top: 20px; /* Add spacing above */
+    margin-bottom: 10px; /* Add spacing below */
+    text-align: center; /* Keep the headings aligned */
+    color: white; /* Ensure it matches the theme */
+}
+
+/* Study Search Box */
+.studypage-search {
+    
+    /*height: 50px;
+    margin-top: 10px;*/
+    display: flex; /* Align input and button side by side */
+    flex-direction: column; /* Stack input and button vertically */
+    align-items: flex-start; /* Align to the left */
+    margin-bottom: 20px; /* Add spacing below search box */
+    margin-top: 10px; /* Add spacing above search box */
+    
+}
+
+.studypage-search input {
+    width: 100%; /* Full width of container */
+    padding: 10px; /* Consistent padding */
+    border-radius: 5px; /* Rounded corners */
+    border: none; /* Removes the default border */
+    font-size: 16px; /* Text size */
+    width: 100%; /* Fit the input to the container */
+    background-color: #2C2C2C; /* Dark background for contrast */
+    color: white; /* Text color */
+    border: 2px solid white; /* White border */
+    box-sizing: border-box; /* Ensures padding and border are included in width */
+    margin-bottom: 5px; /* Add spacing below search box */
+}
+
+/* Input focus effect */
+.studypage-search input:focus {
+    background-color: #404040; /* Slightly lighter background on focus */
+    border-color: #00aaff; /* Change border color on focus for emphasis */
+    outline: none; /* Remove default focus outline */
+}
+
+/* Input hover effect */
+.studypage-search input:hover {
+    background-color: #333333; /* Slightly lighter background on hover */
+}
+
+#clearSearchBtn {
+    width: 60%; /* Full width button */
+    padding: 10px; /* Button padding */
+    background-color: #007BFF; /* Blue background */
+    color: white; /* White text */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    text-align: center; /* Center text */
+    margin: 10px auto; /* Add auto left and right margins */
+    font-size: 18px;
+}
+
+/* Button hover effect */
+#clearSearchBtn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.filter-btn {
+    width: 85%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #2EA0F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-btn:hover {
+    background-color: #1C81C2;
 }
 
 /* Study Content Area (MAIN SECTION) */
@@ -39,8 +122,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.studypage-header h1 {
+    /*flex-grow: 1; /* Allows the title to take up available space */
+    /*text-align: center; /* Center text within its area */
+    margin-left: 40px; /* Remove default margins */
+    font-size: 40px;
 }
 
 .studypage-header h2 {
@@ -60,17 +150,6 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-}
-
-#createSetButton,
-#downloadTemplateButton {
-    background-color: #5DD770; /* Green for Create Set */
-    color: white;
-    border: none;
-    padding: 10px 10px;
-    font-size: large;
-    border-radius: 5px;
-    cursor: pointer;
     text-decoration: none; /* Remove underline for links */
     display: inline-block; /* Ensures proper alignment for link */
     height: 50px; /* Consistent height */
@@ -78,6 +157,39 @@
     text-align: center;
     vertical-align: middle;
     margin-right: 10px; /* Spacing between buttons */
+}
+
+/*#createSetButton,
+#downloadTemplateButton {
+    background-color: #5DD770; 
+    color: white;
+    border: none;
+    
+    font-size: large;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none; 
+    display: inline-block; 
+    height: 50px;
+    line-height: 30px; 
+    text-align: center;
+    vertical-align: middle;
+    margin-right: 10px; 
+}*/
+
+.downloadTooltip {
+    visibility: hidden;
+    background-color: black;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    border: 2px solid #007BFF;
+    padding: 5px;
+    position: absolute;
+    z-index: 3000;
+    top: 25%;  /*Position above the button */
+    left: 60%;
+    transform: translateX(-50%);
 }
 
 #createSetButton:hover {
@@ -92,30 +204,16 @@
     background-color: #0056CC; /* Darker blue */
 }
 
+#downloadTemplateButton:hover .downloadTooltip {
+    visibility: visible;
+}
+
 #FCButton, #MCQButton {
     background-color: #ef0404; /* Darker blue */
 }
 
 #FCButton:hover, #MCQButton:hover{
     background-color: #b40000; /* Darker blue */
-}
-
-/* Study Search Box */
-.studypage-search {
-    
-    height: 50;
-    
-}
-
-.study-search input {
-    padding: 10px 10px;
-    border-radius: 5px;
-    border: none;
-    top: 120;
-    z-index: 200;
-    font-size: 16px; /* Optionally increase the font size for better proportionality */
-    width: 400px;
-    /*box-sizing: border-box;  Ensure padding doesn't increase the element's size */
 }
 
 /*** STUDY SET CONTAINER STYLING ***/

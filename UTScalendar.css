@@ -2,9 +2,9 @@
 .content {
     display: flex;
     gap: 1.5%;
-    margin-top: 130px;
-    height: calc(100vh - 130px);
-    padding: 20px;
+    margin-top: 120px;
+    height: calc(100vh - 120px);
+    padding: 10px;
     box-sizing: border-box;
 }
 
@@ -20,30 +20,48 @@
 .sidebar-button-container {
     display: flex; /* Flexbox layout for the buttons */
     justify-content: space-between; /* Space evenly between buttons */
-    gap: 0.3rem; /* Spacing between buttons */
+    gap: 0.5rem; /* Spacing between buttons */
     margin-bottom: 0.5rem; /* Space below the buttons */
 }
 
-.sidebar-button {
+.sidebar-create-button {
     flex: 1; /* Make buttons evenly sized */
-    background: #2EA0F3;
+    background: #5DD770;
     color: white;
-    font-size: 0.9rem; /* Adjust font size */
+    font-size: 1.2rem; /* Adjust font size */
     font-weight: 600;
-    padding: 0.6rem 0.5rem; /* Adjust padding for smaller buttons */
+    padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
     border: none;
     border-radius: 10px;
     cursor: pointer;
     text-align: center;
-    width: 6rem;
+    width: 4rem;
 }
 
-.sidebar-button:hover {
+.sidebar-create-button:hover {
+    background: #4fb963;
+}
+
+.sidebar-view-button {
+    flex: 1; /* Make buttons evenly sized */
+    background: #2EA0F3;
+    color: white;
+    font-size: 1.2rem; /* Adjust font size */
+    font-weight: 600;
+    padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    width: 4rem;
+}
+
+.sidebar-view-button:hover {
     background: #1C81C2;
 }
 
 /* Modal Background */
-.modal {
+.creationModal {
     display: none; /* Hidden by default */
     position: fixed; /* Fixed to viewport, ignores parent */
     top: 0;
@@ -58,7 +76,7 @@
 }
 
 /* Modal Content */
-.modal-content {
+#defineSemesterModal .modal-content {
     width: 400px; /* Fixed width for modal */
     background: #2C2C2C; /* Black background for modal */
     padding: 20px;
@@ -76,8 +94,7 @@
 }
 
 /* Inputs inside the Modal */
-.modal-content input, 
-.modal-content button {
+#defineSemesterModal .modal-content input {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
@@ -90,7 +107,7 @@
 }
 
 /* Placeholder text styling */
-.modal-content input::placeholder {
+#defineSemesterModal .modal-content input::placeholder {
     color: white;
     opacity: 1;
 }
@@ -98,6 +115,7 @@
 /* Save Button */
 #saveSemesterBtn {
     background: #5DD770;
+    padding: 12px;
     border: none;
     color: white;
     font-size: 18px;
@@ -131,11 +149,74 @@
     overflow-y: auto;
 }
 
+.assignment-list {
+    margin-bottom: 0.75rem;
+}
+
+.assignment-list-title-container,
+.todo-list-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem; /* Space below the title section */
+    gap: 0.3rem; /* Ensure spacing between the title and button */
+}
+
 .assignment-list-title,
 .todo-list-title {
-    font-size: 1.8rem;
+    margin: 0; /* Remove default margin */
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 1rem;
+    padding-right: 0.3rem;
+}
+
+.assignment-list-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.todo-list-title {
+    padding-right: 1rem;
+}
+
+.assignment-list .sidebar-create-button,
+.todo-list .sidebar-create-button {
+    padding: 0.5rem 0.2rem; /* Maintain compact padding */
+    font-size: 0.9rem; /* Compact font size */
+    border-radius: 8px; /* Rounded corners */
+    background: #5DD770; /* Button background color */
+    color: white; /* Button text color */
+    cursor: pointer;
+    white-space: nowrap; /* Prevent text wrapping */
+    width: 0.65rem; /* Adjust to fit the content */
+    flex-shrink: 0; /* Prevent the button from shrinking too much */
+    overflow: hidden; /* Ensure the overflow is hidden */
+    text-overflow: ellipsis; /* Apply the ellipsis effect */
+}
+
+.assignment-list .sidebar-create-button:hover,
+.todo-list .sidebar-create-button:hover {
+    background: #4fb963; /* Darker shade on hover */
+}
+
+.assignment-list .sidebar-view-button,
+.todo-list .sidebar-view-button {
+    padding: 0.5rem 0.2rem; /* Maintain compact padding */
+    font-size: 1rem; /* Compact font size */
+    border-radius: 8px; /* Rounded corners */
+    background: #2EA0F3; /* Button background color */
+    color: white; /* Button text color */
+    cursor: pointer;
+    white-space: nowrap; /* Prevent text wrapping */
+    width: 0.5rem; /* Adjust to fit the content */
+    flex-shrink: 0; /* Prevent the button from shrinking too much */
+    overflow: hidden; /* Ensure the overflow is hidden */
+    text-overflow: ellipsis; /* Apply the ellipsis effect */
+}
+
+.assignment-list .sidebar-view-button:hover,
+.todo-list .sidebar-view-button:hover {
+    background: #1C81C2; /* Darker shade on hover */
 }
 
 .list-item {
@@ -229,7 +310,7 @@
     justify-content: flex-end;
 }
 
-.calendar-button {
+.calendar-create-button {
     background: #5DD970;
     color: white;
     font-size: 1rem;
@@ -241,8 +322,24 @@
     width: 120px; /* Fixed width for this specific button */
 }
 
-.calendar-button:hover {
+.calendar-create-button:hover {
     background: #4bb362;
+}
+
+.calendar-view-button {
+    background: #2EA0F3;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.8rem 1.0rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 120px; /* Fixed width for this specific button */
+}
+
+.calendar-view-button:hover {
+    background: #1C81C2;
 }
 
 #weekMonthBtn {
@@ -461,18 +558,6 @@
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
     overflow-wrap: break-word;
 }
-
-/* Tooltip Arrow 
-.event-tooltip::after {
-    content: '';
-    position: absolute;
-    top: -5px; 
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
-}*/
 
 /* Specific styles for Week View */
 /* Week View Event Blocks */

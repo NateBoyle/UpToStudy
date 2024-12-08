@@ -1,9 +1,11 @@
-import { fetchCourses } from './UTSutils.js';
+import { fetchSemesters, fetchCourses } from './UTSutils.js';
 
 // Constants for API endpoints
 const API_URL = 'UTSmcqs.php';
 const MCQ_SETS_URL = `${API_URL}?type=mcq_sets`; // Fetch MCQ sets
 const MCQS_URL = `${API_URL}?type=mcqs`; // Fetch MCQs within a set
+
+let currentSemesterId = null; // Tracks the selected semester
 
 // CLASSES CODE
 // MCQSet class for managing each MCQ set
@@ -51,7 +53,7 @@ class MCQSet {
 
         // Add click event to the center area
         clickableCenter.onclick = () => {
-            console.log(`Opening MCQ set: ${this.setId}`);
+            //console.log(`Opening MCQ set: ${this.setId}`);
             loadMCQs(this.setId); // Load and display MCQs for the selected set
         };
 
@@ -217,9 +219,10 @@ async function loadCourses() {
         courses.forEach(course => {
             const option = document.createElement('option');
             option.value = course.course_id;
-            option.textContent = course.name;
+            option.textContent = `${course.prefix} ${course.course_number}: ${course.name}`; // Combine prefix and course_number
             courseDropdown.appendChild(option);
         });
+
     } catch (error) {
         console.error('Error loading courses:', error);
 
@@ -233,8 +236,17 @@ async function loadCourses() {
 }
 
 // Load MCQ sets from the database and render them
-function loadMCQSets() {
-    fetch(MCQ_SETS_URL)
+function loadMCQSets(semesterId = null, courseId = null, searchTerm = '') {
+
+    // Construct the URL dynamically based on provided arguments
+    let url = MCQ_SETS_URL;
+
+    // Append query parameters conditionally
+    if (semesterId) url += `&semester_id=${encodeURIComponent(semesterId)}`;
+    if (courseId) url += `&course_id=${encodeURIComponent(courseId)}`;
+    if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
+
+    fetch(url)
         .then(response => response.json())
         .then(data => {
             const mcqSetsContainer = document.getElementById('mcqSetsContainer');
@@ -448,6 +460,7 @@ function handleMCQSetUpload() {
 
                 // Filter and validate the parsed data
                 const filteredMCQs = results.data.filter(row =>
+                    // Include all rows with valid data
                     row.Question?.trim() || row.Option1?.trim() || row.Option2?.trim() || row.Option3?.trim() || row.Option4?.trim() || row.CorrectOption?.trim()
                 );
 
@@ -529,6 +542,7 @@ function handleMCQSetUpload() {
 
 // INDIVIDUAL MCQs FUNCTIONS
 function openMCQModal(setId, mcqId = null, question = '', options = ['', '', '', ''], correctOption = '') {
+
     const modal = document.getElementById('mcqCreationModal');
     const heading = document.getElementById('mcqCreationModalHeading');
     const questionInput = document.getElementById('mcqQuestionInput');
@@ -540,7 +554,7 @@ function openMCQModal(setId, mcqId = null, question = '', options = ['', '', '',
     ];
     
     const correctOptionCheckboxes = Array.from(
-        document.querySelectorAll('#mcqModal .mcq-correct-options input[type="checkbox"]')
+        document.querySelectorAll('#mcqCreationModal .mcq-correct-options input[type="checkbox"]')
     );
 
     const saveButton = document.getElementById('addMCQBtn');
@@ -557,13 +571,31 @@ function openMCQModal(setId, mcqId = null, question = '', options = ['', '', '',
             }
         });
 
+        // Reset all checkboxes to avoid lingering states
+        correctOptionCheckboxes.forEach(checkbox => {
+            checkbox.checked = false; // Clear previous selections
+        });
+
+         // Retrieve the correct options from the mcqDisplayModal's data attribute
+        //const displayModal = document.getElementById('mcqDisplayModal'); // Reference the correct modal
+        //const modalCorrectOptions = displayModal.getAttribute('data-correct-options') || '';
+        const correctOptionString = String(correctOption);
+
+        // Debugging log to verify correct options
+        console.log(`Editing MCQ ID: ${mcqId}`);
+        //console.log(`Modal Correct Options (from attribute): ${modalCorrectOptions}`);
+        console.log(`Converted Correct Option String: ${correctOptionString}`);
+
         // Populate the correct options by checking the corresponding checkboxes
         correctOptionCheckboxes.forEach(checkbox => {
-            checkbox.checked = correctOption.includes(checkbox.value);
+            if (correctOptionString.includes(checkbox.value)) {
+                checkbox.checked = true; // Check the box if it matches
+            }
         });
 
         modal.setAttribute('data-edit-mcq-id', mcqId); // Set MCQ ID for editing
         saveButton.textContent = 'Save Changes'; // Optional: Update button text
+        
     } else {
 
         // For creating a new MCQ
@@ -600,7 +632,7 @@ function closeMCQModal() {
     document.getElementById('mcqOption4').value = '';
     
     // Clear the checkboxes
-    Array.from(document.querySelectorAll('#mcqModal .mcq-correct-options input[type="checkbox"]')).forEach(checkbox => {
+    Array.from(document.querySelectorAll('#mcqCreationModal .mcq-correct-options input[type="checkbox"]')).forEach(checkbox => {
         checkbox.checked = false; // Uncheck all checkboxes
     });
 
@@ -611,6 +643,7 @@ window.closeMCQModal = closeMCQModal;
 
 // Define the function to save an MCQ
 function saveMCQ(setId = null, question = null, options = null) {
+
     // Retrieve the question, options, and (optional) MCQ ID for editing
     // If not provided, get them from the modal inputs
     question = question || document.getElementById('mcqQuestionInput').value;
@@ -634,13 +667,13 @@ function saveMCQ(setId = null, question = null, options = null) {
 
     const mcqId = document.getElementById("mcqCreationModal").getAttribute("data-edit-mcq-id");
 
-    // Use the provided setId, or fetch from the modal if not provided
+    // Use the provided setId, or fetch from the modal if not provided (new)
     const finalSetId = setId || document.getElementById("mcqCreationModal")?.getAttribute("data-set-id");
 
-    console.log('Attempting to save MCQ called with setId:', finalSetId);
+    /*console.log('Attempting to save MCQ called with setId:', finalSetId);
     console.log("Question:", question);
     console.log("Options:", options);
-    console.log("Correct Option:", correctOption);
+    console.log("Correct Option:", correctOption);*/
 
     // Validate inputs
     if (!question || options.some(opt => !opt.trim()) || !correctOption) {
@@ -651,7 +684,7 @@ function saveMCQ(setId = null, question = null, options = null) {
     // Determine the type of operation (new or edit)
     const requestType = mcqId ? 'edit_mcq' : 'add_mcq';
 
-    console.log("Saving MCQ:", { mcqId, question, options, correctOption, setId: finalSetId, requestType });
+    //console.log("Saving MCQ:", { mcqId, question, options, correctOption, setId: finalSetId, requestType });
 
     // Construct the request payload
     const requestData = {
@@ -679,38 +712,43 @@ function saveMCQ(setId = null, question = null, options = null) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Save MCQ response:", data); // Debugging log
+        //console.log("Save MCQ response:", data); // Debugging log
 
         if (data.status === 'success') {
             alert(data.message);
 
-            // Clear inputs after successful save
-            document.getElementById('mcqQuestionInput').value = '';
-            document.getElementById('mcqOption1').value = '';
-            document.getElementById('mcqOption2').value = '';
-            document.getElementById('mcqOption3').value = '';
-            document.getElementById('mcqOption4').value = '';
-
-            Array.from(document.querySelectorAll('#mcqCreationModal .mcq-correct-options input[type="checkbox"]')).forEach(checkbox => {
-                checkbox.checked = false; // Uncheck all checkboxes
-            });
-
-            document.getElementById("mcqCreationModal").removeAttribute("data-edit-mcq-id");
-
-            // Refresh MCQs for the current set
             if (finalSetId) {
+
+                // Refresh MCQs for the current set
                 loadMCQSets();
 
                 // Check if the overview modal is open and refresh it
                 const overviewModal = document.getElementById('mcqOverviewModal');
                 if (overviewModal.style.display === 'flex') {
+
                     openMCQOverviewModal(finalSetId);
+
                 } else {
-                    openMCQModal(finalSetId);
+
+                    // Handle editing vs. creating
+                    if (!mcqId) {
+
+                        openMCQModal(finalSetId);
+
+                    } else {
+
+                        // If editing, close the modal
+                        closeMCQModal();
+                        loadMCQs(finalSetId);
+
+                    }
+                    
                 }
+
             } else {
                 console.error("Set ID missing when reloading MCQs.");
             }
+
         } else {
             alert("Error: " + data.message);
         }
@@ -720,6 +758,7 @@ function saveMCQ(setId = null, question = null, options = null) {
 
 // Function to delete an individual MCQ
 function deleteMCQ(mcqId) {
+
     const setId = document.getElementById("mcqDisplayModal").getAttribute("data-set-id");
 
     console.log('Set ID:', setId);
@@ -742,7 +781,7 @@ function deleteMCQ(mcqId) {
                 alert(data.message);
 
                 // Dynamically update the question count
-                const mcqSetElement = document.querySelector(`.mcq-set[data-set-id="${setId}"]`);
+                const mcqSetElement = document.querySelector(`.study-set[data-set-id="${setId}"]`);
 
                 console.log('MCQ Set Element:', mcqSetElement);
 
@@ -826,6 +865,7 @@ function toggleMCQMasterStatus(mcqId) {
             if (overviewModal.style.display === 'flex') {
                 openMCQOverviewModal(setId); // Reload the overview modal with the updated set
             }
+
         } else {
             alert("Error: " + data.message);
         }
@@ -841,7 +881,7 @@ function loadMCQs(setId) {
     fetch(`${MCQS_URL}&set_id=${setId}`)
         .then(response => response.json())
         .then(data => {
-            console.log("MCQs response:", data);
+            //console.log("MCQs response:", data);
 
             if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
                 // Store MCQs and reset index
@@ -856,10 +896,18 @@ function loadMCQs(setId) {
                     mcqData.correct_option,
                     !!mcqData.is_mastered // Convert to boolean
                 ));
-                window.currentMCQIndex = 0;
 
-                // Display the first MCQ
-                displayMCQ(window.currentMCQs[0]);
+                if(!window.currentMCQIndex){
+                    window.currentMCQIndex = 0;
+                } else {
+                    // Ensure the index is within bounds after reload
+                    window.currentMCQIndex = Math.min(window.currentMCQIndex, window.currentMCQs.length - 1);
+                }
+                
+
+                // Display the current MCQ based on the retained index
+                displayMCQ(window.currentMCQs[window.currentMCQIndex]);
+
             } else {
                 console.log("MCQ array is empty for this set.");
                 alert("No MCQs found for this set."); // Show an alert message
@@ -869,7 +917,8 @@ function loadMCQs(setId) {
 }
 
 function displayMCQ(mcq) {
-    console.log(`Displaying MCQ with Set ID: ${mcq.setId}, MCQ ID: ${mcq.mcqId}`);
+    console.log(`Displaying MCQ with Set ID: ${mcq.setId}, MCQ ID: ${mcq.mcqId}, Correct Option: ${mcq.correctOption}`);
+    console.log(`Current MCQ Index: ${window.currentMCQIndex}`);
 
 
     const mcqModal = document.getElementById('mcqDisplayModal');
@@ -913,7 +962,7 @@ function displayMCQ(mcq) {
     if (toggleButton) {
         toggleButton.onclick = () => {
 
-            const correctOptions = mcqModal.getAttribute('data-correct-options'); // Retrieve correct options
+            const correctOptions = mcq.correctOption; // Retrieve correct options
             // Ensure correctOption is treated as a string
             const correctOptionString = String(correctOptions);
 
@@ -1006,40 +1055,6 @@ function closeMCQDisplayModal() {
     });
 }
 
-/*function toggleMCQAnswer(direction = null) {
-    const optionsContainer = document.getElementById("mcqOptionsContainer");
-    const button = document.getElementById("showMCQAnswerBtn");
-
-    if (button.textContent === "Show Answer") {
-        // Highlight correct options
-        const correctOptions = window.currentMCQs[window.currentMCQIndex].correctOption.split("").map(Number); // Get correct options as an array
-        correctOptions.forEach(optionIndex => {
-            const correctOptionElement = optionsContainer.querySelector(`[data-option-index="${optionIndex}"]`);
-            if (correctOptionElement) {
-                correctOptionElement.style.border = "2px solid lightgreen"; // Add a light green border
-            }
-        });
-
-        button.textContent = "Hide Answer";
-    } else {
-        // Remove the highlighting
-        const optionElements = optionsContainer.querySelectorAll(".mcq-option");
-        optionElements.forEach(optionElement => {
-            optionElement.style.border = ""; // Reset the border
-        });
-
-        button.textContent = "Show Answer";
-
-        // Move to the next or previous MCQ if a direction is specified
-        if (direction === "next") {
-            showNextMCQ();
-        } else if (direction === "previous") {
-            showPreviousMCQ();
-        }
-    }
-}
-window.toggleMCQAnswer = toggleMCQAnswer;*/
-
 function wrapIndex(index, length) {
     return (index + length) % length;
 }
@@ -1047,108 +1062,29 @@ function wrapIndex(index, length) {
 function showNextMCQ() {
     if (window.currentMCQs && window.currentMCQs.length > 0) {
 
-        // Clear current highlights
-        const optionsContainer = document.getElementById('mcqOptionsContainer');
-        optionsContainer.querySelectorAll('.highlight-correct').forEach(option => {
-            option.classList.remove('highlight-correct');
-        });
-        
         // Increment the index and wrap around if necessary
         window.currentMCQIndex = wrapIndex(window.currentMCQIndex + 1, window.currentMCQs.length);
+        //console.log(`Current MCQ Index: ${window.currentMCQIndex}`);
         const nextMCQ = window.currentMCQs[window.currentMCQIndex];
 
-        // Update the modal content with the next MCQ
-        const mcqModal = document.getElementById('mcqDisplayModal');
-        const questionElement = document.getElementById('mcqQuestionDisplay');
-        const toggleButton = document.getElementById('showMCQAnswerBtn');
-        const masterButton = document.getElementById('masterMCQBtn'); // Master button
+        closeMCQDisplayModal();
 
-        questionElement.textContent = nextMCQ.question;
+        displayMCQ(nextMCQ);
 
-        // Populate options dynamically
-        const optionLabels = ['A.', 'B.', 'C.', 'D.']; // Labels for the options
-        optionsContainer.innerHTML = ""; // Clear previous options
-        [nextMCQ.option1, nextMCQ.option2, nextMCQ.option3, nextMCQ.option4].forEach((option, index) => {
-            const optionElement = document.createElement('div');
-            optionElement.classList.add('mcq-option');
-            
-            // Add label (A., B., C., D.) in front of the option text
-            optionElement.textContent = `${optionLabels[index]} ${option}`;
-            optionElement.setAttribute('data-option-index', index + 1);
-            optionsContainer.appendChild(optionElement);
-        });
-
-        // Set the correct options as a numeric attribute on the modal
-        mcqModal.setAttribute('data-correct-options', nextMCQ.correctOption); // Store the correct option(s) as a number
-
-        // Reset the "Show Answer" button text and remove any highlighted borders
-        const optionElements = optionsContainer.querySelectorAll(".mcq-option");
-        optionElements.forEach(option => option.style.border = "");
-        toggleButton.textContent = "Show Answer";
-
-        // Update the Master button text and click handler
-        if (masterButton) {
-            masterButton.textContent = nextMCQ.isMastered ? 'Unmaster' : 'Master';
-            masterButton.onclick = () => {
-                toggleMCQMasterStatus(nextMCQ.mcqId);
-                nextMCQ.isMastered = !nextMCQ.isMastered; // Toggle state
-                masterButton.textContent = nextMCQ.isMastered ? 'Unmaster' : 'Master';
-            };
-        }
     }
 }
 
 function showPreviousMCQ() {
     if (window.currentMCQs && window.currentMCQs.length > 0) {
 
-        // Clear current highlights
-        const optionsContainer = document.getElementById('mcqOptionsContainer');
-        optionsContainer.querySelectorAll('.highlight-correct').forEach(option => {
-            option.classList.remove('highlight-correct');
-        });
-
         // Decrement the index and wrap around if necessary
         window.currentMCQIndex = wrapIndex(window.currentMCQIndex - 1, window.currentMCQs.length);
         const previousMCQ = window.currentMCQs[window.currentMCQIndex];
 
-        // Update the modal content with the previous MCQ
-        const mcqModal = document.getElementById('mcqDisplayModal');
-        const questionElement = document.getElementById('mcqQuestionDisplay');
-        const toggleButton = document.getElementById('showMCQAnswerBtn');
-        const masterButton = document.getElementById('masterMCQBtn'); // Master button
+        closeMCQDisplayModal()
+  
+        displayMCQ(previousMCQ);
 
-        questionElement.textContent = previousMCQ.question;
-
-        // Populate options dynamically
-        const optionLabels = ['A.', 'B.', 'C.', 'D.']; // Labels for the options
-        optionsContainer.innerHTML = ""; // Clear previous options
-        [previousMCQ.option1, previousMCQ.option2, previousMCQ.option3, previousMCQ.option4].forEach((option, index) => {
-            const optionElement = document.createElement('div');
-            optionElement.classList.add('mcq-option');
-
-            // Add label (A., B., C., D.) in front of the option text
-            optionElement.textContent = `${optionLabels[index]} ${option}`;
-            optionElement.setAttribute('data-option-index', index + 1);
-            optionsContainer.appendChild(optionElement);
-        });
-
-        // Set the correct options as a numeric attribute on the modal
-        mcqModal.setAttribute('data-correct-options', previousMCQ.correctOption); // Store the correct option(s) as a number
-
-        // Reset the "Show Answer" button text and remove any highlighted borders
-        const optionElements = optionsContainer.querySelectorAll(".mcq-option");
-        optionElements.forEach(option => option.style.border = "");
-        toggleButton.textContent = "Show Answer";
-
-        // Update the Master button text and click handler
-        if (masterButton) {
-            masterButton.textContent = previousMCQ.isMastered ? 'Unmaster' : 'Master';
-            masterButton.onclick = () => {
-                toggleMCQMasterStatus(previousMCQ.mcqId);
-                previousMCQ.isMastered = !previousMCQ.isMastered; // Toggle state
-                masterButton.textContent = previousMCQ.isMastered ? 'Unmaster' : 'Master';
-            };
-        }
     }
 }
 
@@ -1238,6 +1174,90 @@ function closeAllDropdowns() {
     });
 }
 
+async function populateSemesterButtons() {
+    const container = document.getElementById('semesterButtonsContainer');
+    container.innerHTML = ''; // Clear any existing buttons
+
+    try {
+        // Fetch semesters using the utility function
+        const semesters = await fetchSemesters();
+
+        if (semesters.length > 0) {
+            semesters.forEach((semester) => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn'; // Apply the filter-btn class
+                button.textContent = semester.name;
+                button.setAttribute('data-semester-id', semester.semester_id);
+
+                // Append the button to the container
+                container.appendChild(button);
+            });
+        } else {
+            // Show a placeholder message if no semesters are available
+            const message = document.createElement('p');
+            message.textContent = 'No semesters defined';
+            message.style.color = 'white'; // Optional: Style to match your theme
+            container.appendChild(message);
+        }
+    } catch (error) {
+        console.error('Error fetching semesters:', error);
+        const errorMessage = document.createElement('p');
+        errorMessage.textContent = 'Error loading semesters';
+        errorMessage.style.color = 'red';
+        container.appendChild(errorMessage);
+    }
+
+}
+
+async function populateCourseButtons(semesterId = null) {
+
+    const container = document.getElementById('courseButtonsContainer');
+    container.innerHTML = ''; // Clear any existing buttons
+
+    // Log the semesterId to verify its value
+    console.log(`Populating course buttons for semesterId: ${semesterId}, type: ${typeof semesterId}`);
+
+    try {
+        // Fetch courses with optional semester filter
+        const courses = semesterId 
+            ? await fetchCourses(semesterId) 
+            : await fetchCourses();
+
+        if (courses.length > 0) {
+            courses.forEach((course) => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn'; // Apply the filter-btn class
+                button.textContent = `${course.prefix} ${course.course_number}: ${course.name}`;
+                button.setAttribute('data-course-id', course.course_id);
+                // Log the courseId to verify
+                console.log(`Course button set: ${course.course_id}`);
+
+                // Add click event listener to the button
+                button.addEventListener('click', () => {
+                    const courseId = button.getAttribute('data-course-id');
+                    console.log(`Course ID selected: ${courseId}`);
+                    loadMCQSets(null, courseId); // Filter MCQ sets by course ID and semester
+                });
+
+                // Append the button to the container
+                container.appendChild(button);
+            });
+        } else {
+            // Show a placeholder message if no courses are available
+            const message = document.createElement('p');
+            message.textContent = 'No courses defined';
+            message.style.color = 'white'; // Optional: Style to match your theme
+            container.appendChild(message);
+        }
+    } catch (error) {
+        console.error('Error fetching courses:', error);
+        const errorMessage = document.createElement('p');
+        errorMessage.textContent = 'Error loading courses';
+        errorMessage.style.color = 'red';
+        container.appendChild(errorMessage);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Load MCQ sets into the container
     loadMCQSets();
@@ -1261,6 +1281,60 @@ document.addEventListener("DOMContentLoaded", () => {
             saveMCQ(setId);
         });
     }
+
+    // Populate semester buttons dynamically
+    populateSemesterButtons().then(() => {
+        // Add event listeners to dynamically created semester buttons
+        document.querySelectorAll('.filter-btn[data-semester-id]').forEach(button => {
+            button.addEventListener('click', () => {
+                const semesterId = button.getAttribute('data-semester-id');
+
+                currentSemesterId = semesterId; // Update global variable
+
+                // Log the semesterId to verify
+                console.log(`Semester ID selected: ${semesterId}`);
+                
+                // Dynamically populate course buttons for the selected semester
+                populateCourseButtons(semesterId);
+
+                // Load MCQ sets filtered by semester
+                loadMCQSets(semesterId);
+
+            });
+        });
+    });
+
+    // Populate course buttons initially for all courses
+    populateCourseButtons();
+
+    // Add event listener for the "All Semesters" button (if always in static HTML)
+    document.getElementById('allSemestersBtn').addEventListener('click', () => {
+        currentSemesterId = null; // Reset to no semester filter
+        loadMCQSets(); // Fetch all sets
+        populateCourseButtons(currentSemesterId); // Populate all courses
+    });
+
+    // Add event listener for the "All Courses" button (if always in static HTML)
+    document.getElementById('allCoursesBtn').addEventListener('click', () => {
+        loadMCQSets(currentSemesterId); // Fetch all sets
+    });
+
+    // Add event listener for the search box
+    document.getElementById('searchBox').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') { // Check if the Enter key was pressed
+            const searchTerm = event.target.value.trim(); // Get the search term
+            console.log(`Search initiated with term: ${searchTerm}`); // Debugging log
+
+            // Call loadMCQSets with the search term
+            loadMCQSets(null, null, searchTerm); // Pass null for semesterId and courseId
+        }
+    });
+    // Add event listener for Clear Search button
+    document.getElementById('clearSearchBtn').addEventListener('click', () => {
+        const searchBox = document.getElementById('searchBox');
+        searchBox.value = ''; // Clear the input field
+        loadMCQSets(); // Reset to show all MCQ sets
+    });
 
     // Close dropdowns if clicking outside of any dropdown
     document.addEventListener('click', closeAllDropdowns);

@@ -63,8 +63,27 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h2>TERM - SEMESTER</h2>
-                <button class="see-past-courses">See Past Courses</button>
+
+                <!-- Search Bar -->
+                <div class="studypage-search">
+                    <input id="searchBox" type="text" placeholder="Search flashcards...">
+                    <button id="clearSearchBtn" type="button">Clear Search</button>
+                </div>
+
+                <h2>FILTER BY SEMESTER</h2>
+
+                <button class="filter-btn" id="allSemestersBtn">All Semesters</button>
+                <div id="semesterButtonsContainer">
+                    <!-- Semester buttons will be dynamically added here -->
+                </div>
+
+                <h2>FILTER BY COURSE</h2>
+
+                <button class="filter-btn" id="allCoursesBtn">All Courses</button>
+                <div id="courseButtonsContainer">
+                    <!-- Course buttons will be dynamically added here -->
+                </div>
+
             </div>
 
             <!-- Flashcard Content Area (Main Section) -->
@@ -72,19 +91,20 @@
 
 
                 <div class="studypage-header">
-                    <!-- Search Bar -->
-                    <div class="studypage-search">
-                        <input type="text" placeholder="Search flashcards...">
-                    </div>
+
+                    <h1>Flashcards</h1>
+                    
 
                     <div>
                         <!-- Download Template Button -->
                         <a href="UTS_Flashcards_Upload_Template.csv" download="UTS_Flashcards_Upload_Template.csv" >
-                            <button id="downloadTemplateButton" class="create-set">Download Template</button> 
+                            <button id="downloadTemplateButton" class="create-set">
+                                Download Template<!--<span class="downloadTooltip">Columns A&B: Text</span>-->
+                            </button>
                         </a>
                         
                         <!-- Create Set Button -->
-                        <button id="createSetButton" class="create-set" onclick="openCreateSetModal()">Create Set</button>
+                        <button id="createSetButton" class="create-set" onclick="openCreateSetModal()">Create FC Set</button>
 
                         <!-- Go to MCQ Button -->
                         <a href="UTSmcqs.html">

@@ -20,13 +20,42 @@ $userId = $_SESSION['user_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (isset($_GET['type']) && $_GET['type'] === 'flashcard_sets') {
+
+        // Capture the optional semester_id and course_id parameters
+        $semesterId = isset($_GET['semester_id']) ? (int) $_GET['semester_id'] : null;
+        $courseId = isset($_GET['course_id']) ? (int) $_GET['course_id'] : null;
+        $searchTerm = isset($_GET['search']) ? $_GET['search'] : null;
+
         // Retrieve flashcard sets with associated course names
         $query = "SELECT fs.set_id, fs.set_name, fs.course_id, fs.num_cards, fs.cards_mastered, c.course_name 
                   FROM flashcard_sets AS fs
                   LEFT JOIN courses AS c ON fs.course_id = c.course_id
+                  LEFT JOIN semesters AS s ON c.semester_id = s.semester_id
                   WHERE fs.user_id = ?";
+        
+        // Add filtering logic
+        if (!empty($semesterId)) {
+            // Filter by semester_id
+            $query .= " AND s.semester_id = ?";
+            $params = ["ii", $userId, $semesterId];
+        } elseif (!empty($courseId)) {
+            // Filter by course_id
+            $query .= " AND fs.course_id = ?";
+            $params = ["ii", $userId, $courseId];
+        } elseif (!empty($searchTerm)) {
+            // Filter by set_name using a wildcard search
+            $query .= " AND fs.set_name LIKE ?";
+            $searchWildcard = "%" . $searchTerm . "%";
+            $params = ["is", $userId, $searchWildcard];
+        } else {
+            // Default case: No additional filtering
+            $params = ["i", $userId];
+        }
+
+        // Prepare and bind parameters dynamically
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $userId);
+        $stmt->bind_param(...$params);
+
         $stmt->execute();
         $result = $stmt->get_result();
 

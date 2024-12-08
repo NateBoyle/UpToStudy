@@ -11,6 +11,95 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $action = $_POST['action'] ?? null;
 
+/**
+ * Fetch assignments within a date range for a user.
+ */
+function fetchAssignments($userId, $startDate = null, $endDate = null) {
+    global $conn;
+
+    $query = "SELECT * FROM assignments WHERE user_id = ?";
+    $params = [$userId];
+    $types = "i";
+
+    if ($startDate && $endDate) {
+        $query .= " AND due_date BETWEEN ? AND ?";
+        $params[] = $startDate;
+        $params[] = $endDate;
+        $types .= "ss";
+    }
+
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $assignments = $result->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+
+    return $assignments;
+}
+
+/**
+ * Fetch to-dos within a date range for a user.
+ */
+function fetchToDos($userId, $startDate = null, $endDate = null) {
+    global $conn;
+
+    $query = "SELECT * FROM to_do WHERE user_id = ?";
+    $params = [$userId];
+    $types = "i";
+
+    if ($startDate && $endDate) {
+        $query .= " AND due_date BETWEEN ? AND ?";
+        $params[] = $startDate;
+        $params[] = $endDate;
+        $types .= "ss";
+    }
+
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $toDos = $result->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+
+    return $toDos;
+}
+
+/**
+ * Fetch events within a date range for a user.
+ */
+function fetchEvents($userId, $startDate = null, $endDate = null) {
+    global $conn;
+
+    $query = "SELECT * FROM events WHERE user_id = ?";
+    $params = [$userId];
+    $types = "i";
+
+    if ($startDate && $endDate) {
+        $query .= " AND (start_time BETWEEN ? AND ? OR end_time BETWEEN ? AND ?)";
+        $params[] = $startDate;
+        $params[] = $endDate;
+        $params[] = $startDate;
+        $params[] = $endDate;
+        $types .= "ssss";
+    }
+
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $events = $result->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+
+    return $events;
+}
+
 
 /**
  * Fetch semesters for a specific user.
@@ -80,14 +169,15 @@ function fetchCourses($userId, $semesterId = null) {
     $courses = [];
     while ($row = $result->fetch_assoc()) {
         $days = [];
-        if ($row['monday']) $days[] = 'Monday';
-        if ($row['tuesday']) $days[] = 'Tuesday';
-        if ($row['wednesday']) $days[] = 'Wednesday';
-        if ($row['thursday']) $days[] = 'Thursday';
-        if ($row['friday']) $days[] = 'Friday';
-        if ($row['saturday']) $days[] = 'Saturday';
-        if ($row['sunday']) $days[] = 'Sunday';
-        $row['days'] = $days; // Add days array to each course
+        if ($row['monday']) $days[] = "Mon";
+        if ($row['tuesday']) $days[] = "Tue";
+        if ($row['wednesday']) $days[] = "Wed";
+        if ($row['thursday']) $days[] = "Thu";
+        if ($row['friday']) $days[] = "Fri";
+        if ($row['saturday']) $days[] = "Sat";
+        if ($row['sunday']) $days[] = "Sun";
+    
+        $row['days'] = $days; // Add days array to the course details
         $courses[] = $row;
     }
 
@@ -113,6 +203,21 @@ if ($action === 'fetchSemesters') {
     } else {
         echo json_encode(['success' => true, 'data' => $courses]);
     }
+} elseif ($action === 'fetchAssignments') {
+    $startDate = $_POST['start_date'] ?? null;
+    $endDate = $_POST['end_date'] ?? null;
+    $assignments = fetchAssignments($user_id, $startDate, $endDate);
+    echo json_encode(['success' => true, 'data' => $assignments]);
+} elseif ($action === 'fetchToDos') {
+    $startDate = $_POST['start_date'] ?? null;
+    $endDate = $_POST['end_date'] ?? null;
+    $toDos = fetchToDos($user_id, $startDate, $endDate);
+    echo json_encode(['success' => true, 'data' => $toDos]);
+} elseif ($action === 'fetchEvents') {
+    $startDate = $_POST['start_date'] ?? null;
+    $endDate = $_POST['end_date'] ?? null;
+    $events = fetchEvents($user_id, $startDate, $endDate);
+    echo json_encode(['success' => true, 'data' => $events]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid action specified.']);
 }

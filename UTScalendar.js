@@ -1,4 +1,4 @@
-import { fetchSemesters } from './UTSutils.js';
+import { fetchCourses, fetchSemesters } from './UTSutils.js';
 
 const todaysDate = new Date(); // Always represents today's date
 let currentDate = new Date(); // Tracks the currently displayed month
@@ -286,7 +286,7 @@ async function updateSemester() {
                 // Only update and fetch courses if the semester ID changes
                 currentSemesterId = newSemesterId; // Update the global variable
                 cachedCourses = []; // Clear any cached courses
-                await fetchCourses(); // Fetch new courses for the updated semester
+                await cacheCourses(); // Fetch new courses for the updated semester
             }
 
             currentSemesterId = currentSemester.semester_id; // Update the global variable
@@ -401,7 +401,7 @@ function calculateTimeSlotOffset(start_time, slotHeight) {
     return minuteFraction * slotHeight;
 }
 
-async function fetchCourses() {
+/*async function fetchCourses() {
     if (!currentSemesterId) {
         console.warn("No current semester ID available.");
         return [];
@@ -424,7 +424,7 @@ async function fetchCourses() {
         // Update the cache
         cachedCourses = courses;
 
-        console.log("Fetched new courses for semester ID:", currentSemesterId);
+        console.log("Fetched new courses", courses);
         return courses;
     } catch (error) {
         console.error("Error fetching courses:", error);
@@ -432,6 +432,36 @@ async function fetchCourses() {
         // Clear cache if fetching fails
         cachedCourses = [];
 
+        return [];
+    }
+}*/
+
+async function cacheCourses() {
+    if (!currentSemesterId) {
+        console.warn("No current semester ID available.");
+        return [];
+    }
+
+    // Check if courses are already cached for the current semester
+    if (cachedCourses.length > 0) {
+        console.log("Using cached courses for semester ID:", currentSemesterId);
+        return cachedCourses;
+    }
+
+    try {
+        // Use the imported fetchCourses function
+        const courses = await fetchCourses(currentSemesterId);
+
+        // Update the cache
+        cachedCourses = courses;
+
+        console.log("Fetched new courses:", courses);
+        return courses;
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+
+        // Clear cache if fetching fails
+        cachedCourses = [];
         return [];
     }
 }
@@ -455,7 +485,10 @@ async function renderWeekViewEvents() {
             const timeSlotHeight = 50; // Fixed height for each time slot (e.g., 50px)
 
             cachedCourses.forEach(course => {
-                const { name, color, days, start_time, end_time } = course;
+                const { prefix, course_number, name, color, days, start_time, end_time } = course;
+
+                // Combine prefix and course number for display
+                const displayText = `${prefix} ${course_number}`;
 
                 days.forEach(day => {
                     const column = mapDayToColumn(day); // Map day to grid column
@@ -477,7 +510,7 @@ async function renderWeekViewEvents() {
                         // Create the event block
                         const eventBlock = document.createElement("div");
                         eventBlock.classList.add("event-block");
-                        eventBlock.textContent = name;
+                        eventBlock.textContent = displayText;
                         eventBlock.style.backgroundColor = color || "#424FC6"; // Default color
                         eventBlock.style.height = `${eventHeight}px`; // Set height
                         eventBlock.style.top = `${startOffset}px`;
@@ -536,7 +569,10 @@ async function renderMonthViewEvents() {
 
         // Loop through each course and place it in the correct day cell
         cachedCourses.forEach(course => {
-            const { name, color, days, start_time, end_time } = course; // Adjust based on your course structure
+            const { prefix, course_number, name, color, days, start_time, end_time } = course; // Adjust based on your course structure
+
+            // Combine prefix and course number for display
+            const displayText = `${prefix} ${course_number}`;
             
             days.forEach(dayName => {
                 const dayIndex = dayNameToIndex[dayName];
@@ -557,7 +593,7 @@ async function renderMonthViewEvents() {
                             // Create an event bar
                             const eventBar = document.createElement("div");
                             eventBar.classList.add("event-bar");
-                            eventBar.textContent = name; // Display the event name
+                            eventBar.textContent = displayText; // Display the event name
                             eventBar.style.backgroundColor = color || "#424FC6"; // Use event color or default
                             targetCell.appendChild(eventBar);
 

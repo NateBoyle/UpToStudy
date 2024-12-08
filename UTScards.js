@@ -1,10 +1,11 @@
-import { fetchCourses } from './UTSutils.js';
+import { fetchSemesters, fetchCourses } from './UTSutils.js';
 
 // Constants for API endpoints
 const API_URL = 'UTScards.php';
 const FLASHCARD_SETS_URL = `${API_URL}?type=flashcard_sets`;
 const FLASHCARDS_URL = `${API_URL}?type=flashcards`; // New constant for flashcards
 
+let currentSemesterId = null; // Tracks the selected semester
 
 /* CLASSES CODE */
 
@@ -57,7 +58,7 @@ class FlashcardSet {
 
         // Add click event to the center area
         clickableCenter.onclick = () => {
-            console.log(`Opening flashcard set: ${this.setId}`);
+            //console.log(`Opening flashcard set: ${this.setId}`);
             // Add code here to open or interact with the set, e.g., navigate to flashcards
             loadFlashcards(this.setId); // Load and display flashcards for the selected set
         };
@@ -211,7 +212,7 @@ async function loadCourses() {
             console.log("Course ID:", course.course_id, "Course Name:", course.course_name);
             const option = document.createElement('option');
             option.value = course.course_id;
-            option.textContent = course.name;
+            option.textContent = `${course.prefix} ${course.course_number}: ${course.name}`; // Combine prefix and course_number
             option.style.color = 'white'; // Ensure white font color
             courseDropdown.appendChild(option);
         });
@@ -229,8 +230,17 @@ async function loadCourses() {
 }
 
 // Load flashcard sets from the database and render them
-function loadFlashcardSets() {
-    fetch(FLASHCARD_SETS_URL)
+function loadFlashcardSets(semesterId = null, courseId = null, searchTerm = '') {
+
+    // Construct the URL dynamically based on provided arguments
+    let url = FLASHCARD_SETS_URL;
+
+    // Append query parameters conditionally
+    if (semesterId) url += `&semester_id=${encodeURIComponent(semesterId)}`;
+    if (courseId) url += `&course_id=${encodeURIComponent(courseId)}`;
+    if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
+
+    fetch(url)
         .then(response => response.json())
         .then(data => {
             const flashcardSetsContainer = document.getElementById('flashcardSetsContainer');
@@ -546,6 +556,7 @@ function openFlashcardModal(setId, flashcardId = null, question = '', answer = '
         answerInput.value = answer;
         modal.setAttribute('data-edit-flashcard-id', flashcardId); // Set flashcard ID for editing
         saveButton.textContent = 'Save Changes'; // Optional: Update button text
+        console.log(`Editing FC ID: ${flashcardId}`);
     } else {
         // For creating a new flashcard
         heading.textContent = 'Create New Flashcard';
@@ -579,10 +590,10 @@ function saveFlashcard(setId = null, question = null, answer = null) {
     question = question || document.getElementById('flashcardQuestion').value;
     answer = answer || document.getElementById('flashcardAnswer').value;
 
-    const flashcardId = document.getElementById("flashcardModal").getAttribute("data-edit-flashcard-id");
+    const flashcardId = document.getElementById("fcCreationModal").getAttribute("data-edit-flashcard-id");
     
     // Use the provided setId, or fetch from the modal if not provided
-    const finalSetId = setId || document.getElementById("flashcardModal")?.getAttribute("data-set-id");
+    const finalSetId = setId || document.getElementById("fcCreationModal")?.getAttribute("data-set-id");
 
     console.log('Save flashcard called with setId:', setId);
     
@@ -596,7 +607,7 @@ function saveFlashcard(setId = null, question = null, answer = null) {
     // Determine the type of operation (new or edit)
     const requestType = flashcardId ? 'edit_flashcard' : 'add_flashcard';
 
-    console.log("Saving flashcard:", { flashcardId, question, answer, setId, requestType });
+    //console.log("Saving flashcard:", { flashcardId, question, answer, setId, requestType });
 
     // Construct the request payload
     const requestData = {
@@ -627,7 +638,7 @@ function saveFlashcard(setId = null, question = null, answer = null) {
             alert(data.message);
             document.getElementById('flashcardQuestion').value = '';
             document.getElementById('flashcardAnswer').value = '';
-            document.getElementById("flashcardModal").removeAttribute("data-edit-flashcard-id");
+            document.getElementById("fcCreationModal").removeAttribute("data-edit-flashcard-id");
 
             // Refresh flashcards for the current set
             // Correctly retrieve the setId for reloading
@@ -637,17 +648,25 @@ function saveFlashcard(setId = null, question = null, answer = null) {
                 // Check if the overview modal is open and refresh it
                 const overviewModal = document.getElementById('flashcardOverviewModal');
                 if (overviewModal.style.display === 'flex') {
-                    openOverviewModal(setId);
+                    openOverviewModal(finalSetId);
                 }
                 else{
-                    openFlashcardModal(setId);
+
+                    // Handle editing vs. creating
+                    if(!flashcardId) {
+                        openFlashcardModal(finalSetId);
+                    }
+                    else {
+                        // If editing, close the modal
+                        closeFlashcardModal();
+                        loadFlashcards(finalSetId);
+                    }
+                    
                 }
 
             } else {
                 console.error("Set ID missing when reloading flashcards.");
             }
-
-            
 
         } else {
             alert("Error: " + data.message);
@@ -770,6 +789,7 @@ function toggleMasterStatus(flashcardId) {
             if (overviewModal.style.display === 'flex') {
                 openOverviewModal(setId); // Reload the overview modal with the updated set
             }
+
         } else {
             alert("Error: " + data.message);
         }
@@ -798,10 +818,16 @@ function loadFlashcards(setId) {
                     !!flashcardData.is_mastered // Convert to boolean
                     
                 ));
-                window.currentFlashcardIndex = 0;
+
+                if(!window.currentFlashcardIndex){
+                    window.currentFlashcardIndex = 0;
+                } else {
+                    // Ensure the index is within bounds after reload
+                    window.currentFlashcardIndex = Math.min(window.currentFlashcardIndex, window.currentFlashcards.length - 1);
+                }
 
                 // Display the first flashcard
-                displayCard(window.currentFlashcards[0]);
+                displayCard(window.currentFlashcards[window.currentFlashcardIndex]);
             } else {
                 console.log("Flashcards array is empty for this set.");
                 alert("No flashcards found for this set."); // Show an alert message
@@ -814,6 +840,7 @@ function loadFlashcards(setId) {
 function displayCard(flashcard) {
 
     console.log(`Displaying card with Set ID: ${flashcard.setId}, Flashcard ID: ${flashcard.flashcardId}`);
+    console.log(`Current FC Index: ${window.currentFlashcardIndex}`);
 
     const cardModal = document.getElementById('flashcardDisplayModal'); 
 
@@ -936,28 +963,9 @@ function showNextFlashcard() {
         window.currentFlashcardIndex = wrapIndex(window.currentFlashcardIndex + 1, window.currentFlashcards.length);
         const nextFlashcard = window.currentFlashcards[window.currentFlashcardIndex];
 
-        // Update the modal content with the next flashcard
-        const questionElement = document.getElementById('displayQuestion');
-        const answerElement = document.getElementById('displayAnswer');
-        const toggleButton = document.getElementById('toggleAnswerBtn');
-        const masterButton = document.getElementById('masterFlashcardBtn'); // Master button
+        closeFlashcardDisplayModal();
 
-        questionElement.textContent = nextFlashcard.question;
-        answerElement.textContent = nextFlashcard.answer;
-
-        // Reset the answer visibility and toggle button text
-        answerElement.style.display = 'none';
-        toggleButton.textContent = 'Show Answer';
-
-        // Update the Master button text and click handler
-        if (masterButton) {
-            masterButton.textContent = nextFlashcard.isMastered ? 'Unmaster' : 'Master';
-            masterButton.onclick = () => {
-                toggleMasterStatus(nextFlashcard.flashcardId);
-                nextFlashcard.isMastered = !nextFlashcard.isMastered; // Toggle state
-                masterButton.textContent = nextFlashcard.isMastered ? 'Unmaster' : 'Master';
-            };
-        }
+        displayCard(nextFlashcard);
 
     }
 }
@@ -968,28 +976,9 @@ function showPreviousFlashcard() {
         window.currentFlashcardIndex = wrapIndex(window.currentFlashcardIndex - 1, window.currentFlashcards.length);
         const previousFlashcard = window.currentFlashcards[window.currentFlashcardIndex];
 
-        // Update the modal content with the previous flashcard
-        const questionElement = document.getElementById('displayQuestion');
-        const answerElement = document.getElementById('displayAnswer');
-        const toggleButton = document.getElementById('toggleAnswerBtn');
-        const masterButton = document.getElementById('masterFlashcardBtn'); // Master button
+        closeFlashcardDisplayModal();
 
-        questionElement.textContent = previousFlashcard.question;
-        answerElement.textContent = previousFlashcard.answer;
-
-        // Reset the answer visibility and toggle button text
-        answerElement.style.display = 'none';
-        toggleButton.textContent = 'Show Answer';
-
-        // Update the Master button text and click handler
-        if (masterButton) {
-            masterButton.textContent = previousFlashcard.isMastered ? 'Unmaster' : 'Master';
-            masterButton.onclick = () => {
-                toggleMasterStatus(previousFlashcard.flashcardId);
-                previousFlashcard.isMastered = !previousFlashcard.isMastered; // Toggle state
-                masterButton.textContent = previousFlashcard.isMastered ? 'Unmaster' : 'Master';
-            };
-        }
+        displayCard(previousFlashcard);
 
     }
 }
@@ -1073,6 +1062,90 @@ function closeAllDropdowns() {
     });
 }
 
+async function populateSemesterButtons() {
+    const container = document.getElementById('semesterButtonsContainer');
+    container.innerHTML = ''; // Clear any existing buttons
+
+    try {
+        // Fetch semesters using the utility function
+        const semesters = await fetchSemesters();
+
+        if (semesters.length > 0) {
+            semesters.forEach((semester) => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn'; // Apply the filter-btn class
+                button.textContent = semester.name;
+                button.setAttribute('data-semester-id', semester.semester_id);
+
+                // Append the button to the container
+                container.appendChild(button);
+            });
+        } else {
+            // Show a placeholder message if no semesters are available
+            const message = document.createElement('p');
+            message.textContent = 'No semesters defined';
+            message.style.color = 'white'; // Optional: Style to match your theme
+            container.appendChild(message);
+        }
+    } catch (error) {
+        console.error('Error fetching semesters:', error);
+        const errorMessage = document.createElement('p');
+        errorMessage.textContent = 'Error loading semesters';
+        errorMessage.style.color = 'red';
+        container.appendChild(errorMessage);
+    }
+
+}
+
+async function populateCourseButtons(semesterId = null) {
+
+    const container = document.getElementById('courseButtonsContainer');
+    container.innerHTML = ''; // Clear any existing buttons
+
+    // Log the semesterId to verify its value
+    console.log(`Populating course buttons for semesterId: ${semesterId}, type: ${typeof semesterId}`);
+
+    try {
+        // Fetch courses with optional semester filter
+        const courses = semesterId 
+            ? await fetchCourses(semesterId) 
+            : await fetchCourses();
+
+        if (courses.length > 0) {
+            courses.forEach((course) => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn'; // Apply the filter-btn class
+                button.textContent = `${course.prefix} ${course.course_number}: ${course.name}`;
+                button.setAttribute('data-course-id', course.course_id);
+                // Log the courseId to verify
+                console.log(`Course button set: ${course.course_id}`);
+
+                // Add click event listener to the button
+                button.addEventListener('click', () => {
+                    const courseId = button.getAttribute('data-course-id');
+                    console.log(`Course ID selected: ${courseId}`);
+                    loadFlashcardSets(null, courseId); // Filter FC sets by course ID and semester
+                });
+
+                // Append the button to the container
+                container.appendChild(button);
+            });
+        } else {
+            // Show a placeholder message if no courses are available
+            const message = document.createElement('p');
+            message.textContent = 'No courses defined';
+            message.style.color = 'white'; // Optional: Style to match your theme
+            container.appendChild(message);
+        }
+    } catch (error) {
+        console.error('Error fetching courses:', error);
+        const errorMessage = document.createElement('p');
+        errorMessage.textContent = 'Error loading courses';
+        errorMessage.style.color = 'red';
+        container.appendChild(errorMessage);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Load flashcard sets into the container
     loadFlashcardSets();
@@ -1098,6 +1171,58 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Populate semester buttons dynamically
+    populateSemesterButtons().then(() => {
+        // Add event listeners to dynamically created semester buttons
+        document.querySelectorAll('.filter-btn[data-semester-id]').forEach(button => {
+            button.addEventListener('click', () => {
+                const semesterId = button.getAttribute('data-semester-id');
+
+                currentSemesterId = semesterId; // Update global variable
+                
+                // Log the semesterId to verify
+                console.log(`Semester ID selected: ${semesterId}`);
+                
+                // Dynamically populate course buttons for the selected semester
+                populateCourseButtons(semesterId);
+
+                // Load FC sets filtered by semester
+                loadFlashcardSets(semesterId);
+            });
+        });
+    });
+
+    // Populate course buttons initially for all courses
+    populateCourseButtons();
+
+    // Add event listener for the "All Semesters" button (if always in static HTML)
+    document.getElementById('allSemestersBtn').addEventListener('click', () => {
+        currentSemesterId = null; // Reset to no semester filter
+        loadFlashcardSets(); // Fetch all sets
+        populateCourseButtons(currentSemesterId); // Populate all courses
+    });
+
+    // Add event listener for the "All Courses" button (if always in static HTML)
+    document.getElementById('allCoursesBtn').addEventListener('click', () => {
+        loadFlashcardSets(currentSemesterId); // Fetch all sets
+    });
+
+    // Add event listener for the search box
+    document.getElementById('searchBox').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') { // Check if the Enter key was pressed
+            const searchTerm = event.target.value.trim(); // Get the search term
+            console.log(`Search initiated with term: ${searchTerm}`); // Debugging log
+
+            // Call loadMCQSets with the search term
+            loadFlashcardSets(null, null, searchTerm); // Pass null for semesterId and courseId
+        }
+    });
+    // Add event listener for Clear Search button
+    document.getElementById('clearSearchBtn').addEventListener('click', () => {
+        const searchBox = document.getElementById('searchBox');
+        searchBox.value = ''; // Clear the input field
+        loadFlashcardSets(); // Reset to show all MCQ sets
+    });
 
     // Close dropdowns if clicking outside of any dropdown
     document.addEventListener('click', closeAllDropdowns);

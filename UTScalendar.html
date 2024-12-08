@@ -72,9 +72,9 @@
                     </div>
                     <h2 id="currentSemesterLabel">Semester: Loading...</h2>
                     <div class="calendar-buttons">
-                        <button class="calendar-button" id="todayBtn">Today</button>
-                        <button class="calendar-button" id="weekMonthBtn">Week</button>
-                        <button class="calendar-button">New Event</button>
+                        <button class="calendar-view-button" id="todayBtn">Today</button>
+                        <button class="calendar-view-button" id="weekMonthBtn">Week</button>
+                        <button class="calendar-create-button">New Event</button>
                     </div>
                 </div>
                 <!-- Updated static days header -->
@@ -116,13 +116,12 @@
 
                 <!--Calendar Buttons-->
                 <div class="sidebar-button-container">
-                    <button id="defineSemesterBtn" class="sidebar-button">Define Semester</button>
-                    <button class="sidebar-button">Add Assignment</button>
-                    <button class="sidebar-button">Create To-Do</button>
+                    <button id="defineSemesterBtn" class="sidebar-create-button">Define Semester</button>
+                    <button class="sidebar-view-button">View Semesters</button>
                 </div>
 
                 <!-- Define Semester Modal -->
-                <div id="defineSemesterModal" class="modal">
+                <div id="defineSemesterModal" class="creationModal">
                     <div class="modal-content">
                         <span class="close" id="closeDefineSemester">&times;</span>
                         <h2>Define Semester</h2>
@@ -143,7 +142,11 @@
 
                 <!-- Assignment List -->
                 <div class="assignment-list">
-                    <h2 class="assignment-list-title">Assignment List</h2>
+                    <div class="assignment-list-title-container">
+                        <h2 class="assignment-list-title">Assignments</h2>
+                        <button class="sidebar-create-button">Add Assignment</button>
+                        <button class="sidebar-view-button">See All</button>
+                    </div>
                     <div class="list-item green">
                         <span class="text">Chapter 27 / Quiz</span>
                         <span>See more</span>
@@ -153,10 +156,14 @@
                         <span>See more</span>
                     </div>
                 </div>
-        
+
                 <!-- To-Do List -->
                 <div class="todo-list">
-                    <h2 class="todo-list-title">To-Do List</h2>
+                    <div class="todo-list-title-container">
+                        <h2 class="todo-list-title">To-Do List</h2>
+                        <button class="sidebar-create-button">Create To-Do</button>
+                        <button class="sidebar-view-button">See All</button>
+                    </div>
                     <div class="list-item">
                         <span class="text">Read Chapter 27</span>
                         <span>See more</span>

@@ -21,13 +21,43 @@ $userId = $_SESSION['user_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (isset($_GET['type']) && $_GET['type'] === 'mcq_sets') {
+
+        // Capture the optional semester_id, course_id, and search parameters
+        $semesterId = isset($_GET['semester_id']) ? (int) $_GET['semester_id'] : null;
+        $courseId = isset($_GET['course_id']) ? (int) $_GET['course_id'] : null;
+        $searchTerm = isset($_GET['search']) ? $_GET['search'] : null;
+
         // Retrieve MCQ sets with associated course names
-        $query = "SELECT ms.set_id, ms.set_name, ms.course_id, ms.num_questions, ms.questions_mastered, c.course_name 
-                  FROM mcq_sets AS ms
-                  LEFT JOIN courses AS c ON ms.course_id = c.course_id
-                  WHERE ms.user_id = ?";
+        $query = "SELECT ms.set_id, ms.set_name, ms.course_id, ms.num_questions, ms.questions_mastered, 
+                 c.course_name, s.semester_id, s.name AS semester_name
+                FROM mcq_sets AS ms
+                LEFT JOIN courses AS c ON ms.course_id = c.course_id
+                LEFT JOIN semesters AS s ON c.semester_id = s.semester_id
+                WHERE ms.user_id = ?";
+
+        // Add filtering logic
+        if (!empty($semesterId)) {
+            // Filter by semester_id
+            $query .= " AND s.semester_id = ?";
+            $params = ["ii", $userId, $semesterId];
+        } elseif (!empty($courseId)) {
+            // Filter by course_id
+            $query .= " AND ms.course_id = ?";
+            $params = ["ii", $userId, $courseId];
+        } elseif (!empty($searchTerm)) {
+            // Filter by set_name using a wildcard search
+            $query .= " AND ms.set_name LIKE ?";
+            $searchWildcard = "%" . $searchTerm . "%";
+            $params = ["is", $userId, $searchWildcard];
+        } else {
+            // Default case: No additional filtering
+            $params = ["i", $userId];
+        }
+
+        // Prepare and bind parameters dynamically
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $userId);
+        $stmt->bind_param(...$params);
+
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -49,6 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $query = "SELECT mcq_id, question, option_1, option_2, option_3, option_4, correct_option, is_mastered 
                       FROM mcqs 
                       WHERE set_id = ?";
+
             $stmt = $conn->prepare($query);
             $stmt->bind_param("i", $setId);
             $stmt->execute();
@@ -156,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $insertQuery = "INSERT INTO mcqs (set_id, question, option_1, option_2, option_3, option_4, correct_option, date_created) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("issssss", $setId, $question, $option1, $option2, $option3, $option4, $correctOption);
+        $insertStmt->bind_param("isssssi", $setId, $question, $option1, $option2, $option3, $option4, $correctOption);
     
         if ($insertStmt->execute()) {
             echo json_encode(['status' => 'success', 'message' => 'MCQ added successfully.']);
@@ -165,6 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     
         $insertStmt->close(); // Close the statement
+
     } elseif ($_POST['type'] === 'add_mcqs_bulk') {
         $setId = $_POST['set_id'];
         $mcqs = json_decode($_POST['mcqs'], true); // Decode JSON data for MCQs
@@ -226,58 +258,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     
         $insertStmt->close(); // Close the statement
-    } elseif ($_POST['type'] === 'edit_flashcard') {
-        // Edit an existing flashcard
-        $flashcardId = $_POST['flashcard_id'] ?? null;
-        $question = $_POST['question'] ?? null;
-        $answer = $_POST['answer'] ?? null;
-    
-        // Validate required fields
-        if (empty($flashcardId) || empty($question) || empty($answer)) {
-            echo json_encode(['status' => 'error', 'message' => 'Flashcard ID, question, and answer are required.']);
-            exit;
-        }
-    
-        // Update the flashcard in the database
-        $updateQuery = "UPDATE flashcards SET question = ?, answer = ? WHERE flashcard_id = ?";
-        $updateStmt = $conn->prepare($updateQuery);
-        $updateStmt->bind_param("ssi", $question, $answer, $flashcardId);
-    
-        if ($updateStmt->execute()) {
-            echo json_encode(['status' => 'success', 'message' => 'Flashcard updated successfully.']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to update flashcard: ' . $conn->error]);
-        }
 
-        $updateStmt->close(); // Close the statement
+    } elseif ($_POST['type'] === 'edit_mcq') {
 
-    } elseif ($_POST['type'] === 'mark_mastered') {
-        // Mark a flashcard as mastered
-        $flashcardId = $_POST['flashcard_id'] ?? null;
-        $mastered = $_POST['mastered'] ?? null;
+    // Edit an existing MCQ
+    $mcqId = $_POST['mcq_id'];
+    $setId = $_POST['set_id'];
+    $question = $_POST['question'];
+    $option1 = $_POST['option1'];
+    $option2 = $_POST['option2'];
+    $option3 = $_POST['option3'];
+    $option4 = $_POST['option4'];
+    $correctOption = $_POST['correct_option'];
 
-        // Validate required fields
-        if (empty($flashcardId) || !isset($mastered)) {
-            echo json_encode(['status' => 'error', 'message' => 'Flashcard ID and mastered status are required.']);
-            exit;
-        }
-
-        // Update the mastered status of the flashcard
-        $updateQuery = "UPDATE flashcards SET is_mastered = ? WHERE flashcard_id = ?";
-        $updateStmt = $conn->prepare($updateQuery);
-        $updateStmt->bind_param("ii", $mastered, $flashcardId);
-
-        if ($updateStmt->execute()) {
-            $statusMessage = $mastered ? 'Flashcard marked as mastered successfully.' : 'Flashcard marked as unmastered successfully.';
-            echo json_encode(['status' => 'success', 'message' => $statusMessage]);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to update flashcard: ' . $conn->error]);
-        }
-
-        $updateStmt->close(); // Close the statement
+    // Validate required fields
+    if (empty($mcqId) || empty($setId) || empty($question) || empty($option1) || empty($option2) || empty($option3) || empty($option4) || empty($correctOption)) {
+        echo json_encode(['status' => 'error', 'message' => 'All fields are required to update an MCQ.']);
+        exit;
     }
 
-} 
+    // Update the MCQ in the database
+    $updateQuery = "UPDATE mcqs 
+                    SET set_id = ?, question = ?, option_1 = ?, option_2 = ?, option_3 = ?, option_4 = ?, correct_option = ? 
+                    WHERE mcq_id = ?";
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->bind_param("isssssii", $setId, $question, $option1, $option2, $option3, $option4, $correctOption, $mcqId);
+
+    if ($updateStmt->execute()) {
+        echo json_encode(['status' => 'success', 'message' => 'MCQ updated successfully.']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Failed to update MCQ: ' . $conn->error]);
+    }
+
+    $updateStmt->close(); // Close the statement
+
+    } elseif ($_POST['type'] === 'mark_mcq_mastered') {
+    // Mark an MCQ as mastered
+    $mcqId = $_POST['mcq_id'] ?? null;
+    $mastered = $_POST['mastered'] ?? null;
+
+    // Validate required fields
+    if (empty($mcqId) || !isset($mastered)) {
+        echo json_encode(['status' => 'error', 'message' => 'MCQ ID and mastered status are required.']);
+        exit;
+    }
+
+    // Update the mastered status of the MCQ
+    $updateQuery = "UPDATE mcqs SET is_mastered = ? WHERE mcq_id = ?";
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->bind_param("ii", $mastered, $mcqId);
+
+    if ($updateStmt->execute()) {
+        $statusMessage = $mastered ? 'MCQ marked as mastered successfully.' : 'MCQ marked as unmastered successfully.';
+        echo json_encode(['status' => 'success', 'message' => $statusMessage]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Failed to update MCQ: ' . $conn->error]);
+    }
+
+    $updateStmt->close(); // Close the statement
+    }
+
+} elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    // Parse the DELETE request body for JSON
+    $input = json_decode(file_get_contents('php://input'), true);
+    $userId = $_SESSION['user_id'] ?? null;
+
+    if (!$userId) {
+        echo json_encode(['status' => 'error', 'message' => 'User is not authenticated.']);
+        exit;
+    }
+
+    if (isset($input['type']) && $input['type'] === 'delete_mcq_set') {
+        $setId = $input['set_id'] ?? null;
+
+        if ($setId) {
+            // Delete the MCQ set itself
+            $deleteSetQuery = "DELETE FROM mcq_sets WHERE set_id = ? AND user_id = ?";
+            $deleteSetStmt = $conn->prepare($deleteSetQuery);
+            $deleteSetStmt->bind_param("ii", $setId, $userId);
+
+            if ($deleteSetStmt->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'MCQ set and associated MCQs deleted successfully.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to delete MCQ set: ' . $conn->error]);
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Set ID is missing.']);
+        }
+
+        $deleteSetStmt->close(); // Close the statement
+
+    } elseif (isset($input['type']) && $input['type'] === 'delete_mcq') {
+        $mcqId = $input['mcq_id'] ?? null;
+
+        if ($mcqId) {
+            // Delete the individual MCQ
+            $deleteMCQQuery = "DELETE FROM mcqs WHERE mcq_id = ?";
+            $deleteMCQStmt = $conn->prepare($deleteMCQQuery);
+            $deleteMCQStmt->bind_param("i", $mcqId);
+
+            if ($deleteMCQStmt->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'MCQ deleted successfully.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to delete MCQ: ' . $conn->error]);
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'MCQ ID is missing.']);
+        }
+
+        $deleteMCQStmt->close(); // Close the statement
+
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid delete action type.']);
+    }
+}
+
 
 
 

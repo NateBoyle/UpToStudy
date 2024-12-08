@@ -62,29 +62,50 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h2>TERM - SEMESTER</h2>
-                <button class="see-past-courses">See Past Courses</button>
+
+                <!-- Search Bar -->
+                <div class="studypage-search">
+                    <input id="searchBox" type="text" placeholder="Search questions...">
+                    <button id="clearSearchBtn" type="button">Clear Search</button>
+                </div>
+
+                <div id="filterArea">
+                
+                    <h2>FILTER BY SEMESTER</h2>
+
+                    <button class="filter-btn" id="allSemestersBtn">All Semesters</button>
+                    <div id="semesterButtonsContainer">
+                        <!-- Semester buttons will be dynamically added here -->
+                    </div>
+
+                    <h2>FILTER BY COURSE</h2>
+
+                    <button class="filter-btn" id="allCoursesBtn">All Courses</button>
+                    <div id="courseButtonsContainer">
+                        <!-- Course buttons will be dynamically added here -->
+                    </div>
+
+                </div>
+
             </div>
 
             <!-- Flashcard Content Area (Main Section) -->
-            <div class="studypage-content">
-
-                
+            <div class="studypage-content">    
 
                 <div class="studypage-header">
-                    <!-- Search Bar -->
-                    <div class="studypage-search">
-                        <input type="text" placeholder="Search questions...">
-                    </div>
+                    
+                    <h1>Multiple Choice Questions</h1>
 
                     <div>
                         <!-- Download Template Button -->
-                        <a href="UTS_MCQ_Upload_Template.csv" download="UTS_MCQ_Upload_Template.csv">
-                            <button id="downloadMCQTemplateButton" class="create-set">Download Template</button>
+                        <a href="UTS_MCQs_Upload_Template.csv" download="UTS_MCQs_Upload_Template.csv">
+                            <button id="downloadTemplateButton" class="create-set">
+                                Download Template<!--<span class="downloadTooltip">Columns A-E: Text | Column F: Number(s)</span>-->
+                            </button>
                         </a>
 
                         <!-- Create Set Button -->
-                        <button id="createMCQSetButton" class="create-set" onclick="openCreateMCQSetModal()">Create MCQ Set</button>
+                        <button id="createSetButton" class="create-set" onclick="openCreateMCQSetModal()">Create MCQ Set</button>
 
                         <!-- Go to Flashcards Button -->
                          <a href="UTScards.html">
