@@ -12,6 +12,7 @@
     
     <link rel="stylesheet" href="UTScss.css">
     <link rel="stylesheet" href="UTScalendar.css">
+    <link rel="stylesheet" href="UTSevents.css">
 
 
     <style>
@@ -74,9 +75,34 @@
                     <div class="calendar-buttons">
                         <button class="calendar-view-button" id="todayBtn">Today</button>
                         <button class="calendar-view-button" id="weekMonthBtn">Week</button>
-                        <button class="calendar-create-button">New Event</button>
+                        <button id="newEventButton" class="calendar-create-button">New Event</button>
                     </div>
                 </div>
+                <!-- EVENT CREATION MODAL -->
+                <div id="eventModal" class="creationModal">
+                    <div class="modal-content">
+                      <span class="close">&times;</span>
+                      <h2>Event</h2>
+                      <form id="eventForm">
+                        <input type="text" name="title" placeholder="Title"  />
+                        <select id="course" name="course_id" >
+                            <option value="" disabled selected>Select course (optional)</option>
+                            <!-- Dynamically populate courses here -->
+                          </select>
+                        <textarea name="description" placeholder="Description"></textarea>
+                        <label for="startDate">Start Date and Time:</label>
+                        <input type="date" name="start_date"  />
+                        <input type="time" name="start_time" />
+                        <label for="endDate">End Date and Time:</label>
+                        <input type="date" name="end_date" />
+                        <input type="time" name="end_time" />
+                        <label>
+                          <input type="checkbox" name="all_day" /> All Day
+                        </label>
+                        <button type="submit">Save Event</button>
+                      </form>
+                    </div>
+                  </div>
                 <!-- Updated static days header -->
                 <div class="days-header">
                     <div class="day">
@@ -114,7 +140,7 @@
             <!-- Sidebar Section -->
             <div class="sidebar">
 
-                <!--Calendar Buttons-->
+                <!--Semester Buttons-->
                 <div class="sidebar-button-container">
                     <button id="defineSemesterBtn" class="sidebar-create-button">Define Semester</button>
                     <button class="sidebar-view-button">View Semesters</button>
@@ -144,16 +170,33 @@
                 <div class="assignment-list">
                     <div class="assignment-list-title-container">
                         <h2 class="assignment-list-title">Assignments</h2>
-                        <button class="sidebar-create-button">Add Assignment</button>
+                        <button id="newAssignmentButton" class="sidebar-create-button">Add Assignment</button>
                         <button class="sidebar-view-button">See All</button>
                     </div>
-                    <div class="list-item green">
-                        <span class="text">Chapter 27 / Quiz</span>
-                        <span>See more</span>
+                    <!-- Dynamic Assignment Container -->
+                    <div id="assignmentContainer" class="dynamic-container">
+                        <!-- Assignment items will be dynamically added here -->
                     </div>
-                    <div class="list-item blue">
-                        <span class="text">Study for Quiz</span>
-                        <span>See more</span>
+                </div>
+
+                <!-- ASSIGNMENT CREATION MODAL -->
+                <div id="assignmentModal" class="creationModal">
+                    <div class="modal-content">
+                      <span class="close" id="closeAddAssignment">&times;</span>
+                      <h2>Add Assignment</h2>
+                      <form id="assignmentForm">
+                        <input type="text" id="assignmentTitle" name="title" placeholder="Enter assignment title">
+                        <select id="course" name="course_id">
+                          <option value="" disabled selected>Select course</option>
+                          <!-- Dynamically populate courses here -->
+                        </select>
+                        <label for="dueDate">Due Date and Time:</label>
+                        <input type="date" id="dueDate" name="due_date">
+                        <input type="time" name="due_time" />
+                        <textarea id="description" name="description" placeholder="Enter assignment details (optional)"></textarea>
+                        <input type="number" id="points" name="points" placeholder="Enter total points">
+                        <button type="submit" id="saveAssignmentBtn">Add Assignment</button>
+                      </form>
                     </div>
                 </div>
 
@@ -161,14 +204,35 @@
                 <div class="todo-list">
                     <div class="todo-list-title-container">
                         <h2 class="todo-list-title">To-Do List</h2>
-                        <button class="sidebar-create-button">Create To-Do</button>
+                        <button id="newToDoButton" class="sidebar-create-button">Create To-Do</button>
                         <button class="sidebar-view-button">See All</button>
                     </div>
-                    <div class="list-item">
-                        <span class="text">Read Chapter 27</span>
-                        <span>See more</span>
+                    <!-- Dynamic To-Do Container -->
+                    <div id="toDoContainer" class="dynamic-container">
+                        <!-- To-Do items will be dynamically added here -->
                     </div>
                 </div>
+
+                <!-- TO-DO CREATION MODAL -->
+                <div id="toDoModal" class="creationModal">
+                    <div class="modal-content">
+                      <span class="close">&times;</span>
+                      <h2>To-Do</h2>
+                      <form id="toDoForm">
+                        <input type="text" name="title" placeholder="Task Name" />
+                        <select id="course" name="course_id" >
+                            <option value="" disabled selected>Select course (optional)</option>
+                            <!-- Dynamically populate courses here -->
+                          </select>
+                        <label for="dueDate">Due Date and Time:</label>
+                        <input type="date" name="due_date"  />
+                        <input type="time" name="due_time" />
+                        <textarea name="description" placeholder="Description"></textarea>
+                        <button type="submit">Create To-Do</button>
+                      </form>
+                    </div>
+                </div>
+
             </div>
         </div>
         
@@ -179,5 +243,6 @@
     <script src="UTSsessionManager.js"></script>
     <script type="module" src="UTScalendar.js" defer></script>
     <script type="module" src="UTSdefineSemester.js"></script>
+    <script type="module" src="UTSevents.js"></script>
 
 </body>

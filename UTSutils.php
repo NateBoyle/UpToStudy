@@ -14,14 +14,20 @@ $action = $_POST['action'] ?? null;
 /**
  * Fetch assignments within a date range for a user.
  */
-function fetchAssignments($userId, $startDate = null, $endDate = null) {
+function fetchAssignments($userId, $id = null, $startDate = null, $endDate = null) {
     global $conn;
 
     $query = "SELECT * FROM assignments WHERE user_id = ?";
     $params = [$userId];
     $types = "i";
 
-    if ($startDate && $endDate) {
+    // Fetch by ID if provided
+    if ($id) {
+        $query .= " AND assignment_id = ?";
+        $params[] = $id;
+        $types .= "i";
+    } elseif ($startDate && $endDate) {
+        // Fetch by date range if start and end dates are provided
         $query .= " AND due_date BETWEEN ? AND ?";
         $params[] = $startDate;
         $params[] = $endDate;
@@ -43,14 +49,20 @@ function fetchAssignments($userId, $startDate = null, $endDate = null) {
 /**
  * Fetch to-dos within a date range for a user.
  */
-function fetchToDos($userId, $startDate = null, $endDate = null) {
+function fetchToDos($userId, $id = null, $startDate = null, $endDate = null) {
     global $conn;
 
     $query = "SELECT * FROM to_do WHERE user_id = ?";
     $params = [$userId];
     $types = "i";
 
-    if ($startDate && $endDate) {
+    // Fetch by ID if provided
+    if ($id) {
+        $query .= " AND todo_id = ?";
+        $params[] = $id;
+        $types .= "i";
+    } elseif ($startDate && $endDate) {
+        // Fetch by date range if start and end dates are provided
         $query .= " AND due_date BETWEEN ? AND ?";
         $params[] = $startDate;
         $params[] = $endDate;
@@ -72,14 +84,20 @@ function fetchToDos($userId, $startDate = null, $endDate = null) {
 /**
  * Fetch events within a date range for a user.
  */
-function fetchEvents($userId, $startDate = null, $endDate = null) {
+function fetchEvents($userId, $id = null, $startDate = null, $endDate = null) {
     global $conn;
 
     $query = "SELECT * FROM events WHERE user_id = ?";
     $params = [$userId];
     $types = "i";
 
-    if ($startDate && $endDate) {
+    // Fetch by ID if provided
+    if ($id) {
+        $query .= " AND event_id = ?";
+        $params[] = $id;
+        $types .= "i";
+    } elseif ($startDate && $endDate) {
+        // Fetch by date range if start and end dates are provided
         $query .= " AND (start_time BETWEEN ? AND ? OR end_time BETWEEN ? AND ?)";
         $params[] = $startDate;
         $params[] = $endDate;
@@ -99,7 +117,6 @@ function fetchEvents($userId, $startDate = null, $endDate = null) {
 
     return $events;
 }
-
 
 /**
  * Fetch semesters for a specific user.
@@ -135,7 +152,7 @@ function fetchSemesters($userId) {
  * @param int|null $semesterId The ID of the semester (optional).
  * @return array|false An array of courses on success, or false on failure.
  */
-function fetchCourses($userId, $semesterId = null) {
+function fetchCourses($userId, $semesterId = null, $courseId = null) {
     global $conn;
 
     // Log the semesterId for debugging
@@ -148,8 +165,13 @@ function fetchCourses($userId, $semesterId = null) {
               LEFT JOIN semesters s ON c.semester_id = s.semester_id
               WHERE c.user_id = ?";
 
-    // Append conditionally for semester_id
-    if ($semesterId === null || $semesterId === '') {
+    // Append conditionally for course or semester_id
+    if ($courseId !== null && $courseId !== '') {
+        // Add filter for course_id if provided
+        $query .= " AND c.course_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ii", $userId, $courseId);
+    } elseif ($semesterId === null || $semesterId === '') {
         $query .= ""; // No additional filter
         $stmt = $conn->prepare($query);
         $stmt->bind_param("i", $userId);

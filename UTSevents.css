@@ -1,0 +1,265 @@
+/* Modal Background */
+.creationModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+}
+
+/* General Modal Content Styling */
+.creationModal .modal-content {
+    position: relative; /* Ensures elements inside, like close button, are positioned relative */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    display: inline-block; /* Allow content to dictate width */
+}
+
+/* Assignment Modal */
+#assignmentModal .modal-content {
+    background: #2C2C2C; /* Ensure background is applied */
+    min-height: 500px;
+    min-width: 400px;
+    color: white;
+}
+
+/* To-Do Modal */
+#toDoModal .modal-content {
+    background: #2C2C2C;
+    min-height: 400px;
+    min-width: 400px;
+    color: white;
+}
+
+/* Event Modal */
+#eventModal .modal-content {
+    background: #2C2C2C;
+    min-height: 450px;
+    min-width: 400px;
+    color: white;
+}
+
+/* Form Styling for All Modals */
+.creationModal form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Inputs and Textareas */
+.creationModal input,
+.creationModal select,
+.creationModal textarea {
+    min-width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    color: white;
+    background-color: #333;
+    box-sizing: border-box;
+}
+
+.creationModal input::placeholder,
+.creationModal textarea::placeholder {
+    color: white;
+    opacity: 1;
+}
+
+/* Save Button */
+.creationModal button[type="submit"] {
+    background: #5DD770;
+    padding: 12px;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.creationModal button[type="submit"]:hover {
+    background: #4fb963;
+}
+
+/* Close Button */
+.creationModal .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+}
+
+/* LIST STYLINGS */
+.assignment-list,
+.todo-list {
+    background: #2C2C2C;
+    border-radius: 15px;
+    padding: 1.2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column; /* Stack the title section and dynamic container vertically */
+    height: 100%; /* Allow the container to expand within its parent */
+    overflow: hidden; /* Prevent content overflow */
+}
+
+.assignment-list {
+    margin-bottom: 0.75rem;
+}
+
+.assignment-list-title-container,
+.todo-list-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem; /* Space below the title section */
+    gap: 0.3rem; /* Ensure spacing between the title and button */
+    flex-shrink: 0; /* Ensure the title section does not shrink */
+}
+
+.assignment-list-title,
+.todo-list-title {
+    margin: 0; /* Remove default margin */
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding-right: 0.3rem;
+}
+
+.assignment-list-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.todo-list-title {
+    padding-right: 1rem;
+}
+
+.assignment-list .sidebar-create-button,
+.todo-list .sidebar-create-button {
+    padding: 0.5rem 0.2rem; /* Maintain compact padding */
+    font-size: 0.9rem; /* Compact font size */
+    border-radius: 8px; /* Rounded corners */
+    background: #5DD770; /* Button background color */
+    color: white; /* Button text color */
+    cursor: pointer;
+    white-space: nowrap; /* Prevent text wrapping */
+    width: 0.65rem; /* Adjust to fit the content */
+    flex-shrink: 0; /* Prevent the button from shrinking too much */
+    overflow: hidden; /* Ensure the overflow is hidden */
+    text-overflow: ellipsis; /* Apply the ellipsis effect */
+}
+
+.assignment-list .sidebar-create-button:hover,
+.todo-list .sidebar-create-button:hover {
+    background: #4fb963; /* Darker shade on hover */
+}
+
+.assignment-list .sidebar-view-button,
+.todo-list .sidebar-view-button {
+    padding: 0.5rem 0.2rem; /* Maintain compact padding */
+    font-size: 1rem; /* Compact font size */
+    border-radius: 8px; /* Rounded corners */
+    background: #2EA0F3; /* Button background color */
+    color: white; /* Button text color */
+    cursor: pointer;
+    white-space: nowrap; /* Prevent text wrapping */
+    width: 0.5rem; /* Adjust to fit the content */
+    flex-shrink: 0; /* Prevent the button from shrinking too much */
+    overflow: hidden; /* Ensure the overflow is hidden */
+    text-overflow: ellipsis; /* Apply the ellipsis effect */
+}
+
+.assignment-list .sidebar-view-button:hover,
+.todo-list .sidebar-view-button:hover {
+    background: #1C81C2; /* Darker shade on hover */
+}
+
+/* LIST CONTAINERS */
+.dynamic-container {
+    flex-grow: 1; /* Take up the remaining space */
+    overflow-y: auto; /* Add vertical scrolling if content exceeds available space */
+    background: #252525; /* Dark background for contrast */
+    border-radius: 10px; /* Rounded corners for a clean look */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    padding: 10px; /* Add some padding */
+    margin-top: 10px; /* Space between the container and its title/buttons */
+    max-height: 300px; /* Prevent the container from growing too large */
+}
+
+/* Styling for individual list items */
+.dynamic-container .list-item {
+    display: flex; /* Align text and actions side by side */
+    justify-content: space-between; /* Space out the text and 'See more' */
+    align-items: center; /* Center content vertically */
+    padding: 8px 12px; /* Add some spacing inside each item */
+    margin-bottom: 8px; /* Space between list items */
+    background-color: #2C2C2C;  /*Consistent background for items */
+    border-radius: 4px; /* Slight rounding of item corners */
+    border: 1px solid #ddd; /* Light border for separation */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Minimal shadow for depth */
+    cursor: pointer; /* Indicate clickability */
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.dynamic-container .list-item .text {
+    white-space: nowrap; /* Prevent text from wrapping to the next line */
+    overflow: hidden;    /* Hide the overflowing text */
+    text-overflow: ellipsis; /* Add ellipsis (...) to indicate truncation */
+    display: inline-block; /* Ensure the ellipsis styling applies properly */
+    max-width: 50%; /* Set a maximum width for the text to allow space for other elements */
+    font-size: 0.9rem;
+}
+
+.dynamic-container .list-item .details {
+    flex-shrink: 0; /* Prevent details text from shrinking */
+    white-space: nowrap; /* Keep the details on a single line */
+}
+
+
+/* Hover effect for list items */
+.dynamic-container .list-item:hover {
+    border: 2px solid white; /* Add a white border */
+    transform: scale(1.02); /* Slight zoom effect */
+    background-color: inherit; /* Keep the original background color */
+    transition: border 0.1s ease, /*transform 0.2s ease;  Smooth transition for hover effects */
+}
+
+/* Styling for empty container message */
+.dynamic-container .empty-message {
+    text-align: center; /* Center the message */
+    color: #999; /* Light gray text */
+    font-size: 14px; /* Slightly smaller font for subtlety */
+    margin-top: 20px; /* Space above the message */
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+  .creationModal .modal-content {
+    width: 90%;
+    padding: 15px 20px;
+  }
+}

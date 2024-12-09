@@ -830,6 +830,8 @@ function toggleMCQMasterStatus(mcqId) {
         return;
     }
 
+    const setId = document.getElementById("mcqDisplayModal").getAttribute("data-set-id");
+
     // Determine the current state based on button text
     const isCurrentlyMastered = masterButton.innerText === 'Unmaster';
 
@@ -864,6 +866,7 @@ function toggleMCQMasterStatus(mcqId) {
             const overviewModal = document.getElementById('mcqOverviewModal');
             if (overviewModal.style.display === 'flex') {
                 openMCQOverviewModal(setId); // Reload the overview modal with the updated set
+                console.log('yo');
             }
 
         } else {
@@ -884,29 +887,38 @@ function loadMCQs(setId) {
             //console.log("MCQs response:", data);
 
             if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
-                // Store MCQs and reset index
-                window.currentMCQs = data.data.map(mcqData => new MCQ(
-                    mcqData.mcq_id,
-                    setId, // Pass the setId to the constructor
-                    mcqData.question,
-                    mcqData.option_1,
-                    mcqData.option_2,
-                    mcqData.option_3,
-                    mcqData.option_4,
-                    mcqData.correct_option,
-                    !!mcqData.is_mastered // Convert to boolean
-                ));
 
-                if(!window.currentMCQIndex){
-                    window.currentMCQIndex = 0;
-                } else {
-                    // Ensure the index is within bounds after reload
-                    window.currentMCQIndex = Math.min(window.currentMCQIndex, window.currentMCQs.length - 1);
-                }
+                // Filter out mastered MCQs
+                const filteredMCQs = data.data.filter(mcqData => !mcqData.is_mastered);
                 
+                if (filteredMCQs.length > 0) {
+                    // Store only non-mastered MCQs and reset index
+                    window.currentMCQs = filteredMCQs.map(mcqData => new MCQ(
+                        mcqData.mcq_id,
+                        setId, // Pass the setId to the constructor
+                        mcqData.question,
+                        mcqData.option_1,
+                        mcqData.option_2,
+                        mcqData.option_3,
+                        mcqData.option_4,
+                        mcqData.correct_option,
+                        !!mcqData.is_mastered // Convert to boolean
+                    ));
 
-                // Display the current MCQ based on the retained index
-                displayMCQ(window.currentMCQs[window.currentMCQIndex]);
+                    if(!window.currentMCQIndex){
+                        window.currentMCQIndex = 0;
+                    } else {
+                        // Ensure the index is within bounds after reload
+                        window.currentMCQIndex = Math.min(window.currentMCQIndex, window.currentMCQs.length - 1);
+                    }
+
+                    // Display the current MCQ based on the retained index
+                    displayMCQ(window.currentMCQs[window.currentMCQIndex]);
+
+                } else {
+                    console.log("No non-mastered MCQs found for this set.");
+                    alert("All MCQs in this set are mastered."); // Show an alert message
+                }
 
             } else {
                 console.log("MCQ array is empty for this set.");
@@ -959,6 +971,8 @@ function displayMCQ(mcq) {
 
     // "Show Answer" Button
     const toggleButton = mcqModal.querySelector('#showMCQAnswerBtn');
+    // Change text to "Hide Answer"
+    toggleButton.textContent = "Show Answer";
     if (toggleButton) {
         toggleButton.onclick = () => {
 
@@ -1113,22 +1127,28 @@ function openMCQOverviewModal(setId) {
                     !!mcq.is_mastered // Include isMastered for consistency
                 ));
 
+
                 // Populate the modal with MCQ data
-                data.data.forEach(mcq => {
+                data.data.forEach((mcq, index) => {
                     const mcqOverviewItem = document.createElement('div');
-                    mcqOverviewItem.classList.add('mcq-overview-item');
+                    mcqOverviewItem.classList.add('mcq-group');
+
+                    // Set border color if mastered
+                    if (mcq.is_mastered) {
+                        mcqOverviewItem.style.border = '2px solid #5dd75d'; // Green border
+                    }
 
                     const questionDiv = document.createElement('div');
-                    questionDiv.textContent = `Q: ${mcq.question}`;
+                    questionDiv.textContent = `Q.${index + 1}: ${mcq.question}`;
                     questionDiv.style.fontWeight = 'bold';
 
                     const optionsDiv = document.createElement('div');
                     optionsDiv.innerHTML = `
                         Options: 
-                        1) ${mcq.option_1}, 
-                        2) ${mcq.option_2}, 
-                        3) ${mcq.option_3}, 
-                        4) ${mcq.option_4}
+                        <br>1) ${mcq.option_1}, 
+                        <br>2) ${mcq.option_2}, 
+                        <br>3) ${mcq.option_3}, 
+                        <br>4) ${mcq.option_4}
                     `;
 
                     mcqOverviewItem.appendChild(questionDiv);

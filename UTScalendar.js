@@ -59,7 +59,7 @@ function toggleWeekMonthView() {
     isWeekView = !isWeekView; // Toggle the state
 }
 
-function populateCalendarHeader() {
+function populateCalendarHeader(weekView = null) {
     const days = document.querySelectorAll(".days-header .day");
 
     // Get the current year and month
@@ -77,7 +77,7 @@ function populateCalendarHeader() {
     document.getElementById("year").textContent = currentYear;
     document.getElementById("month").textContent = displayMonth;
 
-    if (isWeekView) {
+    if (weekView) {
         // For week view, add day numbers to the header
         const currentDay = currentDate.getDate();
         const firstDayOfWeek = new Date(currentYear, currentMonth, currentDay - currentDate.getDay());
@@ -93,12 +93,14 @@ function populateCalendarHeader() {
 }
 
 async function populateWeekView() {
+
+    // Update the calendar header
+    populateCalendarHeader(true);
+
     const calendarGrid = document.querySelector(".calendar-grid");
     calendarGrid.innerHTML = ""; // Clear the existing grid
     document.querySelectorAll(".calendar-cell").forEach(cell => cell.remove()); // Ensure no leftover cells
 
-    // Update the calendar header
-    populateCalendarHeader();
 
     // Create the week grid
     const weekGrid = document.createElement("div");

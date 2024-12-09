@@ -754,6 +754,8 @@ function toggleMasterStatus(flashcardId) {
         return;
     }
 
+    const setId = document.getElementById("flashcardDisplayModal").getAttribute("data-set-id");
+
     // Determine the current state based on button text
     const isCurrentlyMastered = masterButton.innerText === 'Unmaster';
 
@@ -809,25 +811,35 @@ function loadFlashcards(setId) {
             console.log("Flashcards response:", data);
 
             if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
-                // Store flashcards and reset index
-                window.currentFlashcards = data.data.map(flashcardData => new Flashcard(
-                    flashcardData.flashcard_id,
-                    setId, // Pass the setId to the constructor
-                    flashcardData.question,
-                    flashcardData.answer,
-                    !!flashcardData.is_mastered // Convert to boolean
-                    
-                ));
+                
+                // Filter out mastered MCQs
+                const filteredFCs = data.data.filter(flashcardData => !flashcardData.is_mastered);
+                
+                if (filteredFCs.length > 0) {
+                    // Store flashcards and reset index
+                    window.currentFlashcards = filteredFCs.map(flashcardData => new Flashcard(
+                        flashcardData.flashcard_id,
+                        setId, // Pass the setId to the constructor
+                        flashcardData.question,
+                        flashcardData.answer,
+                        !!flashcardData.is_mastered // Convert to boolean
+                        
+                    ));
 
-                if(!window.currentFlashcardIndex){
-                    window.currentFlashcardIndex = 0;
+                    if(!window.currentFlashcardIndex){
+                        window.currentFlashcardIndex = 0;
+                    } else {
+                        // Ensure the index is within bounds after reload
+                        window.currentFlashcardIndex = Math.min(window.currentFlashcardIndex, window.currentFlashcards.length - 1);
+                    }
+
+                    // Display the first flashcard
+                    displayCard(window.currentFlashcards[window.currentFlashcardIndex]);
+
                 } else {
-                    // Ensure the index is within bounds after reload
-                    window.currentFlashcardIndex = Math.min(window.currentFlashcardIndex, window.currentFlashcards.length - 1);
+                    console.log("No non-mastered FCs found for this set.");
+                    alert("All FCs in this set are mastered."); // Show an alert message
                 }
-
-                // Display the first flashcard
-                displayCard(window.currentFlashcards[window.currentFlashcardIndex]);
             } else {
                 console.log("Flashcards array is empty for this set.");
                 alert("No flashcards found for this set."); // Show an alert message
@@ -865,6 +877,7 @@ function displayCard(flashcard) {
 
     // Toggle Answer Button
     const toggleButton = cardModal.querySelector('#toggleAnswerBtn');
+    toggleButton.textContent = 'Show Answer';
     if (toggleButton) {
         toggleButton.onclick = () => {
             if (answerElement.style.display === 'none') {
@@ -932,7 +945,7 @@ function closeFlashcardDisplayModal() {
     document.getElementById("flashcardDisplayModal").style.display = "none";
 }
 
-function toggleFlashcardAnswer(direction = null) {
+/*function toggleFlashcardAnswer(direction = null) {
     const answerElement = document.getElementById("displayAnswer");
     const button = document.getElementById("toggleAnswerBtn");
     if (answerElement.style.display === "none") {
@@ -951,7 +964,7 @@ function toggleFlashcardAnswer(direction = null) {
 
     }
 }
-window.toggleFlashcardAnswer = toggleFlashcardAnswer;
+window.toggleFlashcardAnswer = toggleFlashcardAnswer;*/
 
 function wrapIndex(index, length) {
     return (index + length) % length;
@@ -1009,6 +1022,11 @@ function openOverviewModal(setId) {
                 data.data.forEach(flashcard => {
                     const flashcardPair = document.createElement('div');
                     flashcardPair.classList.add('flashcard-pair');
+
+                    // Set border color if mastered
+                    if (flashcard.is_mastered) {
+                        flashcardPair.style.border = '2px solid #5dd75d'; // Green border
+                    }
 
                     const questionDiv = document.createElement('div');
                     questionDiv.textContent = `Q: ${flashcard.question}`;
