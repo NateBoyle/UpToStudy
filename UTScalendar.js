@@ -3,11 +3,16 @@ import { fetchCourses, fetchSemesters } from './UTSutils.js';
 const todaysDate = new Date(); // Always represents today's date
 let currentDate = new Date(); // Tracks the currently displayed month
 
+let semesterStartDate = null;
+let semesterEndDate = null;
+
 let currentSemesterId = null;
 let cachedCourses = []; 
 
 let isWeekView = false; // Tracks whether the calendar is in week view
 let intervalId;
+
+
 
 function goToToday() {
     currentDate = new Date(todaysDate); // Reset currentDate to today's date
@@ -253,6 +258,8 @@ async function updateSemester() {
         if (!semesters || semesters.length === 0) {
             semesterLabel.textContent = "No semesters available.";
             currentSemesterId = null; // Clear the global variable
+            semesterStartDate = null; // Clear global semester start date
+            semesterEndDate = null; // Clear global semester end date
             return;
         }
 
@@ -292,17 +299,33 @@ async function updateSemester() {
             }
 
             currentSemesterId = currentSemester.semester_id; // Update the global variable
-            console.log(currentSemester.semester_id,currentSemester.name);
+
+            // Update global semester start and end dates
+            semesterStartDate = new Date(`${currentSemester.start_date}T00:00:00`);
+            semesterEndDate = new Date(`${currentSemester.end_date}T23:59:59`);
+            console.log(semesterStartDate,semesterEndDate);
+
+            // Log dates for cached courses
+            cachedCourses.forEach(course => logCourseDates(course));
+
         } else {
             semesterLabel.textContent = "Semester: None";
             currentSemesterId = null; // Clear the global variable
             cachedCourses = []; // Clear cache since no semester is active
+
+            // Clear global semester dates
+            semesterStartDate = null;
+            semesterEndDate = null;
         }
     } catch (error) {
         console.error("Error fetching semesters:", error);
         semesterLabel.textContent = "Error loading semester data.";
         currentSemesterId = null; // Clear the global variable in case of error
         cachedCourses = []; // Clear cache
+
+        // Clear global semester dates in case of error
+        semesterStartDate = null;
+        semesterEndDate = null;
     }
 }
 
@@ -353,7 +376,7 @@ function mapDayToColumn(day) {
         Fri: 6,
         Sat: 7
     };
-    console.log(`Mapping day: ${day} -> column: ${daysMap[day]}`);
+    //console.log(`Mapping day: ${day} -> column: ${daysMap[day]}`);
     return daysMap[day];
 }
 
@@ -371,7 +394,7 @@ function calculateTimeSlot(time, rowOffset = 1) {
         const slot = hours + (minutes >= 30 ? 0.5 : 0); // Half-hour increments
         const row = Math.floor(slot) + rowOffset;
 
-        console.log(`Calculating time slot for ${time}: Row ${row}`);
+        //console.log(`Calculating time slot for ${time}: Row ${row}`);
         return row;
     } catch (error) {
         console.error(error.message);
@@ -403,40 +426,59 @@ function calculateTimeSlotOffset(start_time, slotHeight) {
     return minuteFraction * slotHeight;
 }
 
-/*async function fetchCourses() {
-    if (!currentSemesterId) {
-        console.warn("No current semester ID available.");
-        return [];
+function logCourseDates(course) {
+    if (!semesterStartDate || !semesterEndDate) {
+        console.error("Semester dates are not defined.");
+        return;
     }
 
-    // Check if courses are already cached for the current semester
-    if (cachedCourses.length > 0) {
-        console.log("Using cached courses for semester ID:", currentSemesterId);
-        return cachedCourses;
+    // Map day names to numeric values (Sunday = 0, Monday = 1, etc.)
+    const dayMapping = {
+        Sun: 0,
+        Mon: 1,
+        Tue: 2,
+        Wed: 3,
+        Thu: 4,
+        Fri: 5,
+        Sat: 6,
+    };
+
+    // Convert course days to numeric values
+    const targetDays = course.days.map(day => dayMapping[day]);
+
+    // Determine the range to iterate
+    let rangeStart, rangeEnd;
+    if (isWeekView) {
+        const weekStart = new Date(currentDate);
+        weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Sunday of the week
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6); // Saturday of the week
+
+        // Clamp range to semester start and end dates
+        rangeStart = new Date(Math.max(semesterStartDate, weekStart));
+        rangeEnd = new Date(Math.min(semesterEndDate, weekEnd));
+    } else {
+        const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // First day of month
+        const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // Last day of month
+
+        // Clamp range to semester start and end dates
+        rangeStart = new Date(Math.max(semesterStartDate, monthStart));
+        rangeEnd = new Date(Math.min(semesterEndDate, monthEnd));
     }
 
-    try {
-        const response = await fetch(`UTScoursehandler.php?semester_id=${currentSemesterId}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch courses for semester ID: ${currentSemesterId}`);
+    // Iterate through the range and log the dates
+    let currentDateIter = new Date(rangeStart);
+
+    while (currentDateIter <= rangeEnd) {
+        if (targetDays.includes(currentDateIter.getDay())) {
+            console.log(
+                `${course.prefix} ${course.course_number}: ${currentDateIter.toDateString()} | ${currentDateIter.toISOString().split("T")[0]}`
+            );
         }
-
-        const courses = await response.json();
-
-        // Update the cache
-        cachedCourses = courses;
-
-        console.log("Fetched new courses", courses);
-        return courses;
-    } catch (error) {
-        console.error("Error fetching courses:", error);
-
-        // Clear cache if fetching fails
-        cachedCourses = [];
-
-        return [];
+        currentDateIter.setDate(currentDateIter.getDate() + 1); // Move to the next day
     }
-}*/
+}
+
 
 async function cacheCourses() {
     if (!currentSemesterId) {
@@ -447,6 +489,7 @@ async function cacheCourses() {
     // Check if courses are already cached for the current semester
     if (cachedCourses.length > 0) {
         console.log("Using cached courses for semester ID:", currentSemesterId);
+
         return cachedCourses;
     }
 
@@ -457,10 +500,10 @@ async function cacheCourses() {
         // Update the cache
         cachedCourses = courses;
 
-        console.log("Fetched new courses:", courses);
+        //console.log("Fetched new courses:", courses);
         return courses;
     } catch (error) {
-        console.error("Error fetching courses:", error);
+        //console.error("Error fetching courses:", error);
 
         // Clear cache if fetching fails
         cachedCourses = [];
@@ -517,7 +560,7 @@ async function renderWeekViewEvents() {
                         eventBlock.style.height = `${eventHeight}px`; // Set height
                         eventBlock.style.top = `${startOffset}px`;
 
-                        console.log(`Event Height: ${eventHeight}px, row: ${startRow}`);
+                        //console.log(`Event Height: ${eventHeight}px, row: ${startRow}`);
 
                         // Append to the correct time-slot
                         timeSlot.appendChild(eventBlock);

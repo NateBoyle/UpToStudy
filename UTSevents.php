@@ -86,7 +86,7 @@ function addAssignment() {
 function editAssignment() {
     global $conn;
 
-    $assignmentId = $_POST['assignment_id'];
+    $assignmentId = $_POST['id'];
     $title = $_POST['title'];
     $courseId = $_POST['course_id'];
     $dueDate = $_POST['due_date'];
@@ -142,7 +142,7 @@ function addToDo() {
 function editToDo() {
     global $conn;
 
-    $toDoId = $_POST['to_do_id'];
+    $toDoId = $_POST['id'];
     $title = $_POST['title'];
     $courseId = !empty($_POST['course_id']) ? $_POST['course_id'] : null;
     $dueDate = $_POST['due_date'];
@@ -200,7 +200,7 @@ function addEvent() {
 function editEvent() {
     global $conn;
 
-    $eventId = $_POST['event_id'];
+    $eventId = $_POST['id'];
     $title = $_POST['title'];
     $courseId = !empty($_POST['course_id']) ? $_POST['course_id'] : null;
     $startDate = $_POST['start_date'];
@@ -232,7 +232,7 @@ function editEvent() {
 function getTableFromEntity($entity) {
     $map = [
         'assignment' => 'assignments',
-        'todo' => 'to_dos',
+        'toDo' => 'to_do',
         'event' => 'events',
     ];
     return $map[$entity] ?? null;
@@ -241,7 +241,7 @@ function getTableFromEntity($entity) {
 function getPrimaryKeyFromEntity($entity) {
     $map = [
         'assignment' => 'assignment_id',
-        'todo' => 'to_do_id',
+        'toDo' => 'to_do_id',
         'event' => 'event_id',
     ];
     return $map[$entity] ?? null;
@@ -274,13 +274,13 @@ function deleteEntity($entity, $id) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
-    $entity = $_POST['entity'] ?? ''; // 'assignment', 'todo', or 'event'
+    $entity = $_POST['entity'] ?? ''; // 'assignment', 'toDo', or 'event'
 
     switch ($entity) {
         case 'assignment':
             handleAssignmentAction($action);
             break;
-        case 'todo':
+        case 'toDo':
             handleToDoAction($action);
             break;
         case 'event':

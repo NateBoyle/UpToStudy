@@ -110,6 +110,8 @@ export async function fetchSemesters() {
 // Fetch Courses (Optionally filtered by semesterId or courseId)
 export async function fetchCourses(semesterId = null, courseId = null) {
 
+    //console.log(courseId)
+
     try {
         const response = await fetch('UTSutils.php', {
             method: 'POST',

@@ -82,7 +82,7 @@
                 <div id="eventModal" class="creationModal">
                     <div class="modal-content">
                       <span class="close">&times;</span>
-                      <h2>Event</h2>
+                      <h2>New Event</h2>
                       <form id="eventForm">
                         <input type="text" name="title" placeholder="Title"  />
                         <select id="course" name="course_id" >
@@ -99,7 +99,12 @@
                         <label>
                           <input type="checkbox" name="all_day" /> All Day
                         </label>
-                        <button type="submit">Save Event</button>
+                        <!-- Button Container -->
+                        <div class="button-container">
+                            <button type="submit" id="saveEventBtn">Save Event</button>
+                            <button type="button" id="completeButton">Complete</button>
+                            <button type="button" id="deleteButton">Delete</button>
+                        </div>
                       </form>
                     </div>
                   </div>
@@ -183,7 +188,7 @@
                 <div id="assignmentModal" class="creationModal">
                     <div class="modal-content">
                       <span class="close" id="closeAddAssignment">&times;</span>
-                      <h2>Add Assignment</h2>
+                      <h2>New Assignment</h2>
                       <form id="assignmentForm">
                         <input type="text" id="assignmentTitle" name="title" placeholder="Enter assignment title">
                         <select id="course" name="course_id">
@@ -195,7 +200,12 @@
                         <input type="time" name="due_time" />
                         <textarea id="description" name="description" placeholder="Enter assignment details (optional)"></textarea>
                         <input type="number" id="points" name="points" placeholder="Enter total points">
-                        <button type="submit" id="saveAssignmentBtn">Add Assignment</button>
+                        <!-- Button Container -->
+                        <div class="button-container">
+                            <button type="submit" id="saveAssignmentBtn">Add Assignment</button>
+                            <button type="button" id="completeButton">Complete</button>
+                            <button type="button" id="deleteButton">Delete</button>
+                        </div>
                       </form>
                     </div>
                 </div>
@@ -217,7 +227,7 @@
                 <div id="toDoModal" class="creationModal">
                     <div class="modal-content">
                       <span class="close">&times;</span>
-                      <h2>To-Do</h2>
+                      <h2>New To-Do</h2>
                       <form id="toDoForm">
                         <input type="text" name="title" placeholder="Task Name" />
                         <select id="course" name="course_id" >
@@ -228,7 +238,12 @@
                         <input type="date" name="due_date"  />
                         <input type="time" name="due_time" />
                         <textarea name="description" placeholder="Description"></textarea>
-                        <button type="submit">Create To-Do</button>
+                        <!-- Button Container -->
+                        <div class="button-container">
+                            <button type="submit" id="saveToDoBtn">Create To-Do</button>
+                            <button type="button" id="completeButton">Complete</button>
+                            <button type="button" id="deleteButton">Delete</button>
+                        </div>
                       </form>
                     </div>
                 </div>

@@ -156,7 +156,7 @@ function fetchCourses($userId, $semesterId = null, $courseId = null) {
     global $conn;
 
     // Log the semesterId for debugging
-    error_log("fetchCourses called with userId: $userId, semesterId: " . var_export($semesterId, true));
+    //error_log("fetchCourses called with userId: $userId, semesterId: " . var_export($semesterId, true) . ", courseId: " . var_export($courseId, true));
 
     $query = "SELECT c.course_id, c.course_name AS name, c.subject, c.professor, c.total_points, c.start_time, c.end_time, 
                      c.monday, c.tuesday, c.wednesday, c.thursday, c.friday, c.saturday, c.sunday, c.course_color AS color, 
@@ -219,7 +219,8 @@ if ($action === 'fetchSemesters') {
     }
 } elseif ($action === 'fetchCourses') {
     $semesterId = $_POST['semester_id'] ?? null;
-    $courses = fetchCourses($user_id, $semesterId);
+    $courseId = $_POST['course_id'] ?? null;
+    $courses = fetchCourses($user_id, $semesterId, $courseId);
     if ($courses === false) {
         echo json_encode(['success' => false, 'message' => 'Failed to fetch courses.']);
     } else {
