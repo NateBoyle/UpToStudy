@@ -353,8 +353,8 @@
     transition: background 0.3s ease; /* Smooth background transition */
     position: relative; /* Ensure proper positioning for content */
     z-index: 1; /* Ensure cells are above the grid background */
-    position: relative;
-    overflow: visible !important;
+    overflow: hidden;
+    /*width: 90%;*/
 }
 
 .inactive-cell {
@@ -372,7 +372,6 @@
     font-weight: bold;
     
 }
-
 
 .calendar-cell:hover {
     background: #424242;
@@ -439,6 +438,8 @@
     opacity: 0.9;
 }
 
+
+
 /* Tooltip Styling */
 .event-tooltip {
     position: absolute;
@@ -458,7 +459,9 @@
     visibility: hidden;
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
     overflow-wrap: break-word;
+    overflow: visible !important;
 }
+
 
 /* Specific styles for Week View */
 /* Week View Event Blocks */
@@ -469,7 +472,7 @@
     left: 12%; /* Center horizontally (95% width with 2.5% left offset) */
     background-color: var(--event-color, #424FC6); /* Default color */
     color: white; /* Text color */
-    font-size: 0.9rem; /* Slightly larger font for week view */
+    font-size: 0.7rem; /* Slightly larger font for week view */
     padding: 5px; /* Inner padding for text */
     border-radius: 5px; /* Optional: rounded corners */
     text-overflow: ellipsis; /* Add ellipsis for long text */
