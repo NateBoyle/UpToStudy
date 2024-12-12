@@ -13,7 +13,7 @@ const UTSsessionManager = (() => {
                 console.log(data.message || 'Session inactive. Redirecting to welcome page...');
                 window.location.href = 'UTSwelcome.html';
             } else {
-                console.log('User authenticated:', data);
+                //console.log('User authenticated:', data);
             }
         } catch (error) {
             console.error('Error checking authentication:', error);

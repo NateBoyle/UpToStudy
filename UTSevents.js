@@ -1,4 +1,5 @@
-import { fetchCourses, fetchAssignments, fetchToDos } from './UTSutils.js'; // Import the fetchCourses utility
+import { fetchCourses, fetchAssignments, fetchToDos, fetchEvents } from './UTSutils.js'; // Import the fetches utility
+
 
 const todaysDate = new Date(); // Always represents today's date
 
@@ -107,7 +108,7 @@ async function populateContainer(containerId, fetchFunction, type) {
                 item.id = id;
                 const clickedType = e.currentTarget.getAttribute('data-type');
                 const modalId = clickedType + 'Modal'; // Result: 'todoModal'
-                console.log(`Clicked ${clickedType} with ID: ${id}, and modalId: ${modalId}`);
+                console.log(`Clicked ${clickedType} modalId: ${modalId} item: ${item}`);
                 openModal(clickedType, modalId, item); // Pass item instead of just id
             });
 
@@ -119,9 +120,52 @@ async function populateContainer(containerId, fetchFunction, type) {
     }
 }
 
+// Open Modal from Calendar helper function
+export async function openFromCalendar(type, id) {
+  console.log(`Type: ${type}, Id: ${id}`);
+  try {
+    let item;
+
+    // Determine which fetch function to call based on the type
+    if (type === 'assignment') {
+      const result = await fetchAssignments(id);
+      if (result.length > 0) {
+          item = result[0];
+      } else {
+          throw new Error(`Failed to fetch assignment with ID: ${id}`);
+      }
+    } else if (type === 'toDo') {
+      const result = await fetchToDos(id);
+      if (result.length > 0) {
+        item = result[0]; // Extract the first item
+      } else {
+          throw new Error(`Failed to fetch to-do with ID: ${id}. Response: ${JSON.stringify(result)}`);
+      }
+    } else if (type === 'event') {
+      const result = await fetchEvents(id);
+      if (result.length > 0) {
+          item = result[0];
+      } else {
+          throw new Error(`Failed to fetch event with ID: ${id}`);
+      }
+    } else {
+      throw new Error(`Unknown event type: ${type}`);
+    }
+
+    // Call openModal with the fetched item
+    if (item) {
+      console.log(`Type: ${type}, Id: ${id}, Item: ${item}`);
+      openModal(type, `${type}Modal`, item); // Modal ID should match the type (e.g., assignmentModal)
+    }
+
+  } catch (error) {
+      console.error(`Error handling event click for type: ${type}, ID: ${id}`, error);
+      alert('Failed to load event details. Please try again.');
+  }
+}
 
 // Add/Update Modal Workflow
-async function openModal(entity, modalId, item) {
+export async function openModal(entity, modalId, item) {
   const modal = document.getElementById(modalId);
   const form = modal.querySelector('form');
 
@@ -433,11 +477,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Save Buttons Event Handlers
-    document.getElementById('assignmentForm').addEventListener('submit', (e) => saveEntity(e, 'assignment', 'assignmentModal'));
-    document.getElementById('toDoForm').addEventListener('submit', (e) => saveEntity(e, 'toDo', 'toDoModal'));
-    document.getElementById('eventForm').addEventListener('submit', (e) => saveEntity(e, 'event', 'eventModal'));
+    const assignmentForm = document.getElementById('assignmentForm');
+    if (assignmentForm) {
+        assignmentForm.addEventListener('submit', (e) => saveEntity(e, 'assignment', 'assignmentModal'));
+    }
 
-    populateContainer('assignmentContainer', fetchAssignments, 'assignment');
-    populateContainer('toDoContainer', fetchToDos, 'toDo');
+    const toDoForm = document.getElementById('toDoForm');
+    if (toDoForm) {
+        toDoForm.addEventListener('submit', (e) => saveEntity(e, 'toDo', 'toDoModal'));
+    }
+
+    const eventForm = document.getElementById('eventForm');
+    if (eventForm) {
+        eventForm.addEventListener('submit', (e) => saveEntity(e, 'event', 'eventModal'));
+    }
+
+    const assignmentContainer = document.getElementById('assignmentContainer');
+    if (assignmentContainer) {
+        populateContainer('assignmentContainer', fetchAssignments, 'assignment');
+    }
+
+    const toDoContainer = document.getElementById('toDoContainer');
+    if (toDoContainer) {
+        populateContainer('toDoContainer', fetchToDos, 'toDo');
+    }
+
 
 });

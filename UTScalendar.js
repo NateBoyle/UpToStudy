@@ -1,4 +1,5 @@
-import { fetchCourses, fetchSemesters } from './UTSutils.js';
+import { openFromCalendar } from './UTSevents.js';
+import { getCombinedEventsAndCourses, getCurrentSemester } from './UTScalendarHelper.js';
 
 const todaysDate = new Date(); // Always represents today's date
 let currentDate = new Date(); // Tracks the currently displayed month
@@ -7,7 +8,6 @@ let semesterStartDate = null;
 let semesterEndDate = null;
 
 let currentSemesterId = null;
-let cachedCourses = []; 
 
 let isWeekView = false; // Tracks whether the calendar is in week view
 let intervalId;
@@ -19,7 +19,6 @@ function goToToday() {
 
     if (isWeekView) {
         populateWeekView(); // Populate the week view grid
-        //populateWeekHeader(); // Update the week header
     } else {
         populateMonthView(); // Populate the month view grid
     }
@@ -39,7 +38,6 @@ function toggleWeekMonthView() {
         toggleButton.textContent = "Week";
         populateMonthView(); // Rebuild the calendar grid for month view
         clearInterval(intervalId); // Stop the interval for week view updates
-        //renderEvents(); // Render events after fetching semester info
 
     } else {
         // Switch to Week view
@@ -167,7 +165,7 @@ async function populateWeekView() {
     }
 
     // Update the current semester label
-    await updateSemester();
+    await updateSemesterLabel();
 
     // Render week view events with the updated course data
     await renderWeekViewEvents();
@@ -216,7 +214,11 @@ async function populateMonthView() {
         const cell = document.createElement("div");
         cell.classList.add("calendar-cell");
         cell.textContent = day; // Display the day number
-        cell.dataset.date = `${currentYear}-${currentMonth + 1}-${day}`; // Add ISO date for matching
+        
+        // Format date as YYYY-MM-DD with leading zeros
+        const formattedDay = String(day).padStart(2, '0');
+        const formattedMonth = String(currentMonth + 1).padStart(2, '0');
+        cell.dataset.date = `${currentYear}-${formattedMonth}-${formattedDay}`;
         calendarGrid.appendChild(cell);
 
         // Highlight today's date
@@ -241,7 +243,7 @@ async function populateMonthView() {
     }
 
     // Update the current semester label
-    await updateSemester();
+    await updateSemesterLabel();
 
     // Render events on the month view
     await renderMonthViewEvents();
@@ -249,13 +251,14 @@ async function populateMonthView() {
 }
 
 // Function to fetch and update the semester label
-async function updateSemester() {
+async function updateSemesterLabel() {
     const semesterLabel = document.getElementById("currentSemesterLabel");
 
     try {
-        const semesters = await fetchSemesters();
+        // Fetch the current semester using the helper function
+        const currentSemester = await getCurrentSemester(currentDate);
 
-        if (!semesters || semesters.length === 0) {
+        if (!currentSemester) {
             semesterLabel.textContent = "No semesters available.";
             currentSemesterId = null; // Clear the global variable
             semesterStartDate = null; // Clear global semester start date
@@ -263,71 +266,16 @@ async function updateSemester() {
             return;
         }
 
-        // Get the month and year of the current date
-        const currentMonth = currentDate.getMonth();
-        const currentYear = currentDate.getFullYear();
-
-        // Determine the semester for the currently displayed month
-        const currentSemester = semesters.find(semester => {
-            const start = new Date(semester.start_date);
-            const end = new Date(semester.end_date);
-
-           // Extract month and year for comparison
-           const startMonth = start.getMonth();
-           const startYear = start.getFullYear();
-           const endMonth = end.getMonth();
-           const endYear = end.getFullYear();
-
-           // Check if the current month/year falls within the semester's range
-           return (
-               (currentYear > startYear || (currentYear === startYear && currentMonth >= startMonth)) &&
-               (currentYear < endYear || (currentYear === endYear && currentMonth <= endMonth))
-           );
-           
-        });
-
-        if (currentSemester) {
-            semesterLabel.textContent = `Semester: ${currentSemester.name}`;
-
-            const newSemesterId = currentSemester.semester_id; // Assign the semester ID to newSemesterId
-
-            if (newSemesterId !== currentSemesterId) {
-                // Only update and fetch courses if the semester ID changes
-                currentSemesterId = newSemesterId; // Update the global variable
-                cachedCourses = []; // Clear any cached courses
-                await cacheCourses(); // Fetch new courses for the updated semester
-            }
-
-            currentSemesterId = currentSemester.semester_id; // Update the global variable
-
-            // Update global semester start and end dates
-            semesterStartDate = new Date(`${currentSemester.start_date}T00:00:00`);
-            semesterEndDate = new Date(`${currentSemester.end_date}T23:59:59`);
-            console.log(semesterStartDate,semesterEndDate);
-
-            // Log dates for cached courses
-            cachedCourses.forEach(course => logCourseDates(course));
-
-        } else {
-            semesterLabel.textContent = "Semester: None";
-            currentSemesterId = null; // Clear the global variable
-            cachedCourses = []; // Clear cache since no semester is active
-
-            // Clear global semester dates
-            semesterStartDate = null;
-            semesterEndDate = null;
-        }
+        // Update the label
+        semesterLabel.textContent = `Semester: ${currentSemester.name}`;
+      
     } catch (error) {
-        console.error("Error fetching semesters:", error);
+        console.error("Error updating semester label:", error);
         semesterLabel.textContent = "Error loading semester data.";
-        currentSemesterId = null; // Clear the global variable in case of error
-        cachedCourses = []; // Clear cache
-
-        // Clear global semester dates in case of error
-        semesterStartDate = null;
-        semesterEndDate = null;
+        
     }
 }
+
 
 // Function to navigate to the previous time period
 function goToPreviousPeriod() {
@@ -337,7 +285,7 @@ function goToPreviousPeriod() {
         currentDate.setDate(currentDate.getDate() - 7); // Move back 7 days
         console.log("Week updated to:", currentDate);
         populateWeekView(); // Rebuild the week view
-        //populateWeekHeader();
+
     } else {
         // Navigate one month back
         currentDate.setMonth(currentDate.getMonth() - 1); // Move back 1 month
@@ -365,20 +313,6 @@ function goToNextPeriod() {
 
 
 // Functions for putting items on the calendar
-// Mapping event days to columns
-function mapDayToColumn(day) {
-    const daysMap = {
-        Sun: 1,
-        Mon: 2,
-        Tue: 3,
-        Wed: 4,
-        Thu: 5,
-        Fri: 6,
-        Sat: 7
-    };
-    //console.log(`Mapping day: ${day} -> column: ${daysMap[day]}`);
-    return daysMap[day];
-}
 
 // Functions for rendering events
 
@@ -426,159 +360,86 @@ function calculateTimeSlotOffset(start_time, slotHeight) {
     return minuteFraction * slotHeight;
 }
 
-function logCourseDates(course) {
-    if (!semesterStartDate || !semesterEndDate) {
-        console.error("Semester dates are not defined.");
-        return;
-    }
-
-    // Map day names to numeric values (Sunday = 0, Monday = 1, etc.)
-    const dayMapping = {
-        Sun: 0,
-        Mon: 1,
-        Tue: 2,
-        Wed: 3,
-        Thu: 4,
-        Fri: 5,
-        Sat: 6,
-    };
-
-    // Convert course days to numeric values
-    const targetDays = course.days.map(day => dayMapping[day]);
-
-    // Determine the range to iterate
-    let rangeStart, rangeEnd;
-    if (isWeekView) {
-        const weekStart = new Date(currentDate);
-        weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Sunday of the week
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 6); // Saturday of the week
-
-        // Clamp range to semester start and end dates
-        rangeStart = new Date(Math.max(semesterStartDate, weekStart));
-        rangeEnd = new Date(Math.min(semesterEndDate, weekEnd));
-    } else {
-        const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // First day of month
-        const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // Last day of month
-
-        // Clamp range to semester start and end dates
-        rangeStart = new Date(Math.max(semesterStartDate, monthStart));
-        rangeEnd = new Date(Math.min(semesterEndDate, monthEnd));
-    }
-
-    // Iterate through the range and log the dates
-    let currentDateIter = new Date(rangeStart);
-
-    while (currentDateIter <= rangeEnd) {
-        if (targetDays.includes(currentDateIter.getDay())) {
-            console.log(
-                `${course.prefix} ${course.course_number}: ${currentDateIter.toDateString()} | ${currentDateIter.toISOString().split("T")[0]}`
-            );
-        }
-        currentDateIter.setDate(currentDateIter.getDate() + 1); // Move to the next day
-    }
-}
-
-
-async function cacheCourses() {
-    if (!currentSemesterId) {
-        console.warn("No current semester ID available.");
-        return [];
-    }
-
-    // Check if courses are already cached for the current semester
-    if (cachedCourses.length > 0) {
-        console.log("Using cached courses for semester ID:", currentSemesterId);
-
-        return cachedCourses;
-    }
-
-    try {
-        // Use the imported fetchCourses function
-        const courses = await fetchCourses(currentSemesterId);
-
-        // Update the cache
-        cachedCourses = courses;
-
-        //console.log("Fetched new courses:", courses);
-        return courses;
-    } catch (error) {
-        //console.error("Error fetching courses:", error);
-
-        // Clear cache if fetching fails
-        cachedCourses = [];
-        return [];
-    }
-}
 
 async function renderWeekViewEvents() {
-    if (!currentSemesterId) {
-        console.warn("No current semester ID available.");
-    }
-
-    if (!cachedCourses || cachedCourses.length === 0) {
-        console.warn("No courses available to render.");
-    }
-
     try {
+        // Fetch combined events and courses for the current week
+        const combinedEvents = await getCombinedEventsAndCourses(currentDate, true);
+
+        // Debugging: Log combinedEvents to inspect its structure
+        console.log("Combined Events for Week View:", combinedEvents);
+
+        // Validate combinedEvents
+        if (!Array.isArray(combinedEvents) || combinedEvents.length === 0) {
+            console.warn("No combined events or courses to render.");
+            return;
+        }
+
         // Clear existing event blocks
         document.querySelectorAll(".event-block").forEach(block => block.remove());
 
-        // Render courses if any are available
-        if (cachedCourses && cachedCourses.length > 0) {
+        const timeSlotHeight = 50; // Fixed height for each time slot (e.g., 50px)
 
-            const timeSlotHeight = 50; // Fixed height for each time slot (e.g., 50px)
+        // Loop through the combined events grouped by day
+        combinedEvents.forEach(({ key: day, combined }) => {
+            if (!Array.isArray(combined)) {
+                console.warn(`No events for day ${day}`);
+                return;
+            }
 
-            cachedCourses.forEach(course => {
-                const { prefix, course_number, name, color, days, start_time, end_time } = course;
+            // Map day to grid column (0 = Sunday)
+            const column = parseInt(day, 10); // Use `day` as a numeric index for the column
 
-                // Combine prefix and course number for display
-                const displayText = `${prefix} ${course_number}`;
+            // Iterate over the combined events for this day
+            combined.forEach(event => {
+                const { title, startTime, endTime, color } = event;
 
-                days.forEach(day => {
-                    const column = mapDayToColumn(day); // Map day to grid column
-                    const startRow = calculateTimeSlot(start_time); // Map start time to grid row
-                    const endRow = calculateTimeSlot(end_time); // Map end time to grid row
-                    const eventHeight = calculateTimeSlotHeight(start_time, end_time, timeSlotHeight); // Fractional height
-                    const startOffset = calculateTimeSlotOffset(start_time, timeSlotHeight); // Fractional offset
+                // Map times to grid rows and calculate heights
+                const startRow = calculateTimeSlot(startTime); // Map start time to grid row
+                const endRow = calculateTimeSlot(endTime); // Map end time to grid row
+                const eventHeight = calculateTimeSlotHeight(startTime, endTime, timeSlotHeight);
+                const startOffset = calculateTimeSlotOffset(startTime, timeSlotHeight);
 
-                    // Find the starting time-slot using column and startRow
-                    const weekGrid = document.querySelector(".week-grid");
-                    const timeSlot = weekGrid.querySelector(
-                        `.time-slot[data-day="${column - 1}"][data-hour="${startRow - 1}"]`
+                // Find the starting time-slot using column and startRow
+                const weekGrid = document.querySelector(".week-grid");
+                const timeSlot = weekGrid.querySelector(
+                    `.time-slot[data-day="${column}"][data-hour="${startRow - 1}"]`
+                );
+
+                if (timeSlot) {
+                    // Create the event block
+                    const eventBlock = document.createElement("div");
+                    eventBlock.classList.add("event-block");
+                    eventBlock.textContent = title;
+                    eventBlock.style.backgroundColor = color || "#424FC6"; // Default color
+                    eventBlock.style.height = `${eventHeight}px`; // Set height
+                    eventBlock.style.top = `${startOffset}px`;
+
+                    // Add an onclick event
+                    eventBlock.addEventListener("click", () => {
+                        if (event.type === 'course') {
+                            console.log('This is a course!');
+                        } else {
+                            console.log(`This is a ${event.type}!`);
+                            openFromCalendar(event.type, event.id);
+                        }
+                    
+                    });
+
+                    // Append to the correct time-slot
+                    timeSlot.appendChild(eventBlock);
+                } else {
+                    console.warn(
+                        `Time-slot not found for day ${day}, startRow: ${startRow}, endRow: ${endRow}`
                     );
-
-                    if (timeSlot) {
-
-                        //const eventHeight = (endRow - startRow) * timeSlotHeight;  Event height in pixels
-
-                        // Create the event block
-                        const eventBlock = document.createElement("div");
-                        eventBlock.classList.add("event-block");
-                        eventBlock.textContent = displayText;
-                        eventBlock.style.backgroundColor = color || "#424FC6"; // Default color
-                        eventBlock.style.height = `${eventHeight}px`; // Set height
-                        eventBlock.style.top = `${startOffset}px`;
-
-                        //console.log(`Event Height: ${eventHeight}px, row: ${startRow}`);
-
-                        // Append to the correct time-slot
-                        timeSlot.appendChild(eventBlock);
-                    } else {
-                        console.warn(
-                            `Time-slot not found for day ${day}, startRow: ${startRow}, endRow: ${endRow}`
-                        );
-                    }
-
-                });
+                }
             });
-        }
-
-        // Future: Add logic for rendering other types of events (assignments, todos, etc.)
+        });
     } catch (error) {
         console.error("Error rendering week view events:", error);
     }
 }
+
 
 function formatTimeTo12Hour(time) {
     const [hours, minutes] = time.split(':').map(Number);
@@ -588,73 +449,53 @@ function formatTimeTo12Hour(time) {
 }
 
 async function renderMonthViewEvents() {
-    if (!cachedCourses || cachedCourses.length === 0) {
-        console.warn("No courses available to render.");
-        return;
-    }
-
     try {
+        // Fetch combined courses and events for the current month
+        const combinedData = await getCombinedEventsAndCourses(currentDate, false); // `false` for Month View
 
-        // Get the first day of the month
-        const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth(); // 0-based index
-        const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0 = Sunday, 6 = Saturday
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        if (!combinedData || combinedData.length === 0) {
+            console.warn("No courses or events available to render.");
+            return;
+        }
 
-        // Map of day names to indices
-        const dayNameToIndex = {
-            Sun: 0,
-            Mon: 1,
-            Tue: 2,
-            Wed: 3,
-            Thu: 4,
-            Fri: 5,
-            Sat: 6
-        };
+        // Clear previous event bars
+        document.querySelectorAll(".event-bar").forEach(bar => bar.remove());
 
-        // Loop through each course and place it in the correct day cell
-        cachedCourses.forEach(course => {
-            const { prefix, course_number, name, color, days, start_time, end_time } = course; // Adjust based on your course structure
+        // Loop through combined data and render events
+        combinedData.forEach(({ key, combined }) => {
+            const targetCell = document.querySelector(`.calendar-cell[data-date="${key}"]`);
 
-            // Combine prefix and course number for display
-            const displayText = `${prefix} ${course_number}`;
-            
-            days.forEach(dayName => {
-                const dayIndex = dayNameToIndex[dayName];
+            if (targetCell) {
+                combined.forEach(item => {
+                    // Create an event bar
+                    const eventBar = document.createElement("div");
+                    eventBar.classList.add("event-bar");
+                    eventBar.textContent = item.title; // Display the title (e.g., course prefix + number or event name)
+                    eventBar.style.backgroundColor = item.color || "#5DD970"; // Use item color or default
 
-                // Find all dates in the current month that match this day
-                for (let date = 1; date <= daysInMonth; date++) {
-                    const currentDate = new Date(currentYear, currentMonth, date);
-
-                    if (currentDate.getDay() === dayIndex) {
-
-                        // Format the date to match the `data-date` attribute
-                        const formattedDate = `${currentYear}-${currentMonth + 1}-${date}`;
-
-                        // Find the matching cell
-                        const targetCell = document.querySelector(`.calendar-cell[data-date="${formattedDate}"]`);
-
-                        if (targetCell) {
-                            // Create an event bar
-                            const eventBar = document.createElement("div");
-                            eventBar.classList.add("event-bar");
-                            eventBar.textContent = displayText; // Display the event name
-                            eventBar.style.backgroundColor = color || "#424FC6"; // Use event color or default
-                            targetCell.appendChild(eventBar);
-
-                            // Add a tooltip for more details
-                            eventBar.title = `${name}\n: ${formatTimeTo12Hour(start_time)} - ${formatTimeTo12Hour(end_time)}`;
+                    // Add an onclick event
+                    eventBar.addEventListener("click", () => {
+                        if (item.type === 'course') {
+                            console.log('This is a course!');
                         } else {
-                            console.warn(`No cell found for event on ${formattedDate}`);
+                            console.log(`This is a ${item.type}!`);
+                            openFromCalendar(item.type, item.id);
                         }
-                    }
-                }
-            });
+                    
+                    });
+
+                    // Append the event bar to the target cell
+                    targetCell.appendChild(eventBar);
+                });
+            } else {
+                console.warn(`No cell found for date ${key}`);
+            }
         });
     } catch (error) {
         console.error("Error rendering month view events:", error);
     }
 }
+
 
 
 // Event listener to populate the calendar on page load
@@ -679,31 +520,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 600000); // Re-run every ten minutes
 
 
-    document.querySelectorAll('.event-bar').forEach(eventBar => {
-        // Add a child tooltip element
-        const tooltip = document.createElement('div');
-        tooltip.className = 'event-tooltip';
-        tooltip.textContent = eventBar.title; // Use the title content for the tooltip
-        eventBar.appendChild(tooltip);
-        eventBar.title = ''; // Remove the native title to prevent conflicts
-
-        // Show the tooltip on hover
-        eventBar.addEventListener('mouseenter', () => {
-            tooltip.style.opacity = 1;
-            tooltip.style.visibility = 'visible';
-
-            // Inherit the background color of the event-bar
-            const barStyle = getComputedStyle(eventBar);
-            tooltip.style.backgroundColor = barStyle.backgroundColor;
-
-
-        });
-
-        // Hide the tooltip on mouse leave
-        eventBar.addEventListener('mouseleave', () => {
-            tooltip.style.opacity = 0;
-            tooltip.style.visibility = 'hidden';
-        });
-    });
 
 });

@@ -141,7 +141,7 @@
     background: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
-    z-index: 5000;
+    z-index: 2500;
 }
 
 /* Modal content */
@@ -252,6 +252,20 @@
     margin-bottom: 10px;
 }
 
+/* Editing mode for input fields */
+.input-editing {
+    background-color: #333 !important;
+    color: white !important;
+}
+
+/* Creation/Edit Modal Buttons*/
+.button-container {
+    display: flex; /* Arrange buttons horizontally */
+    justify-content: space-between; /* Spread buttons evenly */
+    gap: 5px; /* Space between buttons */
+    padding: 5px; /* Padding inside the container */
+}
+
 /* Add Course button */
 #addCourseBtn {
     width: 100%;
@@ -262,6 +276,44 @@
     font-size: 18px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+#addCourseBtn:hover {
+    background: #4fb963;
+}
+
+/* Add Assignment button */
+#addAssignmentBtn {
+    display: none;
+    width: 100%;
+    padding: 10px;
+    background: #3D9BFF;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#addAssignmentBtn:hover {
+    background: #3079cc;
+}
+
+/* Delete Course button */
+#deleteCourseBtn {
+    display: none;
+    width: 100%;
+    padding: 10px;
+    background: #FF5D5D;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#deleteCourseBtn:hover {
+    background: #cc4a4a;
 }
 
 /* Close button */
@@ -277,6 +329,10 @@
 }
 
 /* Define Semester Modal Styling*/
+#defineSemesterModal  {
+    display: none; /* Hidden by default */
+    
+}
 /* Modal Background */
 .modal {
     display: none; /* Hidden by default */
@@ -294,6 +350,7 @@
 
 /* Modal Content */
 .modal-content {
+    display: inherit; /* Hidden by default */
     width: 400px; /* Fixed width for modal */
     background: #2C2C2C; /* Black background for modal */
     padding: 20px;

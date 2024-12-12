@@ -2,10 +2,14 @@
 export async function fetchAssignments(id = null, startDate = null, endDate = null) {
     const params = new URLSearchParams({ action: 'fetchAssignments' });
     
+    params.append('id', id || ''); // Explicitly pass id, even if null
+
     // Append parameters conditionally
-    if (id) params.append('id', id);
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
+
+    // Log parameters for debugging
+    //console.log(`Fetching Assignments - ID: ${id}, Start Date: ${startDate}, End Date: ${endDate}`);
 
     try {
         const response = await fetch('UTSutils.php', {
@@ -29,12 +33,16 @@ export async function fetchAssignments(id = null, startDate = null, endDate = nu
 
 // Fetch To-Dos
 export async function fetchToDos(id = null, startDate = null, endDate = null) {
-    const params = new URLSearchParams({ action: 'fetchToDos' });
     
+    const params = new URLSearchParams({ action: 'fetchToDos' });
+    console.log(`Id: ${id}`);
+    params.append('id', id || ''); // Explicitly pass id, even if null
+
     // Append parameters conditionally
-    if (id) params.append('id', id);
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
+
+    //console.log(`Fetching To-Dos - ID: ${id}, Start Date: ${startDate}, End Date: ${endDate}`);
 
     try {
         const response = await fetch('UTSutils.php', {
@@ -59,11 +67,14 @@ export async function fetchToDos(id = null, startDate = null, endDate = null) {
 // Fetch Events
 export async function fetchEvents(id = null, startDate = null, endDate = null) {
     const params = new URLSearchParams({ action: 'fetchEvents' });
+
+    params.append('id', id || ''); // Explicitly pass id, even if null
     
     // Append parameters conditionally
-    if (id) params.append('id', id);
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
+
+    //console.log(`Fetching Events - ID: ${id}, Start Date: ${startDate}, End Date: ${endDate}`);
 
     try {
         const response = await fetch('UTSutils.php', {
@@ -86,13 +97,19 @@ export async function fetchEvents(id = null, startDate = null, endDate = null) {
 }
 
 // Fetch Semesters
-export async function fetchSemesters() {
+export async function fetchSemesters(currentDate = null) {
     try {
         const response = await fetch('UTSutils.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ action: 'fetchSemesters' }),
+            body: new URLSearchParams({
+                action: 'fetchSemesters',
+                current_date: currentDate ? currentDate.toISOString().split('T')[0] : '', // Format: yyyy-mm-dd
+                
+            }),
         });
+
+        console.log(currentDate);
 
         const data = await response.json();
         if (data.success) {

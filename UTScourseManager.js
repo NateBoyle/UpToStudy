@@ -1,4 +1,5 @@
 import { fetchSemesters, fetchCourses } from './UTSutils.js';
+import { openModal } from './UTSevents.js';
 
 class Course {
 
@@ -43,11 +44,6 @@ class Course {
         courseCard.innerHTML = `
             <div class="course-header" style="background: ${this.color};">
                 <h2>${this.prefix} ${this.course_number}</h2>
-                <button class="options-button">&#8942;</button>
-                <div class="options-menu">
-                    <button onclick="editCourse(${this.course_id})">Edit</button>
-                    <button onclick="deleteCourse(${this.course_id})">Delete</button>
-                </div>
             </div>
             <div class="course-content">
                 
@@ -59,66 +55,15 @@ class Course {
             </div>
         `;
 
-        const optionsButton = courseCard.querySelector('.options-button');
-        const optionsMenu = courseCard.querySelector('.options-menu');
-
-        optionsButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            optionsMenu.style.display = optionsMenu.style.display === 'none' ? 'block' : 'none';
-        
-            
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            optionsMenu.style.display = 'none';
-        });
-
         // Attach click event to course-content only
         const courseContent = courseCard.querySelector('.course-content');
-        courseContent.addEventListener('click', () => this.showDetailsModal());
+        courseContent.addEventListener('click', () => editCourse(this.course_id));
 
         return courseCard;
     }
 
-    showDetailsModal() {
-        const modal = document.getElementById('courseDetailsModal');
-        const modalContent = document.getElementById('courseDetailsContentWrapper'); // Target modal content
-
-        const modalContentElement = document.getElementById('courseDetailsContent');
-
-        // Populate the modal content with course details
-        modalContentElement.innerHTML = `
-            <p><strong>Course Name:</strong> ${this.name}</p>
-            <p><strong>Prefix:</strong> ${this.prefix || "N/A"}</p>
-            <p><strong>Course Number:</strong> ${this.course_number || "N/A"}</p>
-            <p><strong>Subject:</strong> ${this.subject}</p>
-            <p><strong>Professor:</strong> ${this.professor}</p>
-            <p><strong>Semester:</strong> ${this.semester_name || "Unassigned"}</p>
-            <p><strong>Time:</strong> ${this.formatTimeTo12Hour(this.startTime)}&nbsp;-&nbsp;${this.formatTimeTo12Hour(this.endTime)}</p>
-            <p><strong>Days:</strong> ${this.days.join(', ')}</p>
-            <p><strong>Total Points:</strong> ${this.totalPoints}</p>
-            <p><strong>Color:</strong> <span id="colorBox"  style="background: ${this.color};"></span></p>
-        `;
-
-        // Apply the course's color to the modal border
-        modalContent.style.border = `4px solid ${this.color}`;
-        modalContent.style.borderRadius = '10px'; // Optional: Add rounded corners
-        modal.style.display = 'flex';
-
-        console.log("Modal Content Element:", modalContent);
-        console.log("Border Color:", this.color);
-
-        // Add close functionality
-        const closeModal = document.getElementById('closeCourseDetailsModal');
-        closeModal.onclick = () => {
-            modal.style.display = 'none';
-        };
-    }
 
 }
-
-
 
 function displayErrors(errors) {
     console.log("Errors:", errors); // Debugging line
@@ -128,6 +73,13 @@ function displayErrors(errors) {
             if (errorSpan) errorSpan.textContent = message;
         });
     }
+}
+
+// Reset input styles when adding a new course
+function resetFormStyles() {
+    document.querySelectorAll('#addCourseForm input, #addCourseForm select').forEach(input => {
+        input.classList.remove('input-editing');
+    });
 }
 
 function editCourse(courseId) {
@@ -164,15 +116,48 @@ function editCourse(courseId) {
         checkbox.checked = course.days.includes(checkbox.value);
     });
 
+    // Add the "editing" class to inputs
+    document.querySelectorAll('#addCourseForm input, #addCourseForm select').forEach(input => {
+        if (!['startTime', 'endTime'].includes(input.id)) {
+            input.classList.add('input-editing');
+        }
+    });
+
     // Change heading text to "Edit Course Details"
     document.getElementById('modalHeading').textContent = "Edit Course Details";
+
+
 
     const addCourseBtn = document.getElementById('addCourseBtn');
     addCourseBtn.textContent = "Save Changes";
 
+    const addAssignmentBtn = document.getElementById('addAssignmentBtn');
+    const deleteCourseBtn = document.getElementById('deleteCourseBtn');
+
+    // Show Add Assignment and Delete Course buttons
+    addAssignmentBtn.style.display = 'inline-block';
+    deleteCourseBtn.style.display = 'inline-block';
+    
+
     addCourseBtn.onclick = function(e) {
         e.preventDefault();
         handleSaveCourseChanges(courseId);
+    };
+
+    // Add event listener for the Add Assignment button
+    addAssignmentBtn.onclick = (e) => {
+        e.preventDefault(); // Prevent the default form submission behavior
+        console.log(`Adding assignment for: ${course.prefix} ${course.course_number}`);
+        // Logic to add assignment (if needed)
+        openAddAssignmentModal(course); // Pass the current course to prefill modal data
+    };
+
+    // Add event listener for the Delete Course button
+    deleteCourseBtn.onclick = () => {
+        if (confirm(`Are you sure you want to delete ${course.prefix} ${course.course_number}?`)) {
+            deleteCourse(courseId); // Call deleteCourse method
+            //modal.style.display = 'none'; // Close the modal after deletion
+        }
     };
 
     document.getElementById('modal').style.display = 'flex';
@@ -227,25 +212,25 @@ function deleteCourse(courseId) {
 
     console.log("Deletinging course with ID:", courseId); // Debugging line
 
-    if (confirm("Are you sure you want to delete this course?")) {
-        fetch(`UTScoursehandler.php?id=${courseId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ courseId: courseId }) // Ensure courseId is set correctly
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert("Course deleted successfully!");
-                location.reload();
-            } else {
-                alert("Failed to delete course.");
-            }
-        })
-        .catch(error => console.error('Error deleting course:', error));
-    }
+    
+    fetch(`UTScoursehandler.php?id=${courseId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ courseId: courseId }) // Ensure courseId is set correctly
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert("Course deleted successfully!");
+            location.reload();
+        } else {
+            alert("Failed to delete course.");
+        }
+    })
+    .catch(error => console.error('Error deleting course:', error));
+    
 }
 
 // Attach to global window object
@@ -379,7 +364,6 @@ async function populateSemesterButtons() {
 
 }
 
-
 function handleAddCourse(e) {
     e.preventDefault();
 
@@ -410,6 +394,21 @@ function handleAddCourse(e) {
     .catch(error => console.error('Error:', error));
 }
 
+function openAddAssignmentModal(course) {
+    const entity = 'assignment'; // Prefill entity type
+    const modalId = 'assignmentModal'; // ID of the modal we just imported
+    const item = {
+        course_id: course.course_id, // Prefill with course ID
+        title: '', // Empty title for a new assignment
+        due_date: '', // Default empty date
+        due_time: '', // Default empty time
+        description: '', // Default empty description
+        points: '', // Default empty points
+    };
+
+    openModal(entity, modalId, item);
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -422,7 +421,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const showModalBtn = document.getElementById('showModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const addCourseBtn = document.getElementById('addCourseBtn');
-    const detailsModal = document.getElementById('courseDetailsModal');
+
 
     // Populate semester buttons dynamically
     populateSemesterButtons().then(() => {
@@ -441,7 +440,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     showModalBtn.addEventListener('click', () => {
-        
+
+        resetFormStyles(); // Reset styles for new course
+
         document.getElementById('modalHeading').textContent =  "Add New Course";
         
         addCourseForm.reset();
@@ -455,11 +456,10 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.style.display = 'flex';
     });
 
-    window.addEventListener('click', (e) => {
-        if (e.target === addCourseModal || e.target === detailsModal) { // Handle both modals
-            e.target.style.display = 'none';
-        }
-    });
+    const assignmentForm = document.getElementById('assignmentForm');
+    if (assignmentForm) {
+        assignmentForm.addEventListener('submit', (e) => saveEntity(e, 'assignment', 'assignmentModal'));
+    }
 
     closeModalBtn.addEventListener('click', () => {
         addCourseModal.style.display = 'none';

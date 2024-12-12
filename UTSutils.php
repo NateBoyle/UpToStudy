@@ -34,6 +34,8 @@ function fetchAssignments($userId, $id = null, $startDate = null, $endDate = nul
         $types .= "ss";
     }
 
+    
+
     $stmt = $conn->prepare($query);
     $stmt->bind_param($types, ...$params);
     $stmt->execute();
@@ -50,6 +52,7 @@ function fetchAssignments($userId, $id = null, $startDate = null, $endDate = nul
  * Fetch to-dos within a date range for a user.
  */
 function fetchToDos($userId, $id = null, $startDate = null, $endDate = null) {
+
     global $conn;
 
     $query = "SELECT * FROM to_do WHERE user_id = ?";
@@ -58,7 +61,7 @@ function fetchToDos($userId, $id = null, $startDate = null, $endDate = null) {
 
     // Fetch by ID if provided
     if ($id) {
-        $query .= " AND todo_id = ?";
+        $query .= " AND to_do_id = ?";
         $params[] = $id;
         $types .= "i";
     } elseif ($startDate && $endDate) {
@@ -71,10 +74,16 @@ function fetchToDos($userId, $id = null, $startDate = null, $endDate = null) {
 
     $stmt = $conn->prepare($query);
     $stmt->bind_param($types, ...$params);
-    $stmt->execute();
+
+    if (!$stmt->execute()) {
+        error_log("SQL Error (fetchToDoById): " . $stmt->error);
+        return false;
+    }
 
     $result = $stmt->get_result();
     $toDos = $result->fetch_all(MYSQLI_ASSOC);
+
+    error_log("Response sent to frontend: " . json_encode(['success' => true, 'data' => $toDos]));
 
     $stmt->close();
 
@@ -98,13 +107,15 @@ function fetchEvents($userId, $id = null, $startDate = null, $endDate = null) {
         $types .= "i";
     } elseif ($startDate && $endDate) {
         // Fetch by date range if start and end dates are provided
-        $query .= " AND (start_time BETWEEN ? AND ? OR end_time BETWEEN ? AND ?)";
+        $query .= " AND (start_date BETWEEN ? AND ? OR end_date BETWEEN ? AND ?)";
         $params[] = $startDate;
         $params[] = $endDate;
         $params[] = $startDate;
         $params[] = $endDate;
         $types .= "ssss";
     }
+
+    //error_log("Received Parameters: ID: $id, Start Date: $startDate, End Date: $endDate");
 
     $stmt = $conn->prepare($query);
     $stmt->bind_param($types, ...$params);
@@ -124,14 +135,33 @@ function fetchEvents($userId, $id = null, $startDate = null, $endDate = null) {
  * @param int $userId The ID of the user.
  * @return array|false An array of semesters on success, or false on failure.
  */
-function fetchSemesters($userId) {
+function fetchSemesters($userId, $currentDate = null) {
+
+    
+
     global $conn;
 
-    $query = "SELECT semester_id, name, start_date, end_date 
-              FROM semesters 
-              WHERE user_id = ?";
+    $query = "SELECT * FROM semesters WHERE user_id = ?";
+    $params = [$userId];
+    $types = "i";
+
+    if ($currentDate) {
+        // Log the received POST data
+        error_log("UTSutils.php Received Parameters: " . print_r($_POST, true));
+        // Extract month and year for comparison
+        $query .= " AND MONTH(start_date) <= MONTH(?) 
+                    AND YEAR(start_date) <= YEAR(?) 
+                    AND MONTH(end_date) >= MONTH(?) 
+                    AND YEAR(end_date) >= YEAR(?)";
+        $params[] = $currentDate;
+        $params[] = $currentDate;
+        $params[] = $currentDate;
+        $params[] = $currentDate;
+        $types .= "ssss";
+    }
+
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $userId);
+    $stmt->bind_param($types, ...$params);
 
     if (!$stmt->execute()) {
         error_log("SQL Error (fetchSemesters): " . $stmt->error);
@@ -203,7 +233,7 @@ function fetchCourses($userId, $semesterId = null, $courseId = null) {
         $courses[] = $row;
     }
 
-    error_log("Fetched courses: " . print_r($courses, true));
+    //error_log("Fetched courses: " . print_r($courses, true));
 
     $stmt->close();
 
@@ -211,7 +241,8 @@ function fetchCourses($userId, $semesterId = null, $courseId = null) {
 }
 
 if ($action === 'fetchSemesters') {
-    $semesters = fetchSemesters($user_id);
+    $currentDate = $_POST['current_date'] ?? null;
+    $semesters = fetchSemesters($user_id, $currentDate);
     if ($semesters === false) {
         echo json_encode(['success' => false, 'message' => 'Failed to fetch semesters.']);
     } else {
@@ -227,19 +258,22 @@ if ($action === 'fetchSemesters') {
         echo json_encode(['success' => true, 'data' => $courses]);
     }
 } elseif ($action === 'fetchAssignments') {
+    $id = $_POST['id'] ?? null;
     $startDate = $_POST['start_date'] ?? null;
     $endDate = $_POST['end_date'] ?? null;
-    $assignments = fetchAssignments($user_id, $startDate, $endDate);
+    $assignments = fetchAssignments($user_id, $id, $startDate, $endDate);
     echo json_encode(['success' => true, 'data' => $assignments]);
 } elseif ($action === 'fetchToDos') {
+    $id = $_POST['id'] ?? null;
     $startDate = $_POST['start_date'] ?? null;
     $endDate = $_POST['end_date'] ?? null;
-    $toDos = fetchToDos($user_id, $startDate, $endDate);
+    $toDos = fetchToDos($user_id, $id, $startDate, $endDate);
     echo json_encode(['success' => true, 'data' => $toDos]);
 } elseif ($action === 'fetchEvents') {
+    $id = $_POST['id'] ?? null;
     $startDate = $_POST['start_date'] ?? null;
     $endDate = $_POST['end_date'] ?? null;
-    $events = fetchEvents($user_id, $startDate, $endDate);
+    $events = fetchEvents($user_id, $id, $startDate, $endDate);
     echo json_encode(['success' => true, 'data' => $events]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid action specified.']);
