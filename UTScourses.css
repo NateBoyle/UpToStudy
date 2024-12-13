@@ -328,11 +328,11 @@
     cursor: pointer;
 }
 
-/* Define Semester Modal Styling*/
-#defineSemesterModal  {
-    display: none; /* Hidden by default */
-    
+#assignmentsLabel {
+    margin-top: 30px;
 }
+
+/* Define Semester Modal Styling
 /* Modal Background */
 .modal {
     display: none; /* Hidden by default */
@@ -350,7 +350,7 @@
 
 /* Modal Content */
 .modal-content {
-    display: inherit; /* Hidden by default */
+    /*display: none; /* Hidden by default */
     width: 400px; /* Fixed width for modal */
     background: #2C2C2C; /* Black background for modal */
     padding: 20px;
@@ -403,7 +403,7 @@
 }
 
 /* Close Button */
-.close {
+#defineSemesterModal .close {
     position: absolute;
     top: 10px;
     right: 10px;

@@ -19,6 +19,9 @@ function handleAssignmentAction($action) {
         case 'edit':
             editAssignment();
             break;
+        case 'complete': // New case for marking assignments complete
+            completeAssignment();
+            break;
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action for assignment.']);
             break;
@@ -32,6 +35,9 @@ function handleToDoAction($action) {
             break;
         case 'edit':
             editToDo();
+            break;
+        case 'complete': // New case for marking to-dos complete
+            completeToDo();
             break;
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action for to-do.']);
@@ -111,6 +117,28 @@ function editAssignment() {
     $stmt->close();
 }
 
+function completeAssignment() {
+    global $conn;
+
+    $assignmentId = $_POST['id'] ?? null;
+
+    if (!$assignmentId) {
+        echo json_encode(['success' => false, 'message' => 'Assignment ID is required.']);
+        return;
+    }
+
+    $query = "UPDATE assignments SET is_completed = 1 WHERE assignment_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('i', $assignmentId);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Assignment marked as complete.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error marking assignment as complete.']);
+    }
+    $stmt->close();
+}
+
 // TO DO FUNCTIONS
 function addToDo() {
     global $conn;
@@ -165,6 +193,29 @@ function editToDo() {
 
     $stmt->close();
 }
+
+function completeToDo() {
+    global $conn;
+
+    $toDoId = $_POST['id'] ?? null;
+
+    if (!$toDoId) {
+        echo json_encode(['success' => false, 'message' => 'To-Do ID is required.']);
+        return;
+    }
+
+    $query = "UPDATE to_do SET is_completed = 1 WHERE to_do_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('i', $toDoId);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'To-Do marked as complete.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error marking to-do as complete.']);
+    }
+    $stmt->close();
+}
+
 
 // EVENT FUNCTIONS
 function addEvent() {

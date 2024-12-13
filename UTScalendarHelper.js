@@ -18,7 +18,7 @@ let cachedEvents = [];
 
 export async function getCurrentSemester(currentDate) {
 
-    console.log('From get semester: ' + currentDate);
+    //console.log('From get semester: ' + currentDate);
     try {
 
         // Check if the currentDate is outside the current semester range
@@ -302,7 +302,7 @@ export async function getCurrentEvents(currentDate, isWeekView) {
 
 export async function getCombinedEventsAndCourses(currentDate, isWeekView) {
 
-    console.log('From get events: ' + currentDate);
+    //console.log('From get events: ' + currentDate);
 
     try {
         // Fetch current courses and events

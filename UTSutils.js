@@ -1,12 +1,13 @@
 // Fetch Assignments
-export async function fetchAssignments(id = null, startDate = null, endDate = null) {
+export async function fetchAssignments(id = null, startDate = null, endDate = null, courseId = null) {
     const params = new URLSearchParams({ action: 'fetchAssignments' });
     
     params.append('id', id || ''); // Explicitly pass id, even if null
-
+    //console.log(`From fetch assignments, courseId: ${courseId}`)
     // Append parameters conditionally
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
+    if (courseId) params.append('courseId', courseId);
 
     // Log parameters for debugging
     //console.log(`Fetching Assignments - ID: ${id}, Start Date: ${startDate}, End Date: ${endDate}`);
@@ -35,7 +36,7 @@ export async function fetchAssignments(id = null, startDate = null, endDate = nu
 export async function fetchToDos(id = null, startDate = null, endDate = null) {
     
     const params = new URLSearchParams({ action: 'fetchToDos' });
-    console.log(`Id: ${id}`);
+    //console.log(`Id: ${id}`);
     params.append('id', id || ''); // Explicitly pass id, even if null
 
     // Append parameters conditionally
@@ -109,7 +110,7 @@ export async function fetchSemesters(currentDate = null) {
             }),
         });
 
-        console.log(currentDate);
+        //console.log(currentDate);
 
         const data = await response.json();
         if (data.success) {

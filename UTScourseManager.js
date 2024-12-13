@@ -1,5 +1,5 @@
-import { fetchSemesters, fetchCourses } from './UTSutils.js';
-import { openModal } from './UTSevents.js';
+import { fetchSemesters, fetchCourses, fetchAssignments } from './UTSutils.js';
+import { openModal, populateContainer } from './UTSevents.js';
 
 class Course {
 
@@ -28,7 +28,6 @@ class Course {
         hour = hour % 12 || 12; // Convert to 12-hour format, with 12 instead of 0
         return `${hour}:${minute} ${ampm}`;
     }
-
     
 
     render() {
@@ -85,7 +84,7 @@ function resetFormStyles() {
 function editCourse(courseId) {
 
     console.log("Editing course with ID:", courseId); // Debugging line
-    console.log("Current courses:", courseManager.courses); // Debugging line to check courseManager.courses
+    //console.log("Current courses:", courseManager.courses); // Debugging line to check courseManager.courses
     const course = courseManager.courses.find(c => c.course_id === courseId);
     
     if (!course) {
@@ -95,8 +94,8 @@ function editCourse(courseId) {
 
     // Populate form fields with existing course data
     document.getElementById('courseName').value = course.name;
-    document.getElementById('subject').value = course.subject;
-    document.getElementById('professorName').value = course.professor;
+    //document.getElementById('subject').value = course.subject;
+    //document.getElementById('professorName').value = course.professor;
     document.getElementById('prefix').value = course.prefix || ""; 
     document.getElementById('courseNumber').value = course.course_number || "";
     
@@ -109,7 +108,7 @@ function editCourse(courseId) {
 
     document.getElementById('startTime').value = course.startTime;
     document.getElementById('endTime').value = course.endTime;
-    document.getElementById('totalPoints').value = course.totalPoints;
+    //document.getElementById('totalPoints').value = course.totalPoints;
     document.getElementById('courseColor').value = course.color;
 
     document.querySelectorAll('.day-checkbox').forEach(checkbox => {
@@ -159,6 +158,10 @@ function editCourse(courseId) {
             //modal.style.display = 'none'; // Close the modal after deletion
         }
     };
+
+    //document.getElementById('assignmentContainer4Course').style.display = 'flex';
+    populateContainer('assignmentContainer4Course', fetchAssignments, 'assignment', courseId);
+    
 
     document.getElementById('modal').style.display = 'flex';
 
@@ -307,9 +310,9 @@ async function loadSemesters() {
     dropdown.appendChild(defaultOption);
 
     try {
-        console.log('Attempting to fetch semesters...');
+        //console.log('Attempting to fetch semesters...');
         const semesters = await fetchSemesters(); // Use the utility function to fetch semesters
-        console.log('Fetched semesters:', semesters);
+        //console.log('Fetched semesters:', semesters);
 
         if (semesters.length > 0) {
             // Populate the dropdown with the fetched semesters
@@ -462,6 +465,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     closeModalBtn.addEventListener('click', () => {
+        const addAssignmentBtn = document.getElementById('addAssignmentBtn');
+        const deleteCourseBtn = document.getElementById('deleteCourseBtn');
+
+        // Hide Add Assignment and Delete Course buttons
+        addAssignmentBtn.style.display = 'none';
+        deleteCourseBtn.style.display = 'none';
+
         addCourseModal.style.display = 'none';
     });
 });

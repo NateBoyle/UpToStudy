@@ -312,9 +312,7 @@ function goToNextPeriod() {
 }
 
 
-// Functions for putting items on the calendar
-
-// Functions for rendering events
+// Functions for putting items on the calendar / for rendering events
 
 function calculateTimeSlot(time, rowOffset = 1) {
     try {
@@ -449,6 +447,7 @@ function formatTimeTo12Hour(time) {
 }
 
 async function renderMonthViewEvents() {
+    console.log(`Render month events.`);
     try {
         // Fetch combined courses and events for the current month
         const combinedData = await getCombinedEventsAndCourses(currentDate, false); // `false` for Month View
@@ -478,7 +477,7 @@ async function renderMonthViewEvents() {
                         if (item.type === 'course') {
                             console.log('This is a course!');
                         } else {
-                            console.log(`This is a ${item.type}!`);
+                            console.log(`This is a ${item.type} with id: ${item.id}!`);
                             openFromCalendar(item.type, item.id);
                         }
                     

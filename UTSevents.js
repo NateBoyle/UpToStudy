@@ -28,26 +28,35 @@ async function populateCourseDropdown(modalId) {
 }
 
 function refreshEvents() {
-  populateContainer('assignmentContainer', fetchAssignments, 'assignment');
-  populateContainer('toDoContainer', fetchToDos, 'toDo');
+  window.location.reload();
 }
 
 // Date Formatter
 function formatDate(dateString) {
-    const date = new Date(dateString); // Convert the date string to a Date object
-    const day = String(date.getDate()).padStart(2, '0'); // Get day, padded to 2 digits
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month, padded to 2 digits
-    const year = date.getFullYear(); // Get year
-    return `${month}/${day}/${year}`; // Return formatted date
+  const [year, month, day] = dateString.split('-'); // Split the input string into components
+  const date = new Date(Number(year), Number(month) - 1, Number(day)); // Construct a date in local time
+  const dayFormatted = String(date.getDate()).padStart(2, '0');
+  const monthFormatted = String(date.getMonth() + 1).padStart(2, '0');
+  const yearFormatted = date.getFullYear();
+  return `${monthFormatted}/${dayFormatted}/${yearFormatted}`;
 }
 
 // Populate Containers
-async function populateContainer(containerId, fetchFunction, type) {
+export async function populateContainer(containerId, fetchFunction, type, courseId = null) {
+    
     const container = document.getElementById(containerId);
     container.innerHTML = ''; // Clear existing content
-
+    let items;
     try {
-        const items = await fetchFunction(); // Fetch data (assignments or to-dos)
+
+      if (containerId === "assignmentContainer4Course") {
+        //console.log(` from UTSevents ContainerId: ${courseId}`);
+        items = await fetchFunction(null, null, null, courseId); // Fetch data (assignments or to-dos)
+      }
+      else {
+        //console.log(` from UTSevents ContainerId: ${containerId}`);
+        items = await fetchFunction(); // Fetch data (assignments or to-dos)
+      }  
 
         if (items.length === 0) {
             container.innerHTML = `<p class="empty-message">No ${type}s available.</p>`;
@@ -66,41 +75,40 @@ async function populateContainer(containerId, fetchFunction, type) {
             // Determine if the item is overdue
             const isOverdue = dueDateTime < todaysDate && !item.is_completed;
 
-            // Declare courseColor
-            let courseColor = null;
-
-            // Fetch course color if course_id exists
-            if (item.course_id) {
-                try {
-                    const course = await fetchCourses(null, item.course_id); // Fetch course by course_id
-                    if (course.length > 0) {
-                        courseColor = course[0].color; // Extract the course color
-                        //console.log(course[0])
-                    }
-                } catch (error) {
-                    console.error(`Error fetching course for course ID ${item.course_id}:`, error);
-                }
-            }
-
             const listItem = document.createElement('div');
             listItem.className = 'list-item';
-            // Apply overdue styles
-            if (isOverdue) {
-              listItem.style.backgroundColor = 'black'; // Set background to black
-              listItem.style.border = '2px solid red'; // Set border to red
-              listItem.style.color = 'red'; // Set font color to red
-            } else {
-              if (courseColor) {
-                  listItem.style.backgroundColor = courseColor; // Apply the fetched color
-              } // Else, let the CSS default background color take over
-            }
 
             listItem.setAttribute('data-id', itemId); // Store unique ID
             listItem.setAttribute('data-type', type); // Store type (assignment or to-do)
+            listItem.style.backgroundColor = item.color; // Apply the color if it has one
             listItem.innerHTML = `
                 <span class="text">${item.title}</span>
                 <span class="details">Due: ${formatDate(item.due_date)}</span>
             `;
+
+            // Styling and content for completed items
+            if (item.is_completed) {
+              //listItem.style.backgroundColor = '#5DD970'; // Set a green background for completed
+              listItem.style.color = 'white'; // Set text color to white
+              listItem.innerHTML = `
+                  <span class="text">${item.title}</span>
+                  <span class="details">COMPLETED</span>
+              `;
+            }
+            // Apply overdue styles
+            else if (isOverdue) {
+              listItem.style.backgroundColor = 'black'; // Set background to black
+              listItem.style.border = '2px solid red'; // Set border to red
+              listItem.style.color = 'red'; // Set font color to red
+              listItem.innerHTML = `
+                <span class="text">${item.title}</span>
+                <span class="details">OVERDUE: ${formatDate(item.due_date)}</span>
+            `;
+            } else {
+              if (courseColor) {
+                  listItem.style.backgroundColor = item.color; // Apply the fetched color
+              } // Else, let the CSS default background color take over
+            }
 
             // Add click event listener
             listItem.addEventListener('click', (e) => {
@@ -108,7 +116,7 @@ async function populateContainer(containerId, fetchFunction, type) {
                 item.id = id;
                 const clickedType = e.currentTarget.getAttribute('data-type');
                 const modalId = clickedType + 'Modal'; // Result: 'todoModal'
-                console.log(`Clicked ${clickedType} modalId: ${modalId} item: ${item}`);
+                //console.log(`Clicked ${clickedType} modalId: ${modalId} item: ${item}`);
                 openModal(clickedType, modalId, item); // Pass item instead of just id
             });
 
@@ -122,7 +130,7 @@ async function populateContainer(containerId, fetchFunction, type) {
 
 // Open Modal from Calendar helper function
 export async function openFromCalendar(type, id) {
-  console.log(`Type: ${type}, Id: ${id}`);
+  //console.log(`Type: ${type}, Id: ${id}`);
   try {
     let item;
 
@@ -154,7 +162,8 @@ export async function openFromCalendar(type, id) {
 
     // Call openModal with the fetched item
     if (item) {
-      console.log(`Type: ${type}, Id: ${id}, Item: ${item}`);
+      item.id = id;
+      //console.log(`Type: ${type}, Id: ${id}, Item: ${item}`);
       openModal(type, `${type}Modal`, item); // Modal ID should match the type (e.g., assignmentModal)
     }
 
@@ -170,7 +179,7 @@ export async function openModal(entity, modalId, item) {
   const form = modal.querySelector('form');
 
   // Console log to display entity, modalId, and id
-  console.log(`From openModal - Entity: ${entity}, Modal ID: ${modalId}, Item: ${item}`);
+  //console.log(`From openModal - Entity: ${entity}, Modal ID: ${modalId}, Item: ${item}`);
 
   form.reset(); // Clear previous values
   delete form.dataset.id; // Clear stored ID for new records
@@ -193,7 +202,7 @@ export async function openModal(entity, modalId, item) {
         }
     });
     form.dataset.id = item.id; // Store the item ID for context
-    console.log(`Open Modal with ID: ${item.id}`);
+    //console.log(`Open Modal with ID: ${item.id}`);
 
     // Edit submit button within the specific form
     submitButton.textContent = 'Save'; // Updates the button text
@@ -203,8 +212,10 @@ export async function openModal(entity, modalId, item) {
       const completeButton = modal.querySelector('#completeButton'); // Reference the button
       completeButton.style.display = 'block';
       completeButton.onclick = (e) => {
-        item.is_completed = true; // Mark the item as completed
-        saveEntity(e, entity, modalId); // Use saveEntity to handle the update
+        if (confirm(`Are you sure you want to complete ${item.title}?`)) {
+          console.log(`Completing item: ${item.id}`);
+          completeEntity(entity, item.id)
+        }
       };
     }
 
@@ -214,14 +225,18 @@ export async function openModal(entity, modalId, item) {
     // Set up Delete button event listener
     deleteButton.onclick = () => {
       if (confirm(`Are you sure you want to delete this ${entity.charAt(0).toUpperCase() + entity.slice(1)}?`)) {
-          deleteEntity(entity, item.id); // Call deleteEntity directly
-          closeModal(modalId); // Close the modal
+        deleteEntity(entity, item.id); // Call deleteEntity directly
       }
     };
 
     // Edit title within the specific form
     if (entity === "assignment") {
-      modalTitle.textContent = 'Edit Assignment'; // Change the title
+      if (!item.title) {
+        modalTitle.textContent = 'Add Assignment'; // Change the title
+      } else {
+        modalTitle.textContent = 'Edit Assignment'; // Change the title
+      }
+      
     } else if (entity === "toDo") {
       modalTitle.textContent = 'Edit To-Do'; // Change the title
     } else {
@@ -255,7 +270,7 @@ function validateFields(form, entity) {
   const errors = []; // Collect error messages
 
   // Console log to display entity, modalId, and id
-  console.log(`From validateFields - Form: ${form}, Entity: ${entity}`);
+  //console.log(`From validateFields - Form: ${form}, Entity: ${entity}`);
 
   // Reset all borders
   [...form.elements].forEach(input => {
@@ -379,15 +394,17 @@ async function saveEntity(event, entity, modalId) {
   }
 
   const id = form.dataset.id;
+
   const data = {};
   [...form.elements].forEach(input => {
     if (input.name) data[input.name] = input.value;
   });
 
-  console.log('Id sent to backend:', id);
+  //console.log('Id sent to backend:', id);
 
   const action = id ? 'edit' : 'add';
   if (id) data.id = id;
+  console.log(`Edit id: ${id}`)
 
   try {
     const response = await fetch(`UTSevents.php`, {
@@ -408,6 +425,31 @@ async function saveEntity(event, entity, modalId) {
   } catch (error) {
     console.error(`Error saving ${entity}:`, error);
     alert('An unexpected error occurred.');
+  }
+}
+
+// Complete Functionality
+async function completeEntity(entity, id) {
+  try {
+      const response = await fetch('UTSevents.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+              action: 'complete',
+              entity: entity, // 'assignment' or 'toDo'
+              id: id
+          })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+          console.log(`${entity} with ID ${id} marked as complete.`);
+          refreshEvents(); // Refresh the UI (reload calendar/list)
+      } else {
+          console.error(`Failed to mark ${entity} with ID ${id} as complete:`, data.message);
+      }
+  } catch (error) {
+      console.error(`Error marking ${entity} with ID ${id} as complete:`, error);
   }
 }
 

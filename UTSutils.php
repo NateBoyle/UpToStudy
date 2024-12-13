@@ -14,7 +14,10 @@ $action = $_POST['action'] ?? null;
 /**
  * Fetch assignments within a date range for a user.
  */
-function fetchAssignments($userId, $id = null, $startDate = null, $endDate = null) {
+function fetchAssignments($userId, $id = null, $startDate = null, $endDate = null, $courseId = null) {
+
+    error_log("fetchAssignments called with id: " . var_export($id, true));
+
     global $conn;
 
     $query = "SELECT * FROM assignments WHERE user_id = ?";
@@ -32,7 +35,11 @@ function fetchAssignments($userId, $id = null, $startDate = null, $endDate = nul
         $params[] = $startDate;
         $params[] = $endDate;
         $types .= "ss";
-    }
+    } elseif ($courseId) {
+        $query .= " AND course_id = ?";
+        $params[] = $courseId;
+        $types .= "i";
+    } 
 
     
 
@@ -42,6 +49,8 @@ function fetchAssignments($userId, $id = null, $startDate = null, $endDate = nul
 
     $result = $stmt->get_result();
     $assignments = $result->fetch_all(MYSQLI_ASSOC);
+
+    error_log("Response sent to frontend: " . json_encode(['success' => true, 'data' => $assignments]));
 
     $stmt->close();
 
@@ -136,8 +145,6 @@ function fetchEvents($userId, $id = null, $startDate = null, $endDate = null) {
  * @return array|false An array of semesters on success, or false on failure.
  */
 function fetchSemesters($userId, $currentDate = null) {
-
-    
 
     global $conn;
 
@@ -261,7 +268,8 @@ if ($action === 'fetchSemesters') {
     $id = $_POST['id'] ?? null;
     $startDate = $_POST['start_date'] ?? null;
     $endDate = $_POST['end_date'] ?? null;
-    $assignments = fetchAssignments($user_id, $id, $startDate, $endDate);
+    $courseId = $_POST['courseId'] ?? null;
+    $assignments = fetchAssignments($user_id, $id, $startDate, $endDate, $courseId);
     echo json_encode(['success' => true, 'data' => $assignments]);
 } elseif ($action === 'fetchToDos') {
     $id = $_POST['id'] ?? null;

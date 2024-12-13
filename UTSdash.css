@@ -1,0 +1,142 @@
+/* Dashboard Container */
+.dashboard-container {
+    display: grid;
+    gap: 20px;
+    padding: 20px;
+    grid-template-columns: 3fr 2fr; /* Main grid layout with two columns */
+    grid-template-rows: auto auto auto; /* Flexible row heights */
+    height: 105vh; /* Full viewport height */
+    box-sizing: border-box; /* Ensure padding is included in height calculation */
+    margin-top: 100px; /* Add margin to ensure no overlap with headers */
+}
+
+/* Section Containers */
+.section-container {
+    background-color: #1d1d1d;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    height: 100%; /* Stretch to fill its grid cell */
+}
+
+/* Five-Day Calendar */
+.calendar-container {
+    grid-column: 1 / 2; /* Occupy the left column */
+    grid-row: 1 / 2; /* Place it at the top */
+    height: 100%; /* Stretch to fill its grid cell */
+}
+
+.calendar-container .calendar-grid {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    background-color: #333333;
+    height: 80%; /* Stretch to fill its grid cell */
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.calendar-container .day-block {
+    text-align: center;
+    background-color: #1d1d1d;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 3px;
+    flex: 1;
+}
+
+.calendar-container .day-block .date-number {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.calendar-container .event {
+    background-color: #424FC6;
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+/* Assignments Due */
+.assignments-container {
+    grid-column: 2 / 3; /* Occupy the right column */
+    grid-row: 1 / 2; /* Align with the calendar */
+    height: 100%; /* Stretch to fill its grid cell */
+    background-color: #1d1d1d;
+    box-sizing: border-box; /* Ensure padding is included in height calculation */
+    padding: 20px;
+}
+
+.assignment-list {
+    background-color: #333333;
+    padding: 10px;
+    border-radius: 10px;
+    height: 83%; /* Stretch to fill its grid cell */
+    box-sizing: border-box; /* Ensure padding is included in height calculation */
+}
+
+.assignments-container .assignment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #424FC6;
+    border-radius: 10px;
+    margin: 5px 0;
+}
+
+.assignment-item.overdue {
+    background-color: red;
+    color: white;
+}
+
+/* Goals and To-Do Containers */
+.goals-todo-container {
+    display: flex;
+    gap: 10px;
+    grid-column: 1 / 2; /* Occupy the left column */
+    grid-row: 2 / 3; /* Place below the calendar */
+    height: 100%; /* Stretch to fill its grid cell */
+}
+
+.goals-container, .todo-container {
+    flex: 1;
+    background-color: #333333;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.goal-item, .todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.goal-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+/* Featured Flashcards */
+.flashcards-container {
+    grid-column: 2 / 3; /* Occupy the right column */
+    grid-row: 2 / 3; /* Place below assignments */
+    height: 100%; /* Stretch to fill its grid cell */
+}
+
+.flashcards-container .flashcards-grid {
+    display: flex;
+    gap: 10px;
+}
+
+.flashcard {
+    flex: 1;
+    background-color: #424FC6;
+    color: white;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
