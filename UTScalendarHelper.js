@@ -188,6 +188,7 @@ export async function getCurrentEvents(currentDate, isWeekView) {
 
         viewStartDate = weekStart.toISOString().split("T")[0];
         viewEndDate = weekEnd.toISOString().split("T")[0];
+        console.log(`weekview`);
     } else {
         const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // First day
         const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // Last day
@@ -331,7 +332,7 @@ export async function getCombinedEventsAndCourses(currentDate, isWeekView) {
             combinedResults.push({ key, combined });
         });
 
-        //console.log(combinedResults);
+        console.log(combinedResults);
         return combinedResults; // Array with keys (days/dates) and sorted combined data
     } catch (error) {
         console.error("Error combining courses and events:", error);

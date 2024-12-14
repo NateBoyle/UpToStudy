@@ -1,3 +1,56 @@
+/* Sidebar */
+.sidebar {
+    flex: 0 0 26.5%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Sidebar Buttons */
+.sidebar-button-container {
+    display: flex; /* Flexbox layout for the buttons */
+    justify-content: space-between; /* Space evenly between buttons */
+    gap: 0.5rem; /* Spacing between buttons */
+    margin-bottom: 0.5rem; /* Space below the buttons */
+}
+
+.sidebar-create-button {
+    flex: 1; /* Make buttons evenly sized */
+    background: #5DD770;
+    color: white;
+    font-size: 1.2rem; /* Adjust font size */
+    font-weight: 600;
+    padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    width: 4rem;
+}
+
+.sidebar-create-button:hover {
+    background: #4fb963;
+}
+
+.sidebar-view-button {
+    flex: 1; /* Make buttons evenly sized */
+    background: #2EA0F3;
+    color: white;
+    font-size: 1.2rem; /* Adjust font size */
+    font-weight: 600;
+    padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    width: 4rem;
+}
+
+.sidebar-view-button:hover {
+    background: #1C81C2;
+}
+
+
 /* Modal Background */
 .creationModal {
     display: none;
@@ -219,6 +272,210 @@
 .todo-list .sidebar-view-button:hover {
     background: #1C81C2; /* Darker shade on hover */
 }
+
+/* STYLING FOR COURSE POP-UP MODAL
+/* Modal container */
+#modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 2500;
+}
+
+/* Modal content */
+#modalContent {
+    width: 450px;
+    background: #2C2C2C;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    color: white;
+    text-align: center;
+}
+
+/* Modal Heading */
+#modalHeading {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Course Name Error */
+#courseNameError {
+    color: red;
+    font-size: 10px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Input Fields (Common Styles) */
+#courseName,
+#prefix,
+#courseNumber,
+#subject,
+#professorName,
+#totalPoints,
+#semesterDropdown,
+#courseColor {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#timeInputs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+/* Time Inputs Specific Styles */
+#startTime,
+#endTime {
+    width: 48%;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#prefixError, #courseNumberError {
+    font-size: 10px;
+    color: red;
+    margin-bottom: 10px;
+}
+
+/* Time Error */
+#timeError {
+    color: red;
+    font-size: 10px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+/* Semester Dropdown Label */
+#semesterDropdownLabel {
+    color: white;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Days of the Week Wrapper */
+#daysOfTheWeek {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+/* Days Error */
+#daysError {
+    color: red;
+    font-size: 10px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Course Label Color Dropdown */
+#courseColorLabel {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Course Color Error */
+#courseColorError {
+    color: red;
+    font-size: 10px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Editing mode for input fields */
+.input-editing {
+    background-color: #333 !important;
+    color: white !important;
+}
+
+/* Creation/Edit Modal Buttons*/
+.button-container {
+    display: flex; /* Arrange buttons horizontally */
+    justify-content: space-between; /* Spread buttons evenly */
+    gap: 5px; /* Space between buttons */
+    padding: 5px; /* Padding inside the container */
+}
+
+/* Add Course button */
+#addCourseBtn {
+    width: 100%;
+    padding: 10px;
+    background: #5DD770;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#addCourseBtn:hover {
+    background: #4fb963;
+}
+
+/* Add Assignment button */
+#addAssignmentBtn {
+    display: none;
+    width: 100%;
+    padding: 10px;
+    background: #3D9BFF;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#addAssignmentBtn:hover {
+    background: #3079cc;
+}
+
+/* Delete Course button */
+#deleteCourseBtn {
+    display: none;
+    width: 100%;
+    padding: 10px;
+    background: #FF5D5D;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#deleteCourseBtn:hover {
+    background: #cc4a4a;
+}
+
+/* Close button */
+#closeModalBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+}
+
+#assignmentsLabel {
+    margin-top: 30px;
+}
+
 
 /* LIST CONTAINERS */
 .dynamic-container {

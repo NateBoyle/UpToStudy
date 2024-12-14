@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="UTScss.css">
     <link rel="stylesheet" href="UTSdash.css">
+    <link rel="stylesheet" href="UTSevents.css">
 
     <style>
         @font-face {
@@ -59,76 +60,98 @@
             <div class="dashboard-container">
                 <!-- Five-Day Calendar -->
                 <div class="section-container calendar-container">
-                    <h2>Five-Day Calendar</h2>
+                    <div id="dashCalendarHeader">
+                        <h2>
+                            Five-Day Calendar - <span id="semesterLabel">No Current Semester</span>
+                        </h2>
+                    </div>
                     <div class="calendar-grid">
-                        <div class="day-block">
-                            <h3>Wed</h3>
-                            <span class="date-number">10</span>
-                            <div class="event">Math 127</div>
+                        <div id="day-block1" class="day-block">
+                            <div class="day-header" id="day-header1">
+                                <h3>Wed</h3>
+                                <span class="date-number" id="date-number1">10</span>
+                            </div>
+                            <div class="event-container" id="event-container1">
+                                <div class="event">Math 127</div>
+                            </div>
                         </div>
-                        <div class="day-block">
-                            <h3>Thu</h3>
-                            <span class="date-number">11</span>
+                        <div id="day-block2"class="day-block">
+                            <div class="day-header" id="day-header2">
+                                <h3>Wed</h3>
+                                <span class="date-number" id="date-number2">10</span>
+                            </div>
+                            <div class="event-container" id="event-container2">
+                                <div class="event">Math 127</div>
+                            </div>
                         </div>
-                        <div class="day-block">
-                            <h3>Fri</h3>
-                            <span class="date-number">12</span>
+                        <div id="day-block3" class="day-block">
+                            <div class="day-header" id="day-header3">
+                                <h3>Wed</h3>
+                                <span class="date-number" id="date-number3">10</span>
+                            </div>
+                            <div class="event-container" id="event-container3">
+                                <div class="event">Math 127</div>
+                            </div>
                         </div>
-                        <div class="day-block">
-                            <h3>Sat</h3>
-                            <span class="date-number">13</span>
+                        <div id="day-block4" class="day-block">
+                            <div class="day-header" id="day-header4">
+                                <h3>Wed</h3>
+                                <span class="date-number" id="date-number4">10</span>
+                            </div>
+                            <div class="event-container" id="event-container4">
+                                <div class="event">Math 127</div>
+                            </div>
                         </div>
-                        <div class="day-block">
-                            <h3>Sun</h3>
-                            <span class="date-number">14</span>
+                        <div id="day-block5" class="day-block">
+                            <div class="day-header" id="day-header5">
+                                <h3>Wed</h3>
+                                <span class="date-number" id="date-number5">10</span>
+                            </div>
+                            <div class="event-container" id="event-container5">
+                                <div class="event">Math 127</div>
+                            </div>
                         </div>
                     </div>
                 </div>
         
                 <!-- Assignments Due -->
                 <div class="section-container assignments-container">
-                    <h2>Assignments Due</h2>
                     <div class="assignment-list">
-                        <div class="assignment-item">
-                            <span class="assignment-title">TKAM Essay</span>
-                            <span class="assignment-due">July 13th</span>
-                            <span class="assignment-type">Essay</span>
+                        <div class="assignment-list-title-container">
+                            <h2 class="assignment-list-title">Assignments</h2>
+                            <!--<button id="newAssignmentButton" class="sidebar-create-button">Add Assignment</button>
+                            <button class="sidebar-view-button">See All</button>-->
                         </div>
-                        <div class="assignment-item">
-                            <span class="assignment-title">Programming Project 1</span>
-                            <span class="assignment-due">July 16th</span>
-                            <span class="assignment-type">Essay</span>
+                        <!-- Dynamic Assignment Container -->
+                        <div id="assignmentContainer" class="dynamic-container">
+                            <!-- Assignment items will be dynamically added here -->
                         </div>
-                        <div class="assignment-item overdue">
-                            <span class="assignment-title">Biology Assignment 3</span>
-                            <span class="assignment-due">Overdue</span>
-                            <span class="assignment-type">Essay</span>
-                        </div>
-                    </div>    
+                    </div>
                 </div>
         
                 <!-- Goals and To-Do -->
                 <div class="section-container goals-todo-container">
+                    <!-- Goals -->
                     <div class="goals-container">
-                        <h2>Goals</h2>
-                        <div class="goal-item">
-                            <span class="goal-text">Achieve a 4.0 GPA for semester</span>
-                            <span class="goal-color" style="background-color: blue;"></span>
+                        <div class="goals-title-container">
+                            <h2 class="goals-title">Goals</h2>
+                            <!--<button id="newGoalButton" class="sidebar-create-button">Add Goal</button>
+                            <button class="sidebar-view-button">See All</button>-->
                         </div>
-                        <div class="goal-item">
-                            <span class="goal-text">Become a member of Sorority</span>
-                            <span class="goal-color" style="background-color: purple;"></span>
+                        <div id="goalContainer" class="dynamic-container">
+                            <!-- Goals will be dynamically added here -->
                         </div>
                     </div>
+                
+                    <!-- To-Do List -->
                     <div class="todo-container">
-                        <h2>To-do</h2>
-                        <div class="todo-item">
-                            <span class="todo-text">Study for Exam 1</span>
-                            <input type="checkbox">
+                        <div class="todo-list-title-container">
+                            <h2 class="todo-list-title">To-Do List</h2>
+                            <!--<button id="newToDoButton" class="sidebar-create-button">Create To-Do</button>
+                            <button class="sidebar-view-button">See All</button>-->
                         </div>
-                        <div class="todo-item">
-                            <span class="todo-text">Practice parallelism problems</span>
-                            <input type="checkbox">
+                        <div id="toDoContainer" class="dynamic-container">
+                            <!-- To-Do items will be dynamically added here -->
                         </div>
                     </div>
                 </div>
@@ -149,9 +172,192 @@
                 </div>
             </div>
         <!--</div>-->
+
+        <!-- EVENT MODALS-->
+         <!-- ASSIGNMENT CREATION (EDIT) MODAL -->
+        <div id="assignmentModal" class="creationModal">
+            <div class="modal-content">
+              <span class="close" id="closeAddAssignment">&times;</span>
+              <h2>New Assignment</h2>
+              <form id="assignmentForm">
+                <input type="text" id="assignmentTitle" name="title" placeholder="Enter assignment title">
+                <select id="course" name="course_id">
+                  <option value="" disabled selected>Select course</option>
+                  <!-- Dynamically populate courses here -->
+                </select>
+                <label for="dueDate">Due Date and Time:</label>
+                <input type="date" id="dueDate" name="due_date">
+                <input type="time" name="due_time" />
+                <textarea id="description" name="description" placeholder="Enter assignment details (optional)"></textarea>
+                <input type="number" id="points" name="points" placeholder="Enter total points">
+                <!-- Button Container -->
+                <div class="button-container">
+                    <button type="submit" id="saveAssignmentBtn">Add Assignment</button>
+                    <button type="button" id="completeButton">Complete</button>
+                    <button type="button" id="deleteButton">Delete</button>
+                </div>
+              </form>
+            </div>
+        </div>
+
+        <!-- TO-DO CREATION (EDIT) MODAL -->
+        <div id="toDoModal" class="creationModal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <h2>New To-Do</h2>
+              <form id="toDoForm">
+                <input type="text" name="title" placeholder="Task Name" />
+                <select id="course" name="course_id" >
+                    <option value="" disabled selected>Select course (optional)</option>
+                    <!-- Dynamically populate courses here -->
+                  </select>
+                <label for="dueDate">Due Date and Time:</label>
+                <input type="date" name="due_date"  />
+                <input type="time" name="due_time" />
+                <textarea name="description" placeholder="Description"></textarea>
+                <!-- Button Container -->
+                <div class="button-container">
+                    <button type="submit" id="saveToDoBtn">Create To-Do</button>
+                    <button type="button" id="completeButton">Complete</button>
+                    <button type="button" id="deleteButton">Delete</button>
+                </div>
+              </form>
+            </div>
+        </div>
+
+        <!-- EVENT CREATION (EDIT) MODAL -->
+        <div id="eventModal" class="creationModal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <h2>New Event</h2>
+              <form id="eventForm">
+                <input type="text" name="title" placeholder="Title"  />
+                <select id="course" name="course_id" >
+                    <option value="" disabled selected>Select course (optional)</option>
+                    <!-- Dynamically populate courses here -->
+                  </select>
+                <textarea name="description" placeholder="Description"></textarea>
+                <label for="startDate">Start Date and Time:</label>
+                <input type="date" name="start_date"  />
+                <input type="time" name="start_time" />
+                <label for="endDate">End Date and Time:</label>
+                <input type="date" name="end_date" />
+                <input type="time" name="end_time" />
+                <label>
+                  <input type="checkbox" name="all_day" /> All Day
+                </label>
+                <!-- Button Container -->
+                <div class="button-container">
+                    <button type="submit" id="saveEventBtn">Save Event</button>
+                    <button type="button" id="completeButton">Complete</button>
+                    <button type="button" id="deleteButton">Delete</button>
+                </div>
+              </form>
+            </div>
+        </div>
+
+        <!-- Modal Popup for Adding (EDITING) Courses -->
+        <div id="modal" >
+            <div id="modalContent" >
+                
+                <h2 id="modalHeading">Add New Course</h2>
+
+                <!-- Form element starts here -->
+                <form id="addCourseForm">
+
+                    <input type="text" id="courseName" name="courseName" placeholder="Course Name">
+                    <span class="error" id="courseNameError"></span>
+
+                    <input type="text" id="prefix" name="prefix" placeholder="Enter Course Prefix" />
+                    <span class="error" id="prefixError"></span>
+
+                    <input type="text" id="courseNumber" name="courseNumber" placeholder="Enter Course Number" />
+                    <span class="error" id="courseNumberError"></span>
+                    
+                    <!--<input type="text" id="subject" name="subject" placeholder="Subject">
+                    
+                    <input type="text" id="professorName" name="professorName" placeholder="Professor Name">
+                    
+                     Total Points Input 
+                    <input type="number" id="totalPoints" name="totalPoints" placeholder="Total Points Possible" min="0">-->
+                
+                    <!-- Split time inputs -->
+                    <div id="timeInputs">
+                        <label for="startTime" style="color: white; display: block; margin-bottom: 5px;">Start Time</label>
+                        <input type="time" id="startTime" name="startTime" placeholder="Start Time">
+                        <label for="endTime" style="color: white; display: block; margin-bottom: 5px;">End Time</label>
+                        <input type="time" id="endTime" name="endTime" placeholder="End Time">
+                    </div>
+                    <span class="error" id="timeError"></span>
+
+                    <label id="semesterDropdownLabel" for="semesterDropdown">Select Semester</label>
+                    <select id="semesterDropdown" name="semester">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+
+                    <!-- Days of the Week Checkboxes -->
+                    <div id="daysOfTheWeek">
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Mon"> Mon
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Tue"> Tue
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Wed"> Wed
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Thu"> Thu
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Fri"> Fri
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Sat"> Sat
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Sun"> Sun
+                        </label>
+                    </div>
+                    <span class="error" id="daysError"></span>
+
+
+                    <!-- New Dropdown for Color Selection -->
+                    <label id="courseColorLabel" for="courseColor">Course Label Color</label>
+                    <select id="courseColor" name="courseColor">
+                        <option value="" disabled selected style="background-color: white; color: black;">Pick a color</option>
+                        <option value="#7DBC4B" style="background-color: #7DBC4B; color: white;">Green</option>
+                        <option value="#E52222" style="background-color: #E52222; color: white;">Red</option>
+                        <option value="#4B90D0" style="background-color: #4B90D0; color: white;">Blue</option>
+                        <option value="#E5BA22" style="background-color: #E5BA22; color: black;">Yellow</option>
+                        <option value="#9A4BB3" style="background-color: #9A4BB3; color: white;">Purple</option>
+                        <option value="#FF8C00" style="background-color: #FF8C00; color: white;">Orange</option>
+                    </select>
+                    <span class="error" id="courseColorError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
+
+                    <!-- Button Container -->
+                    <div class="button-container">
+                        <button id="addCourseBtn">Add Course</button>
+                        <button id="addAssignmentBtn">Add Assignment</button>
+                        <button id="deleteCourseBtn">Delete Course</button>
+                    </div>
+                
+                </form>
+                <!-- Form element ends here -->
+                <label id = "assignmentsLabel">Assignments</span>
+                <div id="assignmentContainer4Course" class="dynamic-container">
+                    <!-- Assignment items will be dynamically added here -->
+                </div>
+                <button type="button" id="closeModalBtn">&times;</button>
+            </div>
+        </div>
+
+
     </div>
 
     <script src="UTSsessionManager.js"></script>
+    <!-- Other existing scripts -->
+    <script type="module" src="UTSdash.js"></script>
 
 
 </body>

@@ -1,5 +1,6 @@
 import { fetchSemesters, fetchCourses, fetchAssignments } from './UTSutils.js';
 import { openModal, populateContainer } from './UTSevents.js';
+//import { callEditCourse } from './UTSmodals.js';
 
 class Course {
 
@@ -81,7 +82,9 @@ function resetFormStyles() {
     });
 }
 
-function editCourse(courseId) {
+export function editCourse(courseId) {
+
+    //callEditCourse(courseId);
 
     console.log("Editing course with ID:", courseId); // Debugging line
     //console.log("Current courses:", courseManager.courses); // Debugging line to check courseManager.courses

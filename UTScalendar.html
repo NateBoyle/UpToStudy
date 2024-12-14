@@ -107,7 +107,7 @@
                         </div>
                       </form>
                     </div>
-                  </div>
+                </div>
                 <!-- Updated static days header -->
                 <div class="days-header">
                     <div class="day">
@@ -184,7 +184,7 @@
                     </div>
                 </div>
 
-                <!-- ASSIGNMENT CREATION MODAL -->
+                <!-- ASSIGNMENT CREATION (EDIT) MODAL -->
                 <div id="assignmentModal" class="creationModal">
                     <div class="modal-content">
                       <span class="close" id="closeAddAssignment">&times;</span>
@@ -251,6 +251,101 @@
             </div>
         </div>
         
+        <!-- Modal Popup for Adding (EDITING) Courses -->
+        <div id="modal" >
+            <div id="modalContent" >
+                
+                <h2 id="modalHeading">Add New Course</h2>
+
+                <!-- Form element starts here -->
+                <form id="addCourseForm">
+
+                    <input type="text" id="courseName" name="courseName" placeholder="Course Name">
+                    <span class="error" id="courseNameError"></span>
+
+                    <input type="text" id="prefix" name="prefix" placeholder="Enter Course Prefix" />
+                    <span class="error" id="prefixError"></span>
+
+                    <input type="text" id="courseNumber" name="courseNumber" placeholder="Enter Course Number" />
+                    <span class="error" id="courseNumberError"></span>
+                    
+                    <!--<input type="text" id="subject" name="subject" placeholder="Subject">
+                    
+                    <input type="text" id="professorName" name="professorName" placeholder="Professor Name">
+                    
+                     Total Points Input 
+                    <input type="number" id="totalPoints" name="totalPoints" placeholder="Total Points Possible" min="0">-->
+                
+                    <!-- Split time inputs -->
+                    <div id="timeInputs">
+                        <label for="startTime" style="color: white; display: block; margin-bottom: 5px;">Start Time</label>
+                        <input type="time" id="startTime" name="startTime" placeholder="Start Time">
+                        <label for="endTime" style="color: white; display: block; margin-bottom: 5px;">End Time</label>
+                        <input type="time" id="endTime" name="endTime" placeholder="End Time">
+                    </div>
+                    <span class="error" id="timeError"></span>
+
+                    <label id="semesterDropdownLabel" for="semesterDropdown">Select Semester</label>
+                    <select id="semesterDropdown" name="semester">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+
+                    <!-- Days of the Week Checkboxes -->
+                    <div id="daysOfTheWeek">
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Mon"> Mon
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Tue"> Tue
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Wed"> Wed
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Thu"> Thu
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Fri"> Fri
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Sat"> Sat
+                        </label>
+                        <label style="color: white;">
+                            <input type="checkbox" class="day-checkbox" name="daysOfWeek" value="Sun"> Sun
+                        </label>
+                    </div>
+                    <span class="error" id="daysError"></span>
+
+
+                    <!-- New Dropdown for Color Selection -->
+                    <label id="courseColorLabel" for="courseColor">Course Label Color</label>
+                    <select id="courseColor" name="courseColor">
+                        <option value="" disabled selected style="background-color: white; color: black;">Pick a color</option>
+                        <option value="#7DBC4B" style="background-color: #7DBC4B; color: white;">Green</option>
+                        <option value="#E52222" style="background-color: #E52222; color: white;">Red</option>
+                        <option value="#4B90D0" style="background-color: #4B90D0; color: white;">Blue</option>
+                        <option value="#E5BA22" style="background-color: #E5BA22; color: black;">Yellow</option>
+                        <option value="#9A4BB3" style="background-color: #9A4BB3; color: white;">Purple</option>
+                        <option value="#FF8C00" style="background-color: #FF8C00; color: white;">Orange</option>
+                    </select>
+                    <span class="error" id="courseColorError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
+
+                    <!-- Button Container -->
+                    <div class="button-container">
+                        <button id="addCourseBtn">Add Course</button>
+                        <button id="addAssignmentBtn">Add Assignment</button>
+                        <button id="deleteCourseBtn">Delete Course</button>
+                    </div>
+                
+                </form>
+                <!-- Form element ends here -->
+                <label id = "assignmentsLabel">Assignments</span>
+                <div id="assignmentContainer4Course" class="dynamic-container">
+                    <!-- Assignment items will be dynamically added here -->
+                </div>
+                <button type="button" id="closeModalBtn">&times;</button>
+            </div>
+        </div>
 
 
     </div>        
