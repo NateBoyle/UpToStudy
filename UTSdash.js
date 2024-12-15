@@ -54,19 +54,25 @@ async function renderDashCalendar() {
 
     try {
         // Fetch combined courses and events for the current week
-        const combinedData = await getCombinedEventsAndCourses(currentDate, true);
+        const combinedData = await getCombinedEventsAndCourses(currentDate, false, true);
         console.log('Combined Data:', combinedData); // Debugging: Check fetched data
 
         for (let i = 0; i < daysToRender; i++) {
             const targetDate = new Date(currentDate);
             targetDate.setDate(currentDate.getDate() + i);
-            const targetDay = targetDate.getDay(); // Numeric day of the week (0 = Sunday, 1 = Monday, etc.)
+
+            // Normalize targetDate to midnight local time
+            targetDate.setHours(0, 0, 0, 0);
+            
+            // Format targetDate as YYYY-MM-DD for matching keys
+            const targetKey = targetDate.toISOString().split('T')[0];
 
             const container = document.getElementById(`event-container${i + 1}`);
             container.innerHTML = ''; // Clear container
 
-            const dayData = combinedData.find(entry => entry.key === targetDay);
-            console.log(`Day ${i + 1} Data (Day of Week ${targetDay}):`, dayData); // Debugging: Check day-specific data
+            // Find data for the current day based on the formatted date
+            const dayData = combinedData.find(entry => entry.key === targetKey);
+            console.log(`Day ${i + 1} Data (Date ${targetKey}):`, dayData); // Debugging: Check day-specific data
 
             if (dayData && dayData.combined.length > 0) {
                 dayData.combined.forEach(event => {

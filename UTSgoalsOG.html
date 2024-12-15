@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>UpToStudy</title>
+
+    <link rel="icon" type="image/x-icon" href="UTSicon2.png">
+
+    <link rel="stylesheet" href="UTScss.css">
+
+
+    <style>
+        @font-face {
+            font-family: UTSfont;
+            src: url(PlusJakartaSans-Medium.TTF);
+        }
+    </style>
+
+</head>
+<body>
+
+    <!--<h1 class="header">UpToStudy is awesome!</h1>
+    <button type="button">Dashboard</button>
+    <button type="button">Calendar</button>
+    <button type="button">Courses</button>
+    <button type="button">Click Me!</button>
+    <button type="button">Click Me!</button>
+    <hr>-->
+
+    <div style="width: 100%; height: 100%; position: relative; border-radius: 15px">
+        <div style="width: 1920px; height: 1080px; left: 0px; top: 0px; position: absolute; background: #1E1E1E; border-radius: 15px"></div>
+        
+        <!-- Header Container -->
+        <div class="header">
+              
+            <!-- Left Side: Logo -->
+            <a href="UTStemplate.html">
+                <img src="UTSicon2.png" alt="UpToStudy Logo">
+            </a>
+
+            
+
+            <!-- Center: Navigation Links -->
+            <div class="nav-links">
+                <a href="UTSdash.html" class="nav-item">Dashboard</a>
+                <a href="UTScalendar.html" class="nav-item">Calendar</a>
+                <a href="UTScourses.html" class="nav-item">Courses</a>
+                <a href="UTScards.html" class="nav-item">Study</a>
+                <a href="UTSgoals.html" class="nav-item active">Goals</a>
+            </div>
+
+            <!-- Right Side: User Initial -->
+            <div class="user-initial" id="userInitial">N</div>
+
+            <!-- Dropdown Modal for Profile Options -->
+            <div id="profileDropdown" class="profile-dropdown">
+                <button class="dropdown-option" id="editProfileBtn">Edit Profile</button>
+                <button class="dropdown-option" id="logoutBtn">Logout</button>
+            </div>
+
+        </div>
+        
+        <div style="width: 1794px; height: 513px; left: 63px; top: 125px; position: absolute">
+            <div style="width: 1794px; height: 440px; left: 0px; top: 73px; position: absolute; background: #2C2C2C; border-radius: 24px; border: 1px #2C2C2C solid"></div>
+            <div style="width: 1715px; height: 494px; left: 39px; top: 0px; position: absolute">
+                <div style="width: 1715px; height: 9px; left: 0px; top: 485px; position: absolute; background: #1F1F1F; border-radius: 50px"></div>
+                <div style="width: 550px; height: 342px; left: 0px; top: 123px; position: absolute; background: #1F1F1F; border-radius: 24px"></div>
+                <div style="width: 551px; height: 342px; left: 582px; top: 123px; position: absolute; background: #1F1F1F; border-radius: 24px"></div>
+                <div style="width: 550px; height: 342px; left: 1165px; top: 123px; position: absolute; background: #1F1F1F; border-radius: 24px"></div>
+                <div style="left: 724px; top: 0px; position: absolute; text-align: center; color: white; font-size: 36px; font-weight: 600; word-wrap: break-word">Semester Goals</div>
+                <div style="width: 1664px; height: 237.30px; left: 27px; top: 203.70px; position: absolute">
+                    <div style="width: 1664px; height: 237.30px; left: 0px; top: 0px; position: absolute">
+                        <div style="width: 499.07px; height: 18.80px; left: 0px; top: 218.50px; position: absolute; background: #4BC940; border-radius: 50px"></div>
+                        <div style="width: 499.07px; height: 18.80px; left: 583.11px; top: 218.50px; position: absolute; background: #4BC940; border-radius: 50px"></div>
+                        <div style="width: 499.07px; height: 18.80px; left: 1164.93px; top: 218.50px; position: absolute; background: #4BC940; border-radius: 50px"></div>
+                        <div style="width: 490.02px; height: 46.99px; left: 5.17px; top: 0px; position: absolute; background: linear-gradient(90deg, #2EA0F3 0%, #204B8B 100%); border-radius: 24px"></div>
+                        <div style="width: 490.02px; height: 46.99px; left: 5.17px; top: 65.79px; position: absolute; background: linear-gradient(90deg, #2EA0F3 0%, #204B8B 100%); border-radius: 24px"></div>
+                        <div style="width: 490.02px; height: 46.99px; left: 5.17px; top: 131.57px; position: absolute; background: linear-gradient(90deg, #2EA0F3 0%, #204B8B 100%); border-radius: 24px"></div>
+                        <div style="width: 490.02px; height: 46.99px; left: 586.99px; top: 0px; position: absolute; background: linear-gradient(90deg, #7969DF 0%, #33248E 100%); border-radius: 24px"></div>
+                        <div style="width: 490.02px; height: 46.99px; left: 586.99px; top: 65.79px; position: absolute; background: linear-gradient(90deg, #7969DF 0%, #33248E 100%); border-radius: 24px"></div>
+                        <div style="width: 490.02px; height: 46.99px; left: 586.99px; top: 131.57px; position: absolute; background: linear-gradient(90deg, #7969DF 0%, #33248E 100%); border-radius: 24px"></div>
+                        <div style="width: 490.02px; height: 46.99px; left: 1168.81px; top: 0px; position: absolute; background: linear-gradient(90deg, #D34040 0%, #941111 100%); border-radius: 24px"></div>
+                        <div style="width: 490.02px; height: 46.99px; left: 1168.81px; top: 65.79px; position: absolute; background: linear-gradient(90deg, #D34040 0%, #941111 100%); border-radius: 24px"></div>
+                        <div style="width: 490.02px; height: 46.99px; left: 1168.81px; top: 131.57px; position: absolute; background: linear-gradient(90deg, #D34040 0%, #941111 100%); border-radius: 24px"></div>
+                    </div>
+                    <div style="width: 1533.41px; height: 165.64px; left: 23.27px; top: 12.92px; position: absolute">
+                        <div style="width: 364.61px; height: 34.07px; left: 0px; top: 0px; position: absolute; color: white; font-size: 16px; font-weight: 600; word-wrap: break-word">Achieve a 94% in Math 127</div>
+                        <div style="width: 364.61px; height: 34.07px; left: 0px; top: 65.79px; position: absolute; color: white; font-size: 16px; font-weight: 600; word-wrap: break-word">Achieve a 93% in Philosophy 201</div>
+                        <div style="width: 364.61px; height: 34.07px; left: 0px; top: 131.57px; position: absolute; color: white; font-size: 16px; font-weight: 600; word-wrap: break-word">Achieve a 95% in Chemistry 102</div>
+                        <div style="width: 364.61px; height: 34.07px; left: 584.40px; top: 0px; position: absolute; color: white; font-size: 16px; font-weight: 600; word-wrap: break-word">Go to Rush Week</div>
+                        <div style="width: 364.61px; height: 34.07px; left: 584.40px; top: 65.79px; position: absolute; color: white; font-size: 16px; font-weight: 600; word-wrap: break-word">Attend Introduction Meeting</div>
+                        <div style="width: 364.61px; height: 34.07px; left: 584.40px; top: 131.57px; position: absolute; color: white; font-size: 16px; font-weight: 600; word-wrap: break-word">Do 100 hours of volunteer work</div>
+                        <div style="width: 364.61px; height: 34.07px; left: 1168.81px; top: 0px; position: absolute; color: white; font-size: 16px; font-weight: 600; word-wrap: break-word">Attend 1 Nursing Activity</div>
+                        <div style="width: 364.61px; height: 34.07px; left: 1168.81px; top: 65.79px; position: absolute; color: white; font-size: 16px; font-weight: 600; word-wrap: break-word">Go on 1 LLC Field Trip</div>
+                        <div style="width: 364.61px; height: 34.07px; left: 1168.81px; top: 131.57px; position: absolute; color: white; font-size: 16px; font-weight: 600; word-wrap: break-word">Write Finishing Club Essay</div>
+                    </div>
+                    <div style="width: 1211.64px; height: 179.57px; left: 419px; top: 0.30px; position: absolute">
+                        <div style="width: 48px; height: 48px; padding: 4px; left: 0px; top: 0px; position: absolute; flex-direction: column; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="padding: 11px; border-radius: 100px; justify-content: center; align-items: center; display: inline-flex">
+                                <div style="width: 24px; height: 24px; position: relative">
+                                    <div style="width: 12px; height: 9.40px; left: 6px; top: 7px; position: absolute; background: white"></div>
+                                </div>
+                                <div style="width: 18px; height: 18px; background: #1D192B; border-radius: 2px"></div>
+                            </div>
+                        </div>
+                        <div style="width: 48px; height: 48px; padding: 4px; left: 0px; top: 65.79px; position: absolute; flex-direction: column; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="padding: 11px; border-radius: 100px; justify-content: center; align-items: center; display: inline-flex">
+                                <div style="width: 24px; height: 24px; position: relative">
+                                    <div style="width: 12px; height: 9.40px; left: 6px; top: 7px; position: absolute; background: white"></div>
+                                </div>
+                                <div style="width: 18px; height: 18px; background: #1D192B; border-radius: 2px"></div>
+                            </div>
+                        </div>
+                        <div style="width: 48px; height: 48px; padding: 4px; left: 0px; top: 131.57px; position: absolute; flex-direction: column; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="padding: 11px; border-radius: 100px; justify-content: center; align-items: center; display: inline-flex">
+                                <div style="width: 24px; height: 24px; position: relative">
+                                    <div style="width: 12px; height: 9.40px; left: 6px; top: 7px; position: absolute; background: white"></div>
+                                </div>
+                                <div style="width: 18px; height: 18px; background: #1D192B; border-radius: 2px"></div>
+                            </div>
+                        </div>
+                        <div style="width: 48px; height: 48px; padding: 4px; left: 581.82px; top: 0px; position: absolute; flex-direction: column; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="padding: 11px; border-radius: 100px; justify-content: center; align-items: center; display: inline-flex">
+                                <div style="width: 24px; height: 24px; position: relative">
+                                    <div style="width: 12px; height: 9.40px; left: 6px; top: 7px; position: absolute; background: white"></div>
+                                </div>
+                                <div style="width: 18px; height: 18px; background: #1D192B; border-radius: 2px"></div>
+                            </div>
+                        </div>
+                        <div style="width: 48px; height: 48px; padding: 4px; left: 581.82px; top: 65.79px; position: absolute; flex-direction: column; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="padding: 11px; border-radius: 100px; justify-content: center; align-items: center; display: inline-flex">
+                                <div style="width: 24px; height: 24px; position: relative">
+                                    <div style="width: 12px; height: 9.40px; left: 6px; top: 7px; position: absolute; background: white"></div>
+                                </div>
+                                <div style="width: 18px; height: 18px; background: #1D192B; border-radius: 2px"></div>
+                            </div>
+                        </div>
+                        <div style="width: 48px; height: 48px; padding: 4px; left: 581.82px; top: 131.57px; position: absolute; flex-direction: column; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="padding: 11px; border-radius: 100px; justify-content: center; align-items: center; display: inline-flex">
+                                <div style="width: 24px; height: 24px; position: relative">
+                                    <div style="width: 12px; height: 9.40px; left: 6px; top: 7px; position: absolute; background: white"></div>
+                                </div>
+                                <div style="width: 18px; height: 18px; background: #1D192B; border-radius: 2px"></div>
+                            </div>
+                        </div>
+                        <div style="width: 48px; height: 48px; padding: 4px; left: 1163.64px; top: 0px; position: absolute; flex-direction: column; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="padding: 11px; border-radius: 100px; justify-content: center; align-items: center; display: inline-flex">
+                                <div style="width: 24px; height: 24px; position: relative">
+                                    <div style="width: 12px; height: 9.40px; left: 6px; top: 7px; position: absolute; background: white"></div>
+                                </div>
+                                <div style="width: 18px; height: 18px; background: #1D192B; border-radius: 2px"></div>
+                            </div>
+                        </div>
+                        <div style="width: 48px; height: 48px; padding: 4px; left: 1163.64px; top: 65.79px; position: absolute; flex-direction: column; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="padding: 11px; border-radius: 100px; justify-content: center; align-items: center; display: inline-flex">
+                                <div style="width: 24px; height: 24px; position: relative">
+                                    <div style="width: 12px; height: 9.40px; left: 6px; top: 7px; position: absolute; background: white"></div>
+                                </div>
+                                <div style="width: 18px; height: 18px; background: #1D192B; border-radius: 2px"></div>
+                            </div>
+                        </div>
+                        <div style="width: 48px; height: 48px; padding: 4px; left: 1163.64px; top: 131.57px; position: absolute; flex-direction: column; justify-content: center; align-items: center; display: inline-flex">
+                            <div style="padding: 11px; border-radius: 100px; justify-content: center; align-items: center; display: inline-flex">
+                                <div style="width: 24px; height: 24px; position: relative">
+                                    <div style="width: 12px; height: 9.40px; left: 6px; top: 7px; position: absolute; background: white"></div>
+                                </div>
+                                <div style="width: 18px; height: 18px; background: #1D192B; border-radius: 2px"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="width: 1679.37px; height: 29px; left: 57px; top: 141px; position: absolute">
+                <div style="width: 514.37px; height: 29px; left: 0px; top: 0px; position: absolute; text-align: center; color: white; font-size: 24px; font-weight: 600; word-wrap: break-word">Achieve a 4.0 GPA for semester</div>
+                <div style="width: 514.37px; height: 29px; left: 582.98px; top: 0px; position: absolute; text-align: center; color: white; font-size: 24px; font-weight: 600; word-wrap: break-word">Become member of Sorority </div>
+                <div style="width: 514.37px; height: 29px; left: 1165px; top: 0px; position: absolute; text-align: center; color: white; font-size: 24px; font-weight: 600; word-wrap: break-word">Earn Nursing LLC Badge</div>
+            </div>
+        </div>
+
+        <div style="width: 729px; height: 350px; left: 1126px; top: 672px; position: absolute">
+            <div style="width: 729px; height: 350px; left: 0px; top: 0px; position: absolute; background: #2C2C2C; border-radius: 24px; border: 1px #2C2C2C solid"></div>
+            <div style="width: 694px; height: 255px; left: 18px; top: 70px; position: absolute; background: #1F1F1F; border-radius: 24px; border: 1px #2C2C2C solid"></div>
+            <div style="width: 286px; height: 41.51px; left: 222px; top: 19px; position: absolute; text-align: center; color: white; font-size: 30px; font-weight: 600; word-wrap: break-word">Streak Counter</div>
+            <!--<div style="width: 286px; height: 41.51px; left: 222px; top: 19px; position: absolute; text-align: center; color: white; font-size: 30px; font-weight: 600; word-wrap: break-word">Streak Counter</div>
+            <div style="width: 261.54px; height: 248.74px; left: 234px; top: 67px; position: absolute; background: #CC8720; border-radius: 10px"></div>-->
+            <div style="width: 75px; height: 75px; left: 147px; top: 160px; position: absolute; background: rgba(46.75, 46.75, 46.75, 0.70); border-radius: 9999px"></div>
+            <div style="width: 45px; height: 45px; left: 53px; top: 175px; position: absolute; background: rgba(46.75, 46.75, 46.75, 0.57); border-radius: 9999px"></div>
+            <div style="width: 45px; height: 45px; left: 632px; top: 175px; position: absolute; background: rgba(46.75, 46.75, 46.75, 0.57); border-radius: 9999px"></div>
+            <div style="width: 75px; height: 75px; left: 508px; top: 160px; position: absolute; background: rgba(46.75, 46.75, 46.75, 0.70); border-radius: 9999px"></div>
+            <div>
+                <img src="Star 1.svg" style="width: 261.54px; height: 248.74px; left: 234px; top: 67px; position: absolute; border-radius: 10px">
+                <div style="left: 345px; top: 220px; position: absolute; text-align: center; color: white; font-size: 20px; font-weight: 600; word-wrap: break-word">day</div>
+                <div style="width: 138px; height: 85px; left: 296px; top: 151.74px; position: absolute; text-align: center; color: white; font-size: 64px; font-weight: 800; word-wrap: break-word">1</div>
+            </div>
+        </div>
+        <div style="width: 485px; height: 350px; left: 63px; top: 674px; position: absolute">
+            <div style="width: 485px; height: 350px; left: 0px; top: 0px; position: absolute; background: #2C2C2C; border-radius: 24px; border: 1px #2C2C2C solid"></div>
+            <div style="width: 362px; height: 252px; left: 62px; top: 81px; position: absolute; text-align: center; color: white; font-size: 28px; font-style: italic; font-weight: 300; word-wrap: break-word">&quot;Education is the passport to the future, for tomorrow belongs to those who prepare for it today.&quot;<br/>- Malcolm X<br/></div>
+            <div style="width: 286px; height: 37px; left: 100px; top: 19px; position: absolute; text-align: center; color: white; font-size: 30px; font-weight: 600; word-wrap: break-word">Quote of the Day</div>
+        </div>
+        <div style="width: 546px; height: 350px; left: 561px; top: 674px; position: absolute">
+            <div style="width: 485px; height: 350px; left: 32px; top: 0px; position: absolute; background: #2C2C2C; border-radius: 24px; border: 1px #2C2C2C solid"></div>
+            <div style="width: 85px; height: 100px; left: 56px; top: 76px; position: absolute; opacity: 0.40; background: #1F1F1F; border-radius: 10px"></div>
+            <div style="width: 85px; height: 100px; left: 56px; top: 187px; position: absolute; opacity: 0.40; background: #1F1F1F; border-radius: 10px"></div>
+            <div style="width: 85px; height: 100px; left: 156px; top: 76px; position: absolute; opacity: 0.40; background: #1F1F1F; border-radius: 10px"></div>
+            <div style="width: 85px; height: 100px; left: 156px; top: 187px; position: absolute; opacity: 0.40; background: #1F1F1F; border-radius: 10px"></div>
+            <div style="width: 85px; height: 100px; left: 309px; top: 76px; position: absolute; opacity: 0.40; background: #1F1F1F; border-radius: 10px"></div>
+            <div style="width: 85px; height: 100px; left: 309px; top: 187px; position: absolute; opacity: 0.40; background: #1F1F1F; border-radius: 10px"></div>
+            <div style="width: 85px; height: 100px; left: 409px; top: 76px; position: absolute; opacity: 0.40; background: #1F1F1F; border-radius: 10px"></div>
+            <div style="width: 286px; height: 37px; left: 132px; top: 19px; position: absolute; text-align: center; color: white; font-size: 30px; font-weight: 600; word-wrap: break-word">Usage Time</div>
+            <div style="width: 286px; height: 37px; left: 0px; top: 297px; position: absolute; text-align: center; color: white; font-size: 25px; font-weight: 500; word-wrap: break-word">Hours</div>
+            <div style="width: 286px; height: 37px; left: 260px; top: 297px; position: absolute; text-align: center; color: white; font-size: 25px; font-weight: 500; word-wrap: break-word">Minutes</div>
+            <div style="width: 85px; height: 100px; left: 409px; top: 187px; position: absolute; opacity: 0.40; background: #1F1F1F; border-radius: 10px"></div>
+            <div style="width: 12px; height: 13px; left: 268px; top: 154px; position: absolute; background: #D9D9D9; border-radius: 9999px"></div>
+            <div style="width: 12px; height: 13px; left: 268px; top: 203px; position: absolute; background: #D9D9D9; border-radius: 9999px"></div>
+        </div>
+    
+
+
+    </div>
+
+    <script src="UTSsessionManager.js"></script>
+
+</body>

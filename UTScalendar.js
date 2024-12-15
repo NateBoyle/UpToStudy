@@ -418,7 +418,7 @@ async function renderWeekViewEvents() {
                     eventBlock.addEventListener("click", () => {
                         if (event.type === 'course') {
                             console.log('This is a course!');
-                            //editCourse(event.id);
+                            callEditCourse(event.id);
                         } else {
                             console.log(`This is a ${event.type}!`);
                             openFromCalendar(event.type, event.id);

@@ -415,7 +415,7 @@
 }
 
 /* Sidebar Styling */
-.sidebar {
+.coursesSidebar {
     position: fixed;
     top: 105px; /* Align with header */
     left: 0;
@@ -428,7 +428,7 @@
     border-right: 2px solid white;
 }
 
-.sidebar h2 {
+.coursesSidebar h2 {
     margin-bottom: 20px;
     font-size: 1.2rem;
     font-weight: bold;

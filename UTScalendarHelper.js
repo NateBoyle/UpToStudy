@@ -11,10 +11,6 @@ let currentSemesterEndDate = null;
 // Cache courses
 let cachedCourses = [];
 
-// Cache events
-let cachedAssignments = [];
-let cachedToDos = [];
-let cachedEvents = [];
 
 export async function getCurrentSemester(currentDate) {
 
@@ -56,7 +52,7 @@ export async function getCurrentSemester(currentDate) {
 
 
 // Function to get course occurances within time range
-export async function getCurrentCourses(currentDate, isWeekView) {
+export async function getCurrentCourses(currentDate, isWeekView = false, isDash = false) {
     
     try {
         
@@ -83,7 +79,18 @@ export async function getCurrentCourses(currentDate, isWeekView) {
         // Step 4: Determine the range based on isWeekView
         let rangeStart, rangeEnd;
 
-        if (isWeekView) {
+        if (isDash) {
+            // Custom 5-day range for the dashboard
+            rangeStart = new Date(Math.max(new Date(semesterStartDate), new Date(currentDate)));
+            rangeEnd = new Date(rangeStart);
+            rangeEnd.setDate(rangeStart.getDate() + 4);
+
+            // Ensure rangeEnd does not exceed semesterEndDate
+            if (rangeEnd > new Date(semesterEndDate)) {
+                rangeEnd = new Date(semesterEndDate);
+            }
+            
+        } else if (isWeekView) {
             const weekStart = new Date(currentDate);
             weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Sunday
             const weekEnd = new Date(weekStart);
@@ -98,6 +105,9 @@ export async function getCurrentCourses(currentDate, isWeekView) {
             rangeStart = new Date(Math.max(semesterStartDate, monthStart));
             rangeEnd = new Date(Math.min(semesterEndDate, monthEnd));
         }
+
+        console.log(`Courses start date: ${rangeStart}`);
+        console.log(`Courses end date: ${rangeEnd}`);
 
         // Step 5: Map courses to days (0-6) or dates (yyyy-mm-dd)
         const dayMapping = {
@@ -116,6 +126,12 @@ export async function getCurrentCourses(currentDate, isWeekView) {
 
             let currentDateIter = new Date(rangeStart);
             while (currentDateIter <= rangeEnd) {
+
+                // Normalize currentDateIter to midnight ONLY for isDash
+                if (isDash) {
+                    currentDateIter.setHours(0, 0, 0, 0);
+                }
+
                 const dayOrDate = isWeekView
                     ? currentDateIter.getDay() // Day of the week (0-6)
                     : currentDateIter.toISOString().split("T")[0]; // Date in yyyy-mm-dd
@@ -155,6 +171,7 @@ export async function getCurrentCourses(currentDate, isWeekView) {
         // Sort results for consistent output
         result.sort((a, b) => (isWeekView ? a.key - b.key : new Date(a.key) - new Date(b.key)));
 
+        console.log(result);
         return result;
     } catch (error) {
         console.error("Error in getCurrentCourses:", error);
@@ -163,7 +180,7 @@ export async function getCurrentCourses(currentDate, isWeekView) {
 }
 
 // Get events within time range
-export async function getCurrentEvents(currentDate, isWeekView) {
+export async function getCurrentEvents(currentDate, isWeekView = false, isDash = false) {
 
     if (!currentDate) {
         console.error("Current date is not defined.");
@@ -173,22 +190,41 @@ export async function getCurrentEvents(currentDate, isWeekView) {
     if (cachedDate.toISOString().split("T")[0] !== currentDate.toISOString().split("T")[0]) {
         // Clear caches if dates are different
         cachedDate = currentDate;
-        cachedAssignments = [];
-        cachedToDos = [];
-        cachedEvents = [];
+
     }
 
     // Determine the view range
     let viewStartDate, viewEndDate;
-    if (isWeekView) {
+    if (isDash) {
+        // Custom 5-day range
+        const startDate = new Date(currentDate);
+        startDate.setHours(0, 0, 0, 0); // Normalize to midnight local time
+
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 4); // 5-day range
+        endDate.setHours(23, 59, 59, 999); // Normalize end date to the end of the day
+
+        viewStartDate = startDate.toISOString().split("T")[0];
+        viewEndDate = endDate.toISOString().split("T")[0];
+
+        console.log(`Events start date (Dash): ${startDate}`);
+        console.log(`Events end date (Dash): ${endDate}`);
+        
+    } else if (isWeekView) {
+        // Week view range
         const weekStart = new Date(currentDate);
-        weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Sunday
+        weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Set to Sunday
+        weekStart.setHours(0, 0, 0, 0); // Normalize to midnight local time
+
         const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 6); // Saturday
+        weekEnd.setDate(weekStart.getDate() + 6); // Set to Saturday
+        weekEnd.setHours(23, 59, 59, 999); // Normalize to the end of the day
 
         viewStartDate = weekStart.toISOString().split("T")[0];
         viewEndDate = weekEnd.toISOString().split("T")[0];
-        console.log(`weekview`);
+
+        console.log(`Week view start date: ${weekStart}`);
+        console.log(`Week view end date: ${weekEnd}`);
     } else {
         const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // First day
         const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // Last day
@@ -196,6 +232,9 @@ export async function getCurrentEvents(currentDate, isWeekView) {
         viewStartDate = monthStart.toISOString().split("T")[0];
         viewEndDate = monthEnd.toISOString().split("T")[0];
     }
+
+    console.log(`Events view start date: ${viewStartDate}`);
+    console.log(`Events view end date: ${viewEndDate}`);
 
     try {
         const result = [];
@@ -205,25 +244,13 @@ export async function getCurrentEvents(currentDate, isWeekView) {
         let toDos = [];
         let events = [];
 
-        // Fetch all event types
-        if (
-            cachedAssignments.length === 0
-            && cachedToDos.length === 0
-            && cachedEvents.length === 0
-        ) {
-            [assignments, toDos, events] = await Promise.all([
-                fetchAssignments(null, viewStartDate, viewEndDate),
-                fetchToDos(null, viewStartDate, viewEndDate),
-                fetchEvents(null, viewStartDate, viewEndDate),
-            ]);
-            cachedAssignments = assignments;
-            cachedToDos = toDos;
-            cachedEvents = events;
-        } else {
-            assignments = cachedAssignments;
-            toDos = cachedToDos;
-            events = cachedEvents;
-        }
+        
+        [assignments, toDos, events] = await Promise.all([
+            fetchAssignments(null, viewStartDate, viewEndDate),
+            fetchToDos(null, viewStartDate, viewEndDate),
+            fetchEvents(null, viewStartDate, viewEndDate),
+        ]);
+        
         
 
         // Helper function to process events
@@ -232,6 +259,7 @@ export async function getCurrentEvents(currentDate, isWeekView) {
             let startTime = event.due_time || event.start_time || "00:00:00";
             let endTime; 
             let id;
+
 
             // Adjust assignments/to-dos to mimic event start/end times
             if (type === "assignment" || type === "toDo") {
@@ -301,14 +329,14 @@ export async function getCurrentEvents(currentDate, isWeekView) {
     }
 }
 
-export async function getCombinedEventsAndCourses(currentDate, isWeekView) {
+export async function getCombinedEventsAndCourses(currentDate, isWeekView = false, isDash = false) {
 
     //console.log('From get events: ' + currentDate);
 
     try {
         // Fetch current courses and events
-        const coursesByDate = await getCurrentCourses(currentDate, isWeekView);
-        const eventsByDate = await getCurrentEvents(currentDate, isWeekView);
+        const coursesByDate = await getCurrentCourses(currentDate, isWeekView, isDash);
+        const eventsByDate = await getCurrentEvents(currentDate, isWeekView, isDash);
 
         // Prepare the final combined results array
         const combinedResults = [];

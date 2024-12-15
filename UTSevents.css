@@ -191,6 +191,7 @@
 
 /* LIST STYLINGS */
 .assignment-list,
+.goals-list,
 .todo-list {
     background: #2C2C2C;
     border-radius: 15px;
@@ -198,25 +199,29 @@
     flex: 1;
     display: flex;
     flex-direction: column; /* Stack the title section and dynamic container vertically */
-    height: 100%; /* Allow the container to expand within its parent */
+    height: 90%; /* Allow the container to expand within its parent */
     overflow: hidden; /* Prevent content overflow */
 }
 
 .assignment-list {
+    height: 100%; /* Allow the container to expand within its parent */
     margin-bottom: 0.75rem;
 }
 
 .assignment-list-title-container,
+.goals-list-title-container,
 .todo-list-title-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 0.5rem; /* Space below the title section */
     gap: 0.3rem; /* Ensure spacing between the title and button */
     flex-shrink: 0; /* Ensure the title section does not shrink */
+    padding: 10px;
 }
 
 .assignment-list-title,
+.goals-list-title,
 .todo-list-title {
     margin: 0; /* Remove default margin */
     font-size: 1.5rem;
@@ -297,6 +302,7 @@
     position: relative;
     color: white;
     text-align: center;
+    justify-content: center;
 }
 
 /* Modal Heading */
@@ -473,6 +479,8 @@
 }
 
 #assignmentsLabel {
+    font-size: 20px;
+    display: none;
     margin-top: 30px;
 }
 
@@ -487,6 +495,8 @@
     padding: 10px; /* Add some padding */
     margin-top: 10px; /* Space between the container and its title/buttons */
     max-height: 300px; /* Prevent the container from growing too large */
+    text-align: center;
+    justify-content: center; /* Centers content horizontally */
 }
 
 /* Styling for individual list items */
@@ -494,6 +504,7 @@
     display: flex; /* Align text and actions side by side */
     justify-content: space-between; /* Space out the text and 'See more' */
     align-items: center; /* Center content vertically */
+    text-align: center;
     padding: 8px 12px; /* Add some spacing inside each item */
     margin-bottom: 8px; /* Space between list items */
     background-color: #2C2C2C;  /*Consistent background for items */
@@ -503,6 +514,17 @@
     cursor: pointer; /* Indicate clickability */
     transition: background-color 0.2s ease, transform 0.2s ease;
 }
+
+#assignmentContainer4Course {
+    display: none;
+}
+
+
+#assignmentContainer4Course .list-item {
+    width: 100%;
+}
+
+
 
 .dynamic-container .list-item .text {
     white-space: nowrap; /* Prevent text from wrapping to the next line */
@@ -533,6 +555,30 @@
     color: #999; /* Light gray text */
     font-size: 14px; /* Slightly smaller font for subtlety */
     margin-top: 20px; /* Space above the message */
+    font-size: 15px;
+}
+
+/* For Webkit browsers (Chrome, Edge, Safari) */
+.dynamic-container::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+    /*height: 12px;  Height for horizontal scrollbars */
+}
+
+.dynamic-container::-webkit-scrollbar-thumb {
+    background-color: #888; /* Color of the scrollbar thumb */
+    border-radius: 6px; /* Round the thumb edges */
+    border: 3px solid transparent; /* Space around the thumb */
+    background-clip: padding-box; /* Ensure the border shows */
+}
+
+.dynamic-container::-webkit-scrollbar-thumb:hover {
+    background-color: #393939; /* Darker color when hovered */
+}
+
+.dynamic-container::-webkit-scrollbar-track {
+    background-color: #555555; /* Background of the scrollbar track */
+    border: 1px solid #888;
+    border-radius: 6px; /* Round the track edges */
 }
 
 /* Fade-in animation */

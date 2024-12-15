@@ -162,9 +162,28 @@ export function editCourse(courseId) {
         }
     };
 
-    //document.getElementById('assignmentContainer4Course').style.display = 'flex';
+    document.getElementById('assignmentsLabel').style.display = 'block';
+    document.getElementById('assignmentContainer4Course').style.display = 'flex';
     populateContainer('assignmentContainer4Course', fetchAssignments, 'assignment', courseId);
+
+    const closeModalBtn = document.getElementById('closeModalBtn');
     
+
+    closeModalBtn.addEventListener('click', () => {
+
+        document.getElementById('assignmentsLabel').style.display = 'none';
+        document.getElementById('assignmentContainer4Course').style.display = 'none';
+
+        const addAssignmentBtn = document.getElementById('addAssignmentBtn');
+        const deleteCourseBtn = document.getElementById('deleteCourseBtn');
+
+        // Hide Add Assignment and Delete Course buttons
+        addAssignmentBtn.style.display = 'none';
+        deleteCourseBtn.style.display = 'none';
+
+        const addCourseModal = document.getElementById('modal');
+        addCourseModal.style.display = 'none';
+    });
 
     document.getElementById('modal').style.display = 'flex';
 

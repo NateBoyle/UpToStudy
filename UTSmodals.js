@@ -126,12 +126,17 @@ export async function callEditCourse(courseId) {
         }
     };
 
+    document.getElementById('assignmentsLabel').style.display = 'block';
     document.getElementById('assignmentContainer4Course').style.display = 'flex';
     populateContainer('assignmentContainer4Course', fetchAssignments, 'assignment', courseId);
 
     const closeModalBtn = document.getElementById('closeModalBtn');
 
     closeModalBtn.addEventListener('click', () => {
+
+        document.getElementById('assignmentsLabel').style.display = 'none';
+        document.getElementById('assignmentContainer4Course').style.display = 'none';
+
         const addAssignmentBtn = document.getElementById('addAssignmentBtn');
         const deleteCourseBtn = document.getElementById('deleteCourseBtn');
 
