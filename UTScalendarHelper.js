@@ -25,7 +25,7 @@ export async function getCurrentSemester(currentDate) {
             currentDate >= currentSemesterStartDate &&
             currentDate <= currentSemesterEndDate
         ) {
-            console.log("Current date is within the cached semester range.");
+            //console.log("Current date is within the cached semester range.");
             return currentSemester; // Return cached semester
         }
 
@@ -106,8 +106,8 @@ export async function getCurrentCourses(currentDate, isWeekView = false, isDash 
             rangeEnd = new Date(Math.min(semesterEndDate, monthEnd));
         }
 
-        console.log(`Courses start date: ${rangeStart}`);
-        console.log(`Courses end date: ${rangeEnd}`);
+        //console.log(`Courses start date: ${rangeStart}`);
+        //console.log(`Courses end date: ${rangeEnd}`);
 
         // Step 5: Map courses to days (0-6) or dates (yyyy-mm-dd)
         const dayMapping = {
@@ -171,7 +171,7 @@ export async function getCurrentCourses(currentDate, isWeekView = false, isDash 
         // Sort results for consistent output
         result.sort((a, b) => (isWeekView ? a.key - b.key : new Date(a.key) - new Date(b.key)));
 
-        console.log(result);
+        //console.log(result);
         return result;
     } catch (error) {
         console.error("Error in getCurrentCourses:", error);
@@ -207,8 +207,8 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
         viewStartDate = startDate.toISOString().split("T")[0];
         viewEndDate = endDate.toISOString().split("T")[0];
 
-        console.log(`Events start date (Dash): ${startDate}`);
-        console.log(`Events end date (Dash): ${endDate}`);
+        //console.log(`Events start date (Dash): ${startDate}`);
+        //console.log(`Events end date (Dash): ${endDate}`);
         
     } else if (isWeekView) {
         // Week view range
@@ -223,8 +223,8 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
         viewStartDate = weekStart.toISOString().split("T")[0];
         viewEndDate = weekEnd.toISOString().split("T")[0];
 
-        console.log(`Week view start date: ${weekStart}`);
-        console.log(`Week view end date: ${weekEnd}`);
+        //console.log(`Week view start date: ${weekStart}`);
+        //console.log(`Week view end date: ${weekEnd}`);
     } else {
         const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // First day
         const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // Last day
@@ -233,8 +233,8 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
         viewEndDate = monthEnd.toISOString().split("T")[0];
     }
 
-    console.log(`Events view start date: ${viewStartDate}`);
-    console.log(`Events view end date: ${viewEndDate}`);
+    //console.log(`Events view start date: ${viewStartDate}`);
+    //console.log(`Events view end date: ${viewEndDate}`);
 
     try {
         const result = [];
@@ -360,7 +360,7 @@ export async function getCombinedEventsAndCourses(currentDate, isWeekView = fals
             combinedResults.push({ key, combined });
         });
 
-        console.log(combinedResults);
+        //console.log(combinedResults);
         return combinedResults; // Array with keys (days/dates) and sorted combined data
     } catch (error) {
         console.error("Error combining courses and events:", error);

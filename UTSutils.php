@@ -16,7 +16,7 @@ $action = $_POST['action'] ?? null;
  */
 function fetchAssignments($userId, $id = null, $startDate = null, $endDate = null, $courseId = null) {
 
-    error_log("fetchAssignments called with id: " . var_export($id, true));
+    //error_log("fetchAssignments called with id: " . var_export($id, true));
 
     global $conn;
 
@@ -50,7 +50,7 @@ function fetchAssignments($userId, $id = null, $startDate = null, $endDate = nul
     $result = $stmt->get_result();
     $assignments = $result->fetch_all(MYSQLI_ASSOC);
 
-    error_log("Response sent to frontend: " . json_encode(['success' => true, 'data' => $assignments]));
+    //error_log("Response sent to frontend: " . json_encode(['success' => true, 'data' => $assignments]));
 
     $stmt->close();
 
@@ -92,7 +92,7 @@ function fetchToDos($userId, $id = null, $startDate = null, $endDate = null) {
     $result = $stmt->get_result();
     $toDos = $result->fetch_all(MYSQLI_ASSOC);
 
-    error_log("Response sent to frontend: " . json_encode(['success' => true, 'data' => $toDos]));
+    //error_log("Response sent to frontend: " . json_encode(['success' => true, 'data' => $toDos]));
 
     $stmt->close();
 
