@@ -1,0 +1,184 @@
+/***GOAL SET STYLING***/
+/* Goal Set Creation Modal */
+.goalSetModal {
+    display: none; /* Hidden on page load */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+/* Modal Content */
+.goal-set-modal-content {
+    background-color: #2C2C2C;
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+/* Close Button */
+.goal-set-modal-content .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Form Labels and Inputs */
+.goal-set-modal-content label {
+    display: block;
+    margin: 10px 0 5px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.goal-set-modal-content input,
+.goal-set-modal-content select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    background-color: #333;
+    color: white;
+}
+
+.radio-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 15px 0;
+}
+
+.radio-container label {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Submit Button */
+.goal-set-modal-content .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+#saveGoalSetBtn {
+    background-color: #4BC940;
+    color: white;
+    font-size: 18px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#saveGoalSetBtn:hover {
+    background-color: #3FA631;
+}
+
+#deleteGoalSetButton {
+    display: none;
+    background-color: #E52222; /* Red background */
+    color: white;
+    font-size: 18px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#deleteGoalSetButton:hover {
+    background-color: #C41C1C; /* Darker red on hover */
+}
+
+
+/*** INDIVIDUAL GOAL STYLING ***/
+/* Goal Modal */
+.goalModal {
+    display: none; /* Hidden on page load */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+/* Modal Content */
+.goal-modal-content {
+    background-color: #2C2C2C;
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+/* Close Button */
+.goal-modal-content .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Form Labels and Inputs */
+.goal-modal-content label {
+    display: block;
+    margin: 10px 0 5px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.goal-modal-content input,
+.goal-modal-content select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    background-color: #333;
+    color: white;
+}
+
+/* Submit Button */
+.goal-modal-content .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+#saveGoalBtn {
+    background-color: #4BC940;
+    color: white;
+    font-size: 18px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#saveGoalBtn:hover {
+    background-color: #3FA631;
+}

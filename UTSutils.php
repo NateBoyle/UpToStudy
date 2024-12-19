@@ -12,6 +12,75 @@ $user_id = $_SESSION['user_id'];
 $action = $_POST['action'] ?? null;
 
 /**
+ * Fetch goal sets for a user.
+ */
+function fetchGoalSets($userId, $id = null, $container = null) {
+    global $conn;
+
+    $query = "SELECT * FROM goal_sets WHERE user_id = ?";
+    $params = [$userId];
+    $types = "i";
+
+    // Conditional filters
+    if ($id !== null) {
+        $query .= " AND id = ?";
+        $params[] = $id;
+        $types .= "i";
+    }
+
+    if ($container !== null) {
+        $query .= " AND container = ?";
+        $params[] = $container;
+        $types .= "i";
+    }
+
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $goalSets = $result->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+
+    return $goalSets;
+}
+
+/**
+ * Fetch goals for a user.
+ */
+function fetchGoals($userId, $id = null, $goalSetId = null) {
+    global $conn;
+
+    $query = "SELECT * FROM goals WHERE user_id = ?";
+    $params = [$userId];
+    $types = "i";
+
+    // Conditional filters
+    if ($id !== null) {
+        $query .= " AND id = ?";
+        $params[] = $id;
+        $types .= "i";
+    } elseif ($goalSetId !== null) {
+        $query .= " AND goal_set_id = ?";
+        $params[] = $goalSetId;
+        $types .= "i";
+    }
+
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $goals = $result->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+
+    return $goals;
+}
+
+
+/**
  * Fetch assignments within a date range for a user.
  */
 function fetchAssignments($userId, $id = null, $startDate = null, $endDate = null, $courseId = null) {
@@ -247,7 +316,17 @@ function fetchCourses($userId, $semesterId = null, $courseId = null) {
     return $courses;
 }
 
-if ($action === 'fetchSemesters') {
+if ($action === 'fetchGoalSets') {
+    $id = $_POST['id'] ?? null;
+    $container = $_POST['container'] ?? null;
+    $goalSets = fetchGoalSets($user_id, $id, $container);
+    echo json_encode(['success' => true, 'data' => $goalSets]);
+} elseif ($action === 'fetchGoals') {
+    $id = $_POST['id'] ?? null;
+    $goalSetId = $_POST['goal_set_id'] ?? null;
+    $goals = fetchGoals($user_id, $id, $goalSetId);
+    echo json_encode(['success' => true, 'data' => $goals]);
+} elseif ($action === 'fetchSemesters') {
     $currentDate = $_POST['current_date'] ?? null;
     $semesters = fetchSemesters($user_id, $currentDate);
     if ($semesters === false) {

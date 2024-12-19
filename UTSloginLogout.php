@@ -52,7 +52,7 @@ function handleLogin() {
             $stmt_active_session->execute();
             $result_active_session = $stmt_active_session->get_result();
 
-            $timeout_duration = 45; // Timeout in seconds
+            $timeout_duration = 300; // Timeout in seconds
             $current_time = time();
 
             if ($result_active_session->num_rows > 0) {
@@ -75,7 +75,7 @@ function handleLogin() {
                     echo json_encode(['status' => 'error', 'message' => 'User already logged in.']);
                     exit();
                 }
-                
+
             }
 
             // Start a new session

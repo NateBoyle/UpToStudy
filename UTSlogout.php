@@ -13,6 +13,8 @@ if (session_status() === PHP_SESSION_NONE) {
 function handleLogout() {
     global $conn;
 
+    error_log("Hello! From Logout");
+
     // Check if a session is active
     if (isset($_SESSION['user_id'])) {
         $session_id = session_id();

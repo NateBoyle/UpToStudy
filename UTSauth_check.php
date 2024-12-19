@@ -34,14 +34,22 @@ function updateLastActivity() {
 function checkAuthentication() {
     $response = [];
 
+    
+
     // Check if the user is logged in
     if (isset($_SESSION['user_id'])) {
+
+        
 
         global $conn;
 
         // Check for session expiration (optional)
-        $timeout_duration = 30; // Session timeout in seconds (30)
+        $timeout_duration = 2700; // Session timeout in seconds (30)
         $sessionId = session_id(); // Retrieve current session ID
+
+        $test = time();
+
+        error_log("Hello! From auth check. Time: {$test}, Last Activity: {$_SESSION['last_activity']}. ");
 
         if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout_duration)) {
             
@@ -83,21 +91,6 @@ function checkAuthentication() {
                         logout_time: {$logoutTime},
                         timeout_duration: {$timeout_duration} seconds.");
 
-                    /*// Update last activity time
-                    $_SESSION['last_activity'] = time();
-
-                    // Update last_activity in the database for this session
-                    $sessionId = session_id(); // Get the current session ID
-                    $lastActivity = date('Y-m-d H:i:s', $_SESSION['last_activity']);
-
-                    $updateQuery = "UPDATE login_logout_history 
-                                    SET last_activity = '$lastActivity' 
-                                    WHERE session_id = '$sessionId' AND logout_time IS NULL";
-
-                    // Execute the query
-                    if (!$conn->query($updateQuery)) {
-                        error_log("Failed to update last_activity: " . $conn->error);
-                    }*/
 
                     updateLastActivity();
 
@@ -105,7 +98,6 @@ function checkAuthentication() {
                     $response['user_id'] = $_SESSION['user_id'];
                     $response['username'] = $_SESSION['username'] ?? null; // Include additional user data
                     return $response;
-                    //return false;
                 }
             }
 
@@ -121,29 +113,12 @@ function checkAuthentication() {
 
         } else {
 
-
-            /*// Update last activity time
-            $_SESSION['last_activity'] = time();
-
-            // Update last_activity in the database for this session
-            $sessionId = session_id(); // Get the current session ID
-            $lastActivity = date('Y-m-d H:i:s', $_SESSION['last_activity']);
-
-            $updateQuery = "UPDATE login_logout_history 
-                            SET last_activity = '$lastActivity' 
-                            WHERE session_id = '$sessionId' AND logout_time IS NULL";
-
-            // Execute the query
-            if (!$conn->query($updateQuery)) {
-                error_log("Failed to update last_activity: " . $conn->error);
-            }*/
-
             updateLastActivity();
 
             $response['authenticated'] = true;
             $response['user_id'] = $_SESSION['user_id'];
             $response['username'] = $_SESSION['username'] ?? null; // Include additional user data
-            //$response['role'] = $_SESSION['role'] ?? null;  Include role if available
+
         }
     } else {
         $response['authenticated'] = false;
@@ -154,7 +129,7 @@ function checkAuthentication() {
 }
 
 // Handle specific POST actions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+/*if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'logout') {
@@ -174,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         exit;
     }
-}
+}*/
 
 // Run the session check
 $response = checkAuthentication();

@@ -7,7 +7,9 @@
     <link rel="icon" type="image/x-icon" href="UTSicon2.png">
 
     <link rel="stylesheet" href="UTScss.css">
-    <link rel="stylesheet" href="UTSgoals.css">
+    <link rel="stylesheet" href="UTSgoalsPage.css">
+    <link rel="stylesheet" href="UTSgoalSets.css">
+
 
 
     <style>
@@ -64,64 +66,127 @@
         <div class="main-container">
             <!-- Title Container -->
             <div class="title-container">
-                <h1>Semester Goals</h1>
-                <div class="goal-buttons">
-                    <button id="setGoalButton">Set Goal</button>
-                    <button id="viewAllGoalsButton">View All Goals</button>
+                <h1><span id="semesterName">Loading...</span> Goals</h1>
+                <div class="goal-set-buttons">
+                    <button id="newGoalSetButton">New Goal Set</button>
+                    <button id="viewAllGoalSetsButton">View All Goal Sets</button>
                 </div>
             </div>
         
             <!-- Goals Container -->
             <div class="goals-container">
                 <div class="goal-set" id="goalSetContainer1">
-                    <h2>Achieve a 4.0 GPA for the Semester</h2>
+                    <div id="goalSetHeader1">
+                        <button class="new-goals-button" id="newGoalButton1">New Goal</button>
+                        <h2 id="goalSetTitle1">Achieve a 4.0 GPA for the Semester</h2>
+                        <button class="change-set-button" id="changeSetButton1">Change Set</button>
+                    </div>
                     <ul class="goal-list" id="goalSet1">
                         <!-- Goals dynamically populated here -->
                     </ul>
                 </div>
                 <div class="goal-set" id="goalSetContainer2">
-                    <h2>Become a Member of the Sorority</h2>
+                    <div id="goalSetHeader2">
+                        <button class="new-goals-button" id="newGoalButton2">New Goal</button>
+                        <h2 id="goalSetTitle2">Become a Member of the Sorority</h2>
+                        <button class="change-set-button" id="changeSetButton2">Change Set</button>
+                    </div>
                     <ul class="goal-list" id="goalSet2">
                         <!-- Goals dynamically populated here -->
                     </ul>
                 </div>
                 <div class="goal-set" id="goalSetContainer3">
-                    <h2>Earn Nursing LLC Badge</h2>
+                    <div id="goalSetHeader3">
+                        <button class="new-goals-button" id="newGoalButton3">New Goal</button>
+                        <h2 id="goalSetTitle3">Earn Nursing LLC Badge</h2>
+                        <button class="change-set-button" id="changeSetButton3">Change Set</button>
+                    </div>
                     <ul class="goal-list" id="goalSet3">
                         <!-- Goals dynamically populated here -->
                     </ul>
                 </div>
             </div>
+
         
             <!-- Bottom Section -->
             <div class="bottom-section">
                 <div class="quote-container">
                     <h2>Quote of the Day</h2>
-                    <p class="quote">"Education is the passport to the future, for tomorrow belongs to those who prepare for it today."</p>
-                    <p class="quote-author">- Malcolm X</p>
+                    <p class="quote"></p>
+                    <p class="quote-author"></p>
                 </div>
                 <div class="usage-time-container">
                     <h2>Usage Time</h2>
                     <div class="time-tracker">
-                        <div class="time-block">
-                            <p class="time">0</p>
-                            <p>Hours</p>
-                        </div>
-                        <div class="time-block">
-                            <p class="time">0</p>
-                            <p>Minutes</p>
-                        </div>
+                        <p>
+                            <time id="totalTime" datetime="">Loading...</time>
+                        </p>
                     </div>
                 </div>
                 <div class="streak-counter-container">
                     <h2>Streak Counter</h2>
                     <div class="streak">
-                        <div class="streak-number">1</div>
-                        <p>Day</p>
+                        <div class="streak-background">
+                            <div id="streakNumber" class="streak-number">Loading...</div>
+                        </div>
+                        <p>Day(s)</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Goal Set Creation/Editing Modal -->
+        <div id="goalSetModal" class="goalSetModal">
+            <div class="goal-set-modal-content">
+                <span class="close" id="closeGoalModal">&times;</span>
+                <h2>Create New Goal Set</h2>
+                <form id="goalSetForm">
+                    <!-- Goal Set Name Input -->
+                    <label for="goalSetName">Goal Set Name</label>
+                    <input type="text" id="goalSetName" name="title" placeholder="Enter goal set name" required>
+
+                    <!-- Course Dropdown -->
+                    <label for="goalCourse">Course Selection</label>
+                    <select id="goalCourse" name="course_id">
+                        <option value="" disabled selected>Select Course (optional)</option>
+                        <!-- Dynamically populated -->
+                    </select>
+
+                    <!-- Color Picker -->
+                    <label for="goalColor">Color Selection</label>
+                    <select id="goalColor" name="color">
+                        <option value="" disabled selected>Pick a color (optional)</option>
+                        <option value="#7DBC4B" style="background-color: #7DBC4B; color: white;">Green</option>
+                        <option value="#E52222" style="background-color: #E52222; color: white;">Red</option>
+                        <option value="#4B90D0" style="background-color: #4B90D0; color: white;">Blue</option>
+                        <option value="#E5BA22" style="background-color: #E5BA22; color: black;">Yellow</option>
+                        <option value="#9A4BB3" style="background-color: #9A4BB3; color: white;">Purple</option>
+                        <option value="#FF8C00" style="background-color: #FF8C00; color: white;">Orange</option>
+                    </select>
+
+                    <!-- Container Selection -->
+                    <label>Container Assignment</label>
+                    <div class="radio-container">
+                        <label>
+                            <input type="radio" name="container" value="1"> Container 1
+                        </label>
+                        <label>
+                            <input type="radio" name="container" value="2"> Container 2
+                        </label>
+                        <label>
+                            <input type="radio" name="container" value="3"> Container 3
+                        </label>
+                    </div>
+
+                    <!-- Button Container -->
+                    <div class="button-container">
+                        <button type="submit" id="saveGoalSetBtn">Add Set</button>
+                        <button type="button" id="deleteSetButton" style="display: none;">Delete Set</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         
         
     
@@ -130,5 +195,7 @@
     </div>
 
     <script src="UTSsessionManager.js"></script>
+    <script type="module" src="UTSgoalsPage.js"></script>
+    <script type="module" src="UTSgoalSets.js"></script>
 
 </body>
