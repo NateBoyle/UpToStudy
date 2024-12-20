@@ -19,10 +19,14 @@
     padding: 20px;
     border-radius: 15px;
     color: white;
-    width: 400px;
+    width: fit-content; /* Adjust the modal width to fit its content */
+    min-width: 450px;
     text-align: center;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
     position: relative;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center align child elements */
 }
 
 /* Close Button */
@@ -38,35 +42,64 @@
 /* Form Labels and Inputs */
 .goal-set-modal-content label {
     display: block;
-    margin: 10px 0 5px;
-    font-size: 14px;
-    text-align: left;
+    margin-top: 10px;
+    font-size: 20px;
+    text-align: center;
 }
 
 .goal-set-modal-content input,
-.goal-set-modal-content select {
-    width: 100%;
+.goal-set-modal-content select,
+.goal-set-modal-content textarea {
+    width: 400px;
     padding: 10px;
-    margin-bottom: 15px;
+    margin: 15px;
     border-radius: 5px;
     border: none;
     font-size: 16px;
     background-color: #333;
     color: white;
+    resize: both;
+}
+
+.goal-set-modal-content textarea {
+    min-width: 400px;
 }
 
 .radio-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-around; /* Distribute radio buttons evenly */
     margin: 15px 0;
 }
 
 .radio-container label {
-    font-size: 14px;
+    font-size: 18px; /* Adjust font size if necessary */
+    margin: 10px;
     display: flex;
-    align-items: center;
-    gap: 5px;
+    align-items: center; /* Vertically align text with radio buttons */
+    gap: 10px; /* Space between the radio button and text */
 }
+
+.container-option {
+    display: inline-flex;
+    align-items: center; /* Ensure the radio button and label text align */
+    gap: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.container-option input[type="radio"] {
+    margin: 0; /* Remove default margins */
+    vertical-align: middle; /* Align radio button with label text */
+    display: inline-block;
+    width: 16px; /* Explicitly set width of the radio button */
+    height: 16px; /* Explicitly set height of the radio button */
+}
+
+.radio-container label span {
+    line-height: 16px; /* Match the line height of the text to the radio button */
+}
+
+
 
 /* Submit Button */
 .goal-set-modal-content .button-container {
@@ -78,11 +111,12 @@
 #saveGoalSetBtn {
     background-color: #4BC940;
     color: white;
-    font-size: 18px;
-    padding: 10px 20px;
+    font-size: 20px;
+    padding: 20px 30px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin: 15px;
 }
 
 #saveGoalSetBtn:hover {
@@ -126,10 +160,18 @@
     padding: 20px;
     border-radius: 15px;
     color: white;
-    width: 400px;
+    width: fit-content; /* Adjust the modal width to fit its content */
+    min-width: 450px;
     text-align: center;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
     position: relative;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center align child elements */
+}
+
+.goal-modal-content form {
+    width: 100%;
 }
 
 /* Close Button */
@@ -145,21 +187,25 @@
 /* Form Labels and Inputs */
 .goal-modal-content label {
     display: block;
-    margin: 10px 0 5px;
-    font-size: 14px;
-    text-align: left;
+    margin-top: 10px;
+    font-size: 20px;
+    text-align: center;
 }
 
 .goal-modal-content input,
-.goal-modal-content select {
-    width: 100%;
+.goal-modal-content select,
+.goal-modal-content textarea {
+    min-width: 400px;
     padding: 10px;
-    margin-bottom: 15px;
+    margin: 15px;
     border-radius: 5px;
     border: none;
     font-size: 16px;
     background-color: #333;
     color: white;
+    box-sizing: border-box;
+    resize: both;
+    
 }
 
 /* Submit Button */
@@ -172,11 +218,12 @@
 #saveGoalBtn {
     background-color: #4BC940;
     color: white;
-    font-size: 18px;
-    padding: 10px 20px;
+    font-size: 20px;
+    padding: 20px 30px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin: 15px;
 }
 
 #saveGoalBtn:hover {

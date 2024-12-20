@@ -21,6 +21,9 @@ function fetchGoalSets($userId, $id = null, $container = null) {
     $params = [$userId];
     $types = "i";
 
+     
+
+
     // Conditional filters
     if ($id !== null) {
         $query .= " AND id = ?";
@@ -49,20 +52,26 @@ function fetchGoalSets($userId, $id = null, $container = null) {
 /**
  * Fetch goals for a user.
  */
-function fetchGoals($userId, $id = null, $goalSetId = null) {
+function fetchGoals($id = null, $goalSetId = null) {
     global $conn;
 
-    $query = "SELECT * FROM goals WHERE user_id = ?";
-    $params = [$userId];
-    $types = "i";
+    $query = "SELECT * FROM goals";
+    $params = [];
+    $types = "";
+
+    // Log the received POST data
+    error_log("UTSutils.php Received Parameters: " . print_r($_POST, true));
 
     // Conditional filters
     if ($id !== null) {
-        $query .= " AND id = ?";
+        $query .= " WHERE id = ?";
         $params[] = $id;
         $types .= "i";
-    } elseif ($goalSetId !== null) {
-        $query .= " AND goal_set_id = ?";
+    } 
+    
+    if ($goalSetId !== null) {
+        //$goalSetId = (int) $goalSetId;
+        $query .= " WHERE goal_set_id = ?";
         $params[] = $goalSetId;
         $types .= "i";
     }
@@ -222,8 +231,7 @@ function fetchSemesters($userId, $currentDate = null) {
     $types = "i";
 
     if ($currentDate) {
-        // Log the received POST data
-        error_log("UTSutils.php Received Parameters: " . print_r($_POST, true));
+       
         // Extract month and year for comparison
         $query .= " AND MONTH(start_date) <= MONTH(?) 
                     AND YEAR(start_date) <= YEAR(?) 
@@ -324,7 +332,7 @@ if ($action === 'fetchGoalSets') {
 } elseif ($action === 'fetchGoals') {
     $id = $_POST['id'] ?? null;
     $goalSetId = $_POST['goal_set_id'] ?? null;
-    $goals = fetchGoals($user_id, $id, $goalSetId);
+    $goals = fetchGoals($id, $goalSetId);
     echo json_encode(['success' => true, 'data' => $goals]);
 } elseif ($action === 'fetchSemesters') {
     $currentDate = $_POST['current_date'] ?? null;

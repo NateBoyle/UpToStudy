@@ -138,12 +138,16 @@
         <!-- Goal Set Creation/Editing Modal -->
         <div id="goalSetModal" class="goalSetModal">
             <div class="goal-set-modal-content">
-                <span class="close" id="closeGoalModal">&times;</span>
+                <span class="close" id="closeGoalSetModal">&times;</span>
                 <h2>Create New Goal Set</h2>
                 <form id="goalSetForm">
                     <!-- Goal Set Name Input -->
                     <label for="goalSetName">Goal Set Name</label>
                     <input type="text" id="goalSetName" name="title" placeholder="Enter goal set name" required>
+
+                    <!-- Goal Set Description -->
+                    <label for="goalSetDescription">Goal Set Description</label>
+                    <textarea id="goalSetDescription" name="description" placeholder="Enter goal set description (optional)" rows="4"></textarea>
 
                     <!-- Course Dropdown -->
                     <label for="goalCourse">Course Selection</label>
@@ -155,7 +159,7 @@
                     <!-- Color Picker -->
                     <label for="goalColor">Color Selection</label>
                     <select id="goalColor" name="color">
-                        <option value="" disabled selected>Pick a color (optional)</option>
+                        <option value="" disabled selected>(Defaults to course color if no selection)</option>
                         <option value="#7DBC4B" style="background-color: #7DBC4B; color: white;">Green</option>
                         <option value="#E52222" style="background-color: #E52222; color: white;">Red</option>
                         <option value="#4B90D0" style="background-color: #4B90D0; color: white;">Blue</option>
@@ -165,23 +169,51 @@
                     </select>
 
                     <!-- Container Selection -->
-                    <label>Container Assignment</label>
+                    
                     <div class="radio-container">
-                        <label>
-                            <input type="radio" name="container" value="1"> Container 1
+                        <label>Container Assignment</label>
+                        <label class="container-option"> 
+                            <input type="radio" name="container" value="1"> 1
                         </label>
-                        <label>
-                            <input type="radio" name="container" value="2"> Container 2
+                        <label class="container-option">
+                            <input type="radio" name="container" value="2"> 2
                         </label>
-                        <label>
-                            <input type="radio" name="container" value="3"> Container 3
-                        </label>
+                        <label class="container-option">
+                            <input type="radio" name="container" value="3"> 3
+                        </label>                        
                     </div>
 
                     <!-- Button Container -->
                     <div class="button-container">
                         <button type="submit" id="saveGoalSetBtn">Add Set</button>
                         <button type="button" id="deleteSetButton" style="display: none;">Delete Set</button>
+                    </div>
+                </form>
+            </div>
+        </div>      
+
+        <!-- Goal Creation/Editing Modal -->
+        <div id="goalModal" class="goalModal">
+            <div class="goal-modal-content">
+                <span class="close" id="closeGoalModal">&times;</span>
+                <h2>Create New Goal</h2>
+                <form id="goalForm">
+                    <!-- Goal Title Input -->
+                    <label for="goalTitle">Goal Title</label>
+                    <input type="text" id="goalTitle" name="title" placeholder="Enter goal title" required>
+
+                    <!-- Goal Description -->
+                    <label for="goalDescription">Goal Description</label>
+                    <textarea id="goalDescription" name="description" placeholder="Enter goal description (optional)" rows="4"></textarea>
+
+                    <!-- Due Date -->
+                    <label for="goalDueDate">Due Date</label>
+                    <input type="date" id="goalDueDate" name="due_date" required>
+
+                    <!-- Button Container -->
+                    <div class="button-container">
+                        <button type="submit" id="saveGoalBtn">Add Goal</button>
+                        <button type="button" id="deleteGoalButton" style="display: none;">Delete Goal</button>
                     </div>
                 </form>
             </div>

@@ -1,4 +1,4 @@
-import { fetchCourses, fetchSemesters } from './UTSutils.js'; // Ensure the fetchCourses utility is available
+import { fetchCourses, fetchSemesters } from './UTSutils.js'; // Ensure the fetchs utilities is available
 
 let currentSemesterId;
 
@@ -50,7 +50,7 @@ export async function populateCourseDropdown() {
 async function fetchTotalTime() {
     try {
         // Fetch data from your PHP script
-        const response = await fetch('UTSgoals.php', {
+        const response = await fetch('UTSgoalsPage.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -87,7 +87,7 @@ function updateTimeDisplay(totalSeconds) {
 async function fetchAndCalculateStreak() {
     try {
         // Fetch activity dates from the backend
-        const response = await fetch('UTSgoals.php', {
+        const response = await fetch('UTSgoalsPage.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ action: 'fetchActivityStreak' }),
@@ -142,7 +142,7 @@ function calculateStreak(dates) {
 
 async function fetchQuoteOfTheDay() {
     try {
-        const response = await fetch('UTSgoals.php', {
+        const response = await fetch('UTSgoalsPage.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ action: 'fetchQuoteOfTheDay' }),
@@ -174,18 +174,5 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fetch and display the quote of the day on page load
     fetchQuoteOfTheDay();
 
-    /*// Open Goal Creation Modal
-    document.getElementById('setGoalButton').addEventListener('click', async () => {
-        const modal = document.getElementById('goalCreationModal');
-        modal.style.display = 'flex'; // Show the modal (flex aligns content in the center)
-
-        // Populate the course dropdown
-        await populateCourseDropdown();
-
-        // Close Goal Creation Modal
-        document.getElementById('closeGoalCreation').addEventListener('click', () => {
-            const modal = document.getElementById('goalCreationModal');
-            modal.style.display = 'none'; // Hide the modal
-        });
-    });*/
+    
 });

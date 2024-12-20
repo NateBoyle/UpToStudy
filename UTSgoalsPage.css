@@ -65,7 +65,7 @@
     border-radius: 15px;
     padding: 20px;
     color: white;
-    transition: transform 0.3s ease;
+    /*transition: transform 0.3s ease;*/
     height: 100%;
     overflow: hidden; /* Prevent overflow */
     display: flex;
@@ -73,9 +73,9 @@
     box-sizing: border-box; /* Include padding in the height calculation */
 }
 
-.goal-set:hover {
-    transform: scale(1.025); /* Expand by 5% */
-}
+/*.goal-set:hover {
+    transform: scale(1.025); 
+}*/
 
 .goal-set h2 {
     font-size: 24px;
@@ -179,10 +179,13 @@
     margin-bottom: 20px;
     box-sizing: border-box;
     overflow-y: auto; /* Enable scrolling if content exceeds container */
+    text-align: center;
+    align-items: center;
 }
 
 .goal-list li {
     background-color: #1F1F1F;
+    margin: 5px;
     padding: 10px;
     border-radius: 10px;
     font-size: 16px;
@@ -190,12 +193,32 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    text-align: center;
     color: white;
-    transition: background-color 0.3s ease;
+    /*transition: background-color 0.3s ease;*/
+    width: 90%;
+    cursor: pointer;
+}
+
+.goal-list li .text {
+    font-size: 0.9rem;
+    font-weight: normal;
+    color: white; /* Light gray by default */
+    margin-left: 10px;
+    text-align: center;
+}
+
+.goal-list li .details {
+    font-size: 0.9rem;
+    font-weight: normal;
+    color: #999; /* Light gray by default */
+    margin-left: 10px;
+    text-align: center;
 }
 
 .goal-list li:hover {
-    background-color: #333333;
+    background-color: #3FA631;
+    transform: scale(1.025); /* Expand by 5% */
 }
 
 /*BOTTOM SECTION CONTENTS*/
@@ -268,6 +291,7 @@
 .streak-counter-container .streak-number {
     font-size: 64px;
     font-weight: bold;
+    margin-right: 5px;
     margin-bottom: 10px;
 }
 

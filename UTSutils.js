@@ -1,3 +1,67 @@
+// Fetch goal sets
+export async function fetchGoalSets(id = null, container = null) {
+    const params = new URLSearchParams({ action: 'fetchGoalSets' });
+
+
+    // Add parameters conditionally
+    if (id) params.append("id", id);
+    if (container) params.append('container', container);
+
+    try {
+        const response = await fetch('UTSutils.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString(),
+        });
+
+        const data = await response.json();
+        
+
+        if (data.success) {
+            return data.data; // Return the array of goal sets
+        } else {
+            console.error('Failed to fetch goal sets:', data.message);
+            return [];
+        }
+    } catch (error) {
+        console.error('Error fetching goal sets:', error);
+        return [];
+    }
+}
+
+// Fetch goals
+export async function fetchGoals(id = null, goalSetId = null) {
+    const params = new URLSearchParams({ action: 'fetchGoals' });
+
+    // Add parameters conditionally
+    if (id) params.append("id", id);
+    if (goalSetId) params.append('goal_set_id', goalSetId);
+
+    console.log(`Goal set id for goals: ${goalSetId}`);
+
+    try {
+        const response = await fetch('UTSutils.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString(),
+        });
+
+        const data = await response.json();
+
+        console.log("fetchGoals Response:", data); // Log the raw response
+
+        if (data.success) {
+            return data.data; // Return the array of goals
+        } else {
+            console.error('Failed to fetch goals:', data.message);
+            return [];
+        }
+    } catch (error) {
+        console.error('Error fetching goals:', error);
+        return [];
+    }
+}
+
 // Fetch Assignments
 export async function fetchAssignments(id = null, startDate = null, endDate = null, courseId = null) {
     const params = new URLSearchParams({ action: 'fetchAssignments' });

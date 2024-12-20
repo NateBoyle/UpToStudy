@@ -45,19 +45,42 @@ function handleGoalAction($action) {
 function validateContainer($userId, $container, $goalSetId = null) {
     global $conn;
 
-    // Query to check if the container is already assigned
+    // Log the received data for debugging
+    error_log('validateContainer - Received Data: userId=' . $userId . ', container=' . $container . ', goalSetId=' . ($goalSetId ?? 'null'));
+
+    // Prepare query to check if the container is already assigned
     $query = "SELECT id FROM goal_sets WHERE user_id = ? AND container = ? AND id != ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('iii', $userId, $container, $goalSetId ?? 0);
-    $stmt->execute();
 
-    // Check if any rows are returned (container is taken)
+    if (!$stmt) {
+        error_log('Failed to prepare statement: ' . $conn->error);
+        return [
+            'success' => false,
+            'message' => 'Database error. Failed to validate container.'
+        ];
+    }
+
+    // Bind parameters
+    $goalSetId = $goalSetId ?? 0; // Default to 0 if no goalSetId is provided
+    $stmt->bind_param('iii', $userId, $container, $goalSetId);
+
+    if (!$stmt->execute()) {
+        error_log('Failed to execute statement: ' . $stmt->error);
+        return [
+            'success' => false,
+            'message' => 'Database error. Failed to validate container.'
+        ];
+    }
+
+    // Get results and check if any rows are returned
     $result = $stmt->get_result();
     $isTaken = $result->num_rows > 0;
 
     $stmt->close();
 
+    // Return success or failure based on validation
     if ($isTaken) {
+        error_log("Container $container is already assigned to another goal set.");
         return [
             'success' => false,
             'message' => "Container $container is already assigned to another goal set."
@@ -72,9 +95,13 @@ function addGoalSet() {
 
     $userId = $_SESSION['user_id'];
     $title = $_POST['title'];
-    $courseId = $_POST['course_id'] ?? null; // Optional
-    $color = $_POST['color'] ?? null; // Optional
-    $container = $_POST['container'] ?? null; // Optional
+    $courseId = empty($_POST['courseId']) ? null : $_POST['courseId']; // Convert empty string to NULL
+    $color = empty($_POST['color']) ? null : $_POST['color']; // Convert empty string to NULL
+    $container = empty($_POST['container']) ? null : $_POST['container']; // Convert empty string to NULL
+    $description = empty($_POST['description']) ? null : $_POST['description']; // Convert empty string to NULL
+
+
+    error_log('course_id value: ' . var_export($courseId, true));
 
     // Validate container
     if ($container !== null) {
@@ -90,9 +117,9 @@ function addGoalSet() {
         return;
     }
 
-    $query = "INSERT INTO goal_sets (user_id, title, course_id, color) VALUES (?, ?, ?, ?)";
+    $query = "INSERT INTO goal_sets (user_id, title, course_id, color, container, description) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('isss', $userId, $title, $courseId, $color);
+    $stmt->bind_param('isssis', $userId, $title, $courseId, $color, $container, $description);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Goal set added successfully.']);
@@ -112,6 +139,7 @@ function editGoalSet() {
     $courseId = $_POST['course_id'] ?? null; // Optional
     $color = $_POST['color'] ?? null; // Optional
     $container = $_POST['container'] ?? null; // Optional
+    $description = empty($_POST['description']) ? null : $_POST['description']; // Convert empty string to NULL
 
     // Validate container
     if ($container !== null) {
@@ -127,9 +155,9 @@ function editGoalSet() {
         return;
     }
 
-    $query = "UPDATE goal_sets SET title = ?, course_id = ?, color = ? WHERE id = ?";
+    $query = "UPDATE goal_sets SET title = ?, course_id = ?, color = ?, description = ? WHERE id = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('sssi', $title, $courseId, $color, $goalSetId);
+    $stmt->bind_param('ssssi', $title, $courseId, $color, $container, $description, $goalSetId);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Goal set updated successfully.']);
@@ -176,8 +204,8 @@ function addGoal() {
     
     $goalSetId = $_POST['goal_set_id'];
     $title = $_POST['title'];
-    $description = $_POST['description'] ?? null; // Optional
-    $dueDate = $_POST['due_date'] ?? null; // Optional
+    $description = empty($_POST['description']) ? null : $_POST['description']; // Convert empty string to NULL
+    $dueDate = empty($_POST['due_date']) ? null : $_POST['due_date']; // Optional
     $createdAt = date('Y-m-d H:i:s'); // Automatically set the current date and time
 
     if (!$goalSetId || !$title) {
@@ -203,9 +231,9 @@ function editGoal() {
 
     $goalId = $_POST['id'];
     $title = $_POST['title'];
-    $description = $_POST['description'] ?? null; // Optional
-    $dueDate = $_POST['due_date'] ?? null; // Optional
-    $isCompleted = $_POST['is_completed'] ?? 0; // Defaults to 0 (not completed)
+    $description = empty($_POST['description']) ? null : $_POST['description']; // Convert empty string to NULL
+    $dueDate = empty($_POST['due_date']) ? null : $_POST['due_date']; // Optional
+    $isCompleted = empty($_POST['is_completed']) ? 0 : $_POST['is_completed'] ; // Defaults to 0 (not completed)
 
     if (!$goalId || !$title) {
         echo json_encode(['success' => false, 'message' => 'Goal ID and title are required.']);
@@ -252,6 +280,8 @@ function deleteGoal() {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     $entity = $_POST['entity'] ?? ''; // 'goalSet' or 'goal'
+
+    error_log('Received POST data: ' . print_r($_POST, true));
 
     switch ($entity) {
         case 'goalSet':
