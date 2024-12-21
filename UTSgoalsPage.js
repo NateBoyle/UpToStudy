@@ -1,8 +1,9 @@
 import { fetchCourses, fetchSemesters } from './UTSutils.js'; // Ensure the fetchs utilities is available
+import { populateGoalSets, fetchAndSetSemesterName } from './UTSgoalSets.js';
 
-let currentSemesterId;
 
-// Fetch Current Semester and update the page header
+
+/*// Fetch Current Semester and update the page header
 async function fetchAndSetSemesterName() {
     try {
         const currentDate = new Date(); // Format as YYYY-MM-DD
@@ -26,9 +27,9 @@ async function fetchAndSetSemesterName() {
         document.getElementById('semesterName').textContent = "Error Loading Semester";
         currentSemesterId = null; // Reset on error
     }
-}
+}*/
 
-// Populate Course Dropdown
+/*// Populate Course Dropdown
 export async function populateCourseDropdown() {
     const dropdown = document.getElementById('goalCourse');
     dropdown.innerHTML = '<option value="" disabled selected>Select Course (optional)</option>'; // Clear previous options
@@ -44,7 +45,7 @@ export async function populateCourseDropdown() {
     } catch (error) {
         console.error('Failed to load courses:', error);
     }
-}
+}*/
 
 // Function to fetch total_time from the PHP script
 async function fetchTotalTime() {
@@ -73,16 +74,30 @@ async function fetchTotalTime() {
     }
 }
 
-// Function to convert seconds into Hours and Minutes and update the HTML
+// Function to convert seconds into Days, Hours, and Minutes and update the HTML
 function updateTimeDisplay(totalSeconds) {
-    const hours = Math.floor(totalSeconds / 3600);
+    const totalHours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+    let displayText = '';
+    let datetimeValue = '';
+
+    if (totalHours >= 24) {
+        const days = Math.floor(totalHours / 24);
+        const hours = totalHours % 24;
+        displayText = `${days} Day(s), ${hours} Hour(s)`;
+        datetimeValue = `P${days}DT${hours}H`;
+    } else {
+        displayText = `${totalHours} Hours, ${minutes} Minutes`;
+        datetimeValue = `PT${totalHours}H${minutes}M`;
+    }
 
     // Update the <time> element
     const timeElement = document.getElementById('totalTime');
-    timeElement.textContent = `${hours} Hours, ${minutes} Minutes`;
-    timeElement.setAttribute('datetime', `PT${hours}H${minutes}M`);
+    timeElement.textContent = displayText;
+    timeElement.setAttribute('datetime', datetimeValue);
 }
+
 
 async function fetchAndCalculateStreak() {
     try {
@@ -116,8 +131,8 @@ function calculateStreak(dates) {
     const today = new Date();
     const todayString = today.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
 
-    console.log(`dates: ${dates}`);
-    console.log(`Today: ${todayString}`);
+    //console.log(`dates: ${dates}`);
+    //console.log(`Today: ${todayString}`);
     
     for (let i = 0; i < dates.length; i++) {
         const expectedDate = new Date(today);
@@ -125,7 +140,7 @@ function calculateStreak(dates) {
 
         const expectedDateString = expectedDate.toISOString().split('T')[0]; // Expected date in YYYY-MM-DD
 
-        console.log(`expectedDateString: ${expectedDateString}, activityDate: ${dates[i]}`);
+        //console.log(`expectedDateString: ${expectedDateString}, activityDate: ${dates[i]}`);
 
         // Compare strings directly
         if (dates[i] === expectedDateString) {
@@ -135,7 +150,7 @@ function calculateStreak(dates) {
         }
     }
 
-    console.log(`Final streak: ${streak}`);
+    //console.log(`Final streak: ${streak}`);
 
     document.getElementById("streakNumber").textContent = streak;
 }
@@ -173,6 +188,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fetch and display the quote of the day on page load
     fetchQuoteOfTheDay();
+
+    populateGoalSets();
 
     
 });

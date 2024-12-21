@@ -1,6 +1,9 @@
 import { getCombinedEventsAndCourses, getCurrentSemester } from './UTScalendarHelper.js';
 import { openFromCalendar } from './UTSevents.js';
 import { callEditCourse } from './UTSmodals.js';
+import { fetchGoalSets } from './UTSutils.js'; // Adjust the path to your utilities file if necessary.
+import { openGoalSetModal } from './UTSgoalSets.js';
+
 
 async function updateSemesterLabel(currentDate) {
     const semesterLabel = document.getElementById('semesterLabel');
@@ -107,9 +110,59 @@ async function renderDashCalendar() {
     }
 }
 
+async function populateGoalSetsContainer() {
+    const container = document.getElementById('goalContainer');
+    container.innerHTML = ''; // Clear existing content
 
+    try {
+        const goalSets = await fetchGoalSets(); // Fetch goal sets for the user
+
+        if (!goalSets || goalSets.length === 0) {
+            container.innerHTML = `<p class="empty-message">No goal sets available.</p>`;
+            return;
+        }
+
+        goalSets.forEach((goalSet) => {
+            const listItem = document.createElement('div');
+            listItem.className = 'list-item';
+            listItem.setAttribute('data-id', goalSet.id); // Store the goal set ID
+
+            // Apply the color if the goal set has one
+            if (goalSet.color) {
+                listItem.style.backgroundColor = goalSet.color;
+            }
+
+            // Create inner content with goal set title and goals completed fraction
+            const title = document.createElement('span');
+            title.className = 'text';
+            title.textContent = goalSet.title;
+
+            const goalsFraction = document.createElement('span');
+            goalsFraction.className = 'details';
+            goalsFraction.textContent = `${goalSet.goals_completed}/${goalSet.number_of_goals} Goals Completed`;
+
+            // Add event listener to open the Goal Set modal on click
+            listItem.addEventListener('click', () => {
+                openGoalSetModal(goalSet); // Pass the goal set object to the modal
+            });
+
+            // Append title and fraction to the list item
+            listItem.appendChild(title);
+            listItem.appendChild(goalsFraction);
+
+            // Append the list item to the container
+            container.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error('Error populating goal sets container:', error);
+        container.innerHTML = `<p class="error-message">Failed to load goal sets. Please try again later.</p>`;
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Call the function to populate the dashboard calendar
     populateDashCalendar();
+
+    // Call the function to populate the goal sets container
+    populateGoalSetsContainer()
 });

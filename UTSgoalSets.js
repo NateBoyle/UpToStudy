@@ -1,11 +1,60 @@
-import { populateCourseDropdown } from './UTSgoalsPage.js'; 
-import { fetchGoalSets, fetchGoals } from './UTSutils.js'; // Ensure the fetchs utilities is available
+//import { populateCourseDropdown } from './UTSgoalsPage.js'; 
+import { fetchGoalSets, fetchGoals, fetchCourses, fetchSemesters } from './UTSutils.js'; // Ensure the fetchs utilities is available
 
-export async function openGoalModal(id = null, goalSetId = null) {
+let currentSemesterId;
+
+export async function fetchAndSetSemesterName() {
+    try {
+        const currentDate = new Date(); // Format as YYYY-MM-DD
+        const semesters = await fetchSemesters(currentDate); // Pass the current date
+
+        // Retrieve the first (and only) semester in the returned list
+        const currentSemester = semesters[0];
+
+        const semesterNameElement = document.getElementById('semesterName');
+
+        if (currentSemester) {
+            semesterNameElement.textContent = currentSemester.name;
+            currentSemesterId = currentSemester.semester_id; // Assign semester_id to global variable
+        } else {
+            semesterNameElement.textContent = "No Current Semester";
+            currentSemesterId = null; // Reset if no current semester
+        }
+
+    } catch (error) {
+        console.error("Error fetching semester:", error);
+        document.getElementById('semesterName').textContent = "Error Loading Semester";
+        currentSemesterId = null; // Reset on error
+    }
+}
+
+// Populate Course Dropdown
+async function populateCourseDropdown() {
+    const dropdown = document.getElementById('goalCourse');
+    dropdown.innerHTML = '<option value="" disabled selected>Select Course (optional)</option>'; // Clear previous options
+
+    try {
+        const courses = await fetchCourses(currentSemesterId); // Fetch courses from the backend
+        courses.forEach(course => {
+            const option = document.createElement('option');
+            option.value = course.course_id;
+            option.textContent = `${course.prefix} ${course.course_number} - ${course.name}`;
+            dropdown.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Failed to load courses:', error);
+    }
+}
+
+export async function openGoalModal(goal = null, goalSetId = null) {
+
+    console.log(`openGoalModal called`);
+
     const modal = document.getElementById('goalModal');
     const form = modal.querySelector('form');
     const modalTitle = modal.querySelector('h2');
     const submitButton = modal.querySelector('#saveGoalBtn');
+    const completeButton = modal.querySelector('#completeGoalButton');
     const deleteButton = modal.querySelector('#deleteGoalButton');
 
     form.reset(); // Clear all fields
@@ -17,30 +66,37 @@ export async function openGoalModal(id = null, goalSetId = null) {
         form.dataset.goalSetId = goalSetId;
     }
 
-    if (id) {
-        // Fetch goal data
-        const response = await fetch(`UTSgoalSets.php?action=fetchGoal&id=${id}`);
-        const goal = await response.json();
+    
 
-        if (!goal.success) {
-            alert(`Error: ${goal.message}`);
-            return;
-        }
-
-        // Populate form with fetched data
-        Object.keys(goal.data).forEach((key) => {
-            const input = form.querySelector(`[name="${key}"]`);
-            if (input) input.value = goal.data[key];
-        });
-
+    if (goal) {
+        
         // Update modal for editing
-        form.dataset.id = id;
+        form.dataset.id = goal.id;
         modalTitle.textContent = 'Edit Goal';
+
+        // Populate form fields with goal data
+        const titleField = form.querySelector('[name="title"]');
+        const descriptionField = form.querySelector('[name="description"]');
+        const dueDateField = form.querySelector('[name="due_date"]');
+
+        if (titleField) titleField.value = goal.title || '';
+        if (descriptionField) descriptionField.value = goal.description || '';
+        if (dueDateField) dueDateField.value = goal.due_date || '';
+
         submitButton.textContent = 'Save Goal';
+        completeButton.style.display = 'block';
+        completeButton.onclick = async () => {
+            if (confirm('Are you sure you want to complete this Goal?')) {
+                await completeGoal(goal.id);
+                closeModal('goalModal');
+                populateGoalSets(); // Reload UI
+            }
+        };
+
         deleteButton.style.display = 'block';
         deleteButton.onclick = async () => {
             if (confirm('Are you sure you want to delete this Goal?')) {
-                await deleteEntity('goal', id);
+                await deleteEntity('goal', goal.id);
                 closeModal('goalModal');
             }
         };
@@ -64,14 +120,35 @@ export async function openGoalModal(id = null, goalSetId = null) {
     modal.style.display = 'flex'; // Show modal
 }
 
+function updateGoalSetProgress(totalGoals, completedGoals) {
+    
+    const progressBar = document.getElementById('goalProgressBar');
+    const progressText = document.getElementById('goalProgressText');
 
-export async function openGoalSetModal(id = null) {
+    
+
+    if (totalGoals === 0) {
+        progressBar.style.width = '0%';
+        progressText.textContent = '0 / 0 Goals Completed';
+    } else {
+        const progressPercentage = (completedGoals / totalGoals) * 100;
+        progressBar.style.width = `${progressPercentage}%`;
+        progressText.textContent = `${completedGoals} / ${totalGoals} Goals Completed`;
+    }
+}
+
+export async function openGoalSetModal(goalSet = null) {
     const modal = document.getElementById('goalSetModal');
     const form = modal.querySelector('form');
     const modalTitle = modal.querySelector('h2');
-    const submitButton = modal.querySelector('#saveGoalSetBtn');
-    const deleteButton = modal.querySelector('#deleteSetButton');
+    
+    const courseDropdown = form.querySelector('[name="course_id"]');
+    const colorDropdown = form.querySelector('[name="color"]');
     const containerRadios = form.querySelectorAll('[name="container"]');
+    const progressContainer = document.querySelector('.goal-progress-container');
+
+    const submitButton = modal.querySelector('#saveGoalSetBtn');
+    const deleteButton = modal.querySelector('#deleteGoalSetButton');
 
     form.reset(); // Clear all fields
     delete form.dataset.id; // Remove stored ID
@@ -79,30 +156,42 @@ export async function openGoalSetModal(id = null) {
     // Populate the course dropdown
     await populateCourseDropdown();
 
-    if (id) {
-        // Fetch goal set data
-        const response = await fetch(`UTSgoals.php?action=fetchGoalSet&id=${id}`);
-        const goalSet = await response.json();
+    if (goalSet) {
+        // Use provided goalSet object directly
+        Object.keys(goalSet).forEach((key) => {
+            const input = form.querySelector(`[name="${key}"]`);
+            if (input) input.value = goalSet[key];
+        });
 
-        if (!goalSet.success) {
-            alert(`Error: ${goalSet.message}`);
-            return;
+        // Handle course dropdown default
+        if (!goalSet.course_id || goalSet.course_id === '') {
+            courseDropdown.value = ''; // Reset to default
         }
 
-        // Populate form with fetched data
-        Object.keys(goalSet.data).forEach((key) => {
-            const input = form.querySelector(`[name="${key}"]`);
-            if (input) input.value = goalSet.data[key];
-        });
+        // Handle color dropdown default
+        if (!goalSet.color || goalSet.color === '') {
+            colorDropdown.value = ''; // Reset to default
+        }
 
         // Check the container radio button
         containerRadios.forEach((radio) => {
-            if (radio.value === goalSet.data.container) radio.checked = true;
+            if (String(radio.value) === String(goalSet.container)) {
+                radio.checked = true;
+                console.log(`Radio button with value ${radio.value} is checked.`);
+            } else {
+                console.log(`Radio button with value ${radio.value} is NOT checked.`);
+            }
         });
 
+        // Update progress bar
+        updateGoalSetProgress(goalSet.number_of_goals, goalSet.goals_completed);
+
         // Update modal for editing
-        form.dataset.id = id;
+        form.dataset.id = goalSet.id;
         modalTitle.textContent = 'Edit Goal Set';
+
+        progressContainer.style.display = 'flex';
+
         submitButton.textContent = 'Save Set';
         deleteButton.style.display = 'block';
         deleteButton.onclick = async () => {
@@ -111,11 +200,13 @@ export async function openGoalSetModal(id = null) {
                 modal.style.display = 'none';
             }
         };
+
     } else {
         // Prepare modal for creating a new goal set
         modalTitle.textContent = 'New Goal Set';
         submitButton.textContent = 'Add Set';
         deleteButton.style.display = 'none';
+        progressContainer.style.display = 'none';
     }
 
     // Add event listener for the submit button
@@ -219,6 +310,28 @@ async function saveEntity(event, entity, modalId) {
     }
 }
 
+async function completeGoal(id) {
+    console.log(`Attempting to complete goal with id: ${id}`);
+    try {
+        const response = await fetch('UTSgoalSets.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ entity: 'goal', action: 'complete', id }),
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Goal marked as complete!');
+            
+        } else {
+            alert(`Error: ${result.message}`);
+        }
+    } catch (error) {
+        console.error(`Error completing goal:`, error);
+        alert('An unexpected error occurred.');
+    }
+}
+
 async function deleteEntity(entity, id) {
     try {
         const response = await fetch('UTSgoals.php', {
@@ -230,7 +343,7 @@ async function deleteEntity(entity, id) {
         const result = await response.json();
         if (result.success) {
             alert(`${entity.charAt(0).toUpperCase() + entity.slice(1)} deleted successfully!`);
-            refreshGoals(); // Reload UI
+            populateGoalSets(); // Reload UI
         } else {
             alert(`Error: ${result.message}`);
         }
@@ -240,26 +353,6 @@ async function deleteEntity(entity, id) {
     }
 }
 
-async function completeGoal(id) {
-    try {
-        const response = await fetch('UTSgoals.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ entity: 'goal', action: 'complete', id }),
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            alert('Goal marked as complete!');
-            refreshGoals();
-        } else {
-            alert(`Error: ${result.message}`);
-        }
-    } catch (error) {
-        console.error(`Error completing goal:`, error);
-        alert('An unexpected error occurred.');
-    }
-}
 
 // Date Formatter
 function formatDate(dateString) {
@@ -278,7 +371,7 @@ async function populateGoalLists() {
 
         for (const goalList of goalLists) {
             const goalSetId = goalList.getAttribute('data-set-id');
-            console.log(`Goal set id for list: ${goalSetId}`);
+            //console.log(`Goal set id for list: ${goalSetId}`);
 
             // Skip if there's no associated goal set
             if (!goalSetId) {
@@ -289,7 +382,7 @@ async function populateGoalLists() {
             /// Fetch goals for the current goal set
             const goals = await fetchGoals(null, goalSetId);
 
-            console.log("Goals Response:", goals); // Log the result
+            //console.log("Goals Response:", goals); // Log the result
 
             // Clear existing content and handle response
             goalList.innerHTML = '';
@@ -333,16 +426,17 @@ async function populateGoalLists() {
                     `;
 
                     // Add click event listener to open modal
-                    listItem.addEventListener('click', (e) => {
-                        const id = e.currentTarget.getAttribute('data-id');
-                        openGoalModal(goal.id, goalSetId); // Open goal modal with the goal and goal set ID
+                    listItem.addEventListener('click', () => {
+                        //const id = e.currentTarget.getAttribute('data-id');
+                        console.log(`Goal id: ${goal.id}, goalsetid: ${goalSetId}`);
+                        openGoalModal(goal, goalSetId); // Open goal modal with the goal and goal set ID
                     });
 
                     // Append to the goal list
                     goalList.appendChild(listItem);
                 });
             } else {
-                goalList.innerHTML = '<li class="empty-message">No goals yet.</li>';
+                goalList.innerHTML = '<liclass="empty-message">No goals yet.</li>';
             }
         }
     } catch (error) {
@@ -350,7 +444,7 @@ async function populateGoalLists() {
     }
 }
 
-async function populateGoalSets() {
+export async function populateGoalSets() {
     try {
         // Fetch all goal sets using the utility function
         const goalSets = await fetchGoalSets();
@@ -361,9 +455,12 @@ async function populateGoalSets() {
             const goalSetTitle = document.getElementById(`goalSetTitle${i}`);
             const goalSetList = document.getElementById(`goalSet${i}`);
             const newGoalButton = document.getElementById(`newGoalButton${i}`);
+            const editGoalSetButton = document.getElementById(`editGoalSetButton${i}`);
 
             // Find the goal set for this container
             const goalSet = goalSets.find((set) => set.container == i);
+
+            console.log(`GoalSetID: ${goalSet.id}, set container: ${goalSet.container} i: ${i}`)
 
             if (goalSet) {
                 // Populate the title and set data attributes
@@ -374,6 +471,12 @@ async function populateGoalSets() {
                 if (newGoalButton) {
                     newGoalButton.addEventListener('click', () => openGoalModal(null, goalSet.id));
                 }
+
+                // Add event listener for the "Add Goal" button
+                if (editGoalSetButton) {
+                    editGoalSetButton.addEventListener('click', () => openGoalSetModal(goalSet));
+                }
+
             } else {
                 // No goal set in this container
                 goalSetTitle.textContent = 'No goal set for this container';
@@ -406,7 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
 
-    populateGoalSets();
+    //populateGoalSets();
     
     /*// Open Goal Creation Modal
     document.getElementById('setGoalButton').addEventListener('click', async () => {

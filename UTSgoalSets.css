@@ -10,7 +10,7 @@
     background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
     justify-content: center;
     align-items: center;
-    z-index: 2000;
+    z-index: 5000;
 }
 
 /* Modal Content */
@@ -99,24 +99,66 @@
     line-height: 16px; /* Match the line height of the text to the radio button */
 }
 
+/* Progress Bar Container */
+.goal-progress-container {
+    display: none; /* Hidden by default */
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center;
+    gap: 10px;
+    margin: 0 auto; /* Center the progress bar horizontally */
+    margin-top: 15px;
+    width: 100%; /* Ensures the container takes full width */
+}
+
+/* Progress Bar Wrapper */
+.goal-progress-bar-container {
+    /*max-width: 250px;  Match the width of the card or container */
+    width: 90%; /* Allow flexibility for responsive layouts */
+    height: 10px; /* Height of the progress bar */
+    background-color: #292828; /* Light gray background */
+    border-radius: 5px; /* Rounded edges */
+    overflow: hidden; /* Ensure the progress stays within bounds */
+    border: 2px solid white; /* Add white border */
+    margin: 0 auto; /* Center the progress bar horizontally */
+}
+
+/* Progress Indicator */
+.goal-progress-bar {
+    height: 100%;
+    background-color: #4caf50; /* Green bar for progress */
+    transition: width 0.3s ease; /* Smooth transition */
+    border-radius: 5px; /* Match container edges */
+    width: 0%; /* Dynamically updated via JS */
+}
+
+/* Progress Text (Displayed above the Progress Bar) */
+#goalProgressText {
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    margin-bottom: 5px; /* Add spacing above the progress bar */
+    pointer-events: none; /* Prevent interactions with the text */
+}
+
 
 
 /* Submit Button */
 .goal-set-modal-content .button-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 5px;
 }
 
-#saveGoalSetBtn {
+#saveGoalSetBtn, #deleteGoalSetButton {
     background-color: #4BC940;
     color: white;
     font-size: 20px;
     padding: 20px 30px;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
-    margin: 15px;
+    cursor: pointer;    
+    margin: 5px;
+    margin-top: 20px;
 }
 
 #saveGoalSetBtn:hover {
@@ -126,12 +168,6 @@
 #deleteGoalSetButton {
     display: none;
     background-color: #E52222; /* Red background */
-    color: white;
-    font-size: 18px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
 #deleteGoalSetButton:hover {
@@ -212,20 +248,41 @@
 .goal-modal-content .button-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 5px;
 }
 
-#saveGoalBtn {
+#saveGoalBtn, #completeGoalButton, #deleteGoalButton {
     background-color: #4BC940;
     color: white;
-    font-size: 20px;
-    padding: 20px 30px;
+    font-size: 16px;
+    padding: 20px 20px;
+    width: 160px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin: 15px;
+    margin-top: 15px;
 }
 
 #saveGoalBtn:hover {
     background-color: #3FA631;
+}
+
+/* Complete Button (Blue) */
+#completeGoalButton {
+    display: none;
+    background: #3D9BFF;
+}
+
+#completeGoalButton:hover {
+    background: #3079cc;
+}
+
+/* Delete Goal Button (Red) */
+#deleteGoalButton {
+    display: none;
+    background: #FF5D5D;
+}
+
+#deleteGoalButton:hover {
+    background: #cc4a4a;
 }

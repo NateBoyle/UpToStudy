@@ -69,7 +69,7 @@
                 <h1><span id="semesterName">Loading...</span> Goals</h1>
                 <div class="goal-set-buttons">
                     <button id="newGoalSetButton">New Goal Set</button>
-                    <button id="viewAllGoalSetsButton">View All Goal Sets</button>
+                    <!--<button id="viewAllGoalSetsButton">View All Goal Sets</button>-->
                 </div>
             </div>
         
@@ -79,31 +79,40 @@
                     <div id="goalSetHeader1">
                         <button class="new-goals-button" id="newGoalButton1">New Goal</button>
                         <h2 id="goalSetTitle1">Achieve a 4.0 GPA for the Semester</h2>
-                        <button class="change-set-button" id="changeSetButton1">Change Set</button>
+                        <button class="new-goals-button" id="editGoalSetButton1">Edit Set</button>
                     </div>
                     <ul class="goal-list" id="goalSet1">
                         <!-- Goals dynamically populated here -->
                     </ul>
+                    <div class="change-set-div">
+                        <button class="change-set-button" id="changeSetButton1">Change Set</button>
+                    </div>
                 </div>
                 <div class="goal-set" id="goalSetContainer2">
                     <div id="goalSetHeader2">
                         <button class="new-goals-button" id="newGoalButton2">New Goal</button>
                         <h2 id="goalSetTitle2">Become a Member of the Sorority</h2>
-                        <button class="change-set-button" id="changeSetButton2">Change Set</button>
+                        <button class="new-goals-button" id="editGoalSetButton2">Edit Set</button>
                     </div>
                     <ul class="goal-list" id="goalSet2">
                         <!-- Goals dynamically populated here -->
                     </ul>
+                    <div class="change-set-div">
+                        <button class="change-set-button" id="changeSetButton2">Change Set</button>
+                    </div>
                 </div>
                 <div class="goal-set" id="goalSetContainer3">
                     <div id="goalSetHeader3">
                         <button class="new-goals-button" id="newGoalButton3">New Goal</button>
                         <h2 id="goalSetTitle3">Earn Nursing LLC Badge</h2>
-                        <button class="change-set-button" id="changeSetButton3">Change Set</button>
+                        <button class="new-goals-button" id="editGoalSetButton3">Edit Set</button>
                     </div>
                     <ul class="goal-list" id="goalSet3">
                         <!-- Goals dynamically populated here -->
                     </ul>
+                    <div class="change-set-div">
+                        <button class="change-set-button" id="changeSetButton3">Change Set</button>
+                    </div>
                 </div>
             </div>
 
@@ -183,10 +192,18 @@
                         </label>                        
                     </div>
 
+                    <!-- Progress Bar Section -->
+                    <div class="goal-progress-container">
+                        <span id="goalProgressText">0 / 0 Goals Completed</span>
+                        <div class="goal-progress-bar-container">
+                            <div class="goal-progress-bar" id="goalProgressBar"></div>
+                        </div>
+                    </div>
+
                     <!-- Button Container -->
                     <div class="button-container">
                         <button type="submit" id="saveGoalSetBtn">Add Set</button>
-                        <button type="button" id="deleteSetButton" style="display: none;">Delete Set</button>
+                        <button type="button" id="deleteGoalSetButton" style="display: none;">Delete Set</button>
                     </div>
                 </form>
             </div>
@@ -213,6 +230,7 @@
                     <!-- Button Container -->
                     <div class="button-container">
                         <button type="submit" id="saveGoalBtn">Add Goal</button>
+                        <button type="button" id="completeGoalButton" style="display: none;">Complete Goal</button>
                         <button type="button" id="deleteGoalButton" style="display: none;">Delete Goal</button>
                     </div>
                 </form>

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="UTScss.css">
     <link rel="stylesheet" href="UTSdash.css">
     <link rel="stylesheet" href="UTSevents.css">
+    <link rel="stylesheet" href="UTSgoalSets.css">
 
     <style>
         @font-face {
@@ -349,6 +350,71 @@
                     <!-- Assignment items will be dynamically added here -->
                 </div>
                 <button type="button" id="closeModalBtn">&times;</button>
+            </div>
+        </div>
+
+        <!-- Goal Set Creation/Editing Modal -->
+        <div id="goalSetModal" class="goalSetModal">
+            <div class="goal-set-modal-content">
+                <span class="close" id="closeGoalSetModal">&times;</span>
+                <h2>Create New Goal Set</h2>
+                <form id="goalSetForm">
+                    <!-- Goal Set Name Input -->
+                    <label for="goalSetName">Goal Set Name</label>
+                    <input type="text" id="goalSetName" name="title" placeholder="Enter goal set name" required>
+
+                    <!-- Goal Set Description -->
+                    <label for="goalSetDescription">Goal Set Description</label>
+                    <textarea id="goalSetDescription" name="description" placeholder="Enter goal set description (optional)" rows="4"></textarea>
+
+                    <!-- Course Dropdown -->
+                    <label for="goalCourse">Course Selection</label>
+                    <select id="goalCourse" name="course_id">
+                        <option value="" disabled selected>Select Course (optional)</option>
+                        <!-- Dynamically populated -->
+                    </select>
+
+                    <!-- Color Picker -->
+                    <label for="goalColor">Color Selection</label>
+                    <select id="goalColor" name="color">
+                        <option value="" disabled selected>(Defaults to course color if no selection)</option>
+                        <option value="#7DBC4B" style="background-color: #7DBC4B; color: white;">Green</option>
+                        <option value="#E52222" style="background-color: #E52222; color: white;">Red</option>
+                        <option value="#4B90D0" style="background-color: #4B90D0; color: white;">Blue</option>
+                        <option value="#E5BA22" style="background-color: #E5BA22; color: black;">Yellow</option>
+                        <option value="#9A4BB3" style="background-color: #9A4BB3; color: white;">Purple</option>
+                        <option value="#FF8C00" style="background-color: #FF8C00; color: white;">Orange</option>
+                    </select>
+
+                    <!-- Container Selection -->
+                    
+                    <div class="radio-container">
+                        <label>Container Assignment</label>
+                        <label class="container-option"> 
+                            <input type="radio" name="container" value="1"> 1
+                        </label>
+                        <label class="container-option">
+                            <input type="radio" name="container" value="2"> 2
+                        </label>
+                        <label class="container-option">
+                            <input type="radio" name="container" value="3"> 3
+                        </label>                        
+                    </div>
+
+                    <!-- Progress Bar Section -->
+                    <div class="goal-progress-container">
+                        <span id="goalProgressText">0 / 0 Goals Completed</span>
+                        <div class="goal-progress-bar-container">
+                            <div class="goal-progress-bar" id="goalProgressBar"></div>
+                        </div>
+                    </div>
+
+                    <!-- Button Container -->
+                    <div class="button-container">
+                        <button type="submit" id="saveGoalSetBtn">Add Set</button>
+                        <button type="button" id="deleteGoalSetButton" style="display: none;">Delete Set</button>
+                    </div>
+                </form>
             </div>
         </div>
 

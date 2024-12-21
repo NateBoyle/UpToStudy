@@ -106,6 +106,10 @@
     margin-right: 10px;
 }
 
+.change-set-div {
+    align-items: center;
+}
+
 .change-set-button, .new-goals-button {
     background-color: #4BC940;
     color: white;
@@ -114,18 +118,21 @@
     padding: 5px 10px;
     cursor: pointer;
     font-size: 16px;
-    height: 3rem;
+    height: 2.5rem;
 }
 
-.new-goals-button {
+.change-set-button {
     background-color: #2EA0F3;
+    width: 50%;
+    border-radius: 50px;
+    height: 2rem;
 }
 
-.change-set-button:hover {
+.new-goals-button:hover {
     background-color: #3FA631;
 }
 
-.view-goals-button:hover {
+.change-set-button:hover {
     background-color: #1C81C2;
 }
 
@@ -142,6 +149,7 @@
 .goal-set-buttons {
     display: flex;
     gap: 10px;
+    margin-right: 20px;
 }
 
 .goal-set-buttons button {
@@ -167,10 +175,10 @@
 .goal-list {
     list-style: none;
     padding: 0;
-    margin: 20px 15px;
+    margin: 10px 15px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0px;
     width: auto;
     height: auto; /* Prevent fixed height */
     flex: 1; /* Allow it to grow and fill available space */
@@ -185,9 +193,9 @@
 
 .goal-list li {
     background-color: #1F1F1F;
-    margin: 5px;
     padding: 10px;
     border-radius: 10px;
+    margin-top: 5px;
     font-size: 16px;
     font-weight: bold;
     display: flex;
@@ -211,7 +219,7 @@
 .goal-list li .details {
     font-size: 0.9rem;
     font-weight: normal;
-    color: #999; /* Light gray by default */
+    color: white; /* Light gray by default */
     margin-left: 10px;
     text-align: center;
 }
@@ -219,6 +227,19 @@
 .goal-list li:hover {
     background-color: #3FA631;
     transform: scale(1.025); /* Expand by 5% */
+}
+
+/* Styling for the 'No goals yet' message */
+.empty-message {
+    text-align: center !important; /* Center the text */
+    color: #999; /* Light gray to distinguish from active goals */
+    font-size: 14px; /* Slightly smaller font size */
+    /*font-style: italic;  Make the text italicized for emphasis */
+    margin: 10px 0; /* Add some spacing around the message */
+    background-color: transparent; /* Ensure no hover effect */
+    border: none; /* Remove any border */
+    cursor: default; /* Make it non-clickable */
+    pointer-events: none; /* Disable hover effects and interactions */
 }
 
 /*BOTTOM SECTION CONTENTS*/

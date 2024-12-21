@@ -37,7 +37,7 @@ export async function fetchGoals(id = null, goalSetId = null) {
     if (id) params.append("id", id);
     if (goalSetId) params.append('goal_set_id', goalSetId);
 
-    console.log(`Goal set id for goals: ${goalSetId}`);
+    //console.log(`Goal id for goals: ${id}`);
 
     try {
         const response = await fetch('UTSutils.php', {
@@ -48,7 +48,7 @@ export async function fetchGoals(id = null, goalSetId = null) {
 
         const data = await response.json();
 
-        console.log("fetchGoals Response:", data); // Log the raw response
+        //console.log("fetchGoals Response:", data); // Log the raw response
 
         if (data.success) {
             return data.data; // Return the array of goals

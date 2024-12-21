@@ -32,6 +32,9 @@ function handleGoalAction($action) {
         case 'edit':
             editGoal();
             break;
+        case 'complete':
+            completeGoal();
+            break;    
         case 'delete':
             deleteGoal();
             break;
@@ -45,8 +48,7 @@ function handleGoalAction($action) {
 function validateContainer($userId, $container, $goalSetId = null) {
     global $conn;
 
-    // Log the received data for debugging
-    error_log('validateContainer - Received Data: userId=' . $userId . ', container=' . $container . ', goalSetId=' . ($goalSetId ?? 'null'));
+    
 
     // Prepare query to check if the container is already assigned
     $query = "SELECT id FROM goal_sets WHERE user_id = ? AND container = ? AND id != ?";
@@ -136,9 +138,9 @@ function editGoalSet() {
     $userId = $_SESSION['user_id']; // Assuming user_id is in the session
     $goalSetId = $_POST['id'];
     $title = $_POST['title'];
-    $courseId = $_POST['course_id'] ?? null; // Optional
-    $color = $_POST['color'] ?? null; // Optional
-    $container = $_POST['container'] ?? null; // Optional
+    $courseId = empty($_POST['courseId']) ? null : $_POST['courseId']; // Convert empty string to NULL
+    $color = empty($_POST['color']) ? null : $_POST['color']; // Convert empty string to NULL
+    $container = empty($_POST['container']) ? null : $_POST['container']; // Convert empty string to NULL
     $description = empty($_POST['description']) ? null : $_POST['description']; // Convert empty string to NULL
 
     // Validate container
@@ -155,9 +157,9 @@ function editGoalSet() {
         return;
     }
 
-    $query = "UPDATE goal_sets SET title = ?, course_id = ?, color = ?, description = ? WHERE id = ?";
+    $query = "UPDATE goal_sets SET title = ?, course_id = ?, color = ?, container = ?, description = ? WHERE id = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('ssssi', $title, $courseId, $color, $container, $description, $goalSetId);
+    $stmt->bind_param('sisssi', $title, $courseId, $color, $container, $description, $goalSetId);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Goal set updated successfully.']);
@@ -248,6 +250,29 @@ function editGoal() {
         echo json_encode(['success' => true, 'message' => 'Goal updated successfully.']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Error updating goal.']);
+    }
+
+    $stmt->close();
+}
+
+function completeGoal() {
+    global $conn;
+
+    $goalId = $_POST['id'];
+
+    if (!$goalId) {
+        echo json_encode(['success' => false, 'message' => 'Goal ID is required.']);
+        return;
+    }
+
+    $query = "UPDATE goals SET is_completed = 1 WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('i', $goalId);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Goal marked as completed successfully.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error marking goal as completed.']);
     }
 
     $stmt->close();
