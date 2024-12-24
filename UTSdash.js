@@ -1,7 +1,7 @@
 import { getCombinedEventsAndCourses, getCurrentSemester } from './UTScalendarHelper.js';
 import { openFromCalendar } from './UTSevents.js';
 import { callEditCourse } from './UTSmodals.js';
-import { fetchGoalSets } from './UTSutils.js'; // Adjust the path to your utilities file if necessary.
+import { fetchGoalSets, fetchFlashcardSets } from './UTSutils.js'; // Adjust the path to your utilities file if necessary.
 import { openGoalSetModal } from './UTSgoalSets.js';
 
 
@@ -159,10 +159,60 @@ async function populateGoalSetsContainer() {
     }
 }
 
+async function loadRecentFlashcardSets() {
+    try {
+        // Fetch recent flashcard sets
+        const flashcardSets = await fetchFlashcardSets(null, null, null, true);
+
+        const flashcardsGrid = document.querySelector('.flashcards-grid');
+        flashcardsGrid.innerHTML = ''; // Clear existing content
+
+        if (flashcardSets.length > 0) {
+            flashcardSets.forEach(set => {
+                // Create the flashcard set container
+                const setCard = document.createElement('div');
+                setCard.classList.add('study-set');
+
+                // Add clickable area
+                const clickableCenter = document.createElement('div');
+                clickableCenter.classList.add('studySetClickable');
+                clickableCenter.innerHTML = `
+                    <div class="study-set-header">
+                        <h2>${set.set_name}</h2>
+                    </div>
+                    <p>Course: ${set.course_name || 'N/A'}</p>
+                    <p>${set.num_cards || 0} cards | ${set.cards_mastered || 0} mastered</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${(set.cards_mastered / set.num_cards) * 100 || 0}%;"></div>
+                    </div>
+                `;
+
+                // Attach click functionality (e.g., navigation or modal)
+                clickableCenter.addEventListener('click', () => {
+                    window.location.href = `UTScards.html?set_id=${set.set_id}`;
+                });
+
+                setCard.appendChild(clickableCenter);
+                flashcardsGrid.appendChild(setCard);
+            });
+        } else {
+            flashcardsGrid.innerHTML = '<p>No recent flashcard sets available.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading recent flashcard sets:', error);
+        const flashcardsGrid = document.querySelector('.flashcards-grid');
+        flashcardsGrid.innerHTML = '<p>Failed to load recent flashcard sets.</p>';
+    }
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     // Call the function to populate the dashboard calendar
     populateDashCalendar();
 
     // Call the function to populate the goal sets container
     populateGoalSetsContainer()
+
+    // Call the function to populate the flashcard sets container
+    loadRecentFlashcardSets()
 });

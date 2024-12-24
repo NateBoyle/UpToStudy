@@ -1,3 +1,35 @@
+
+// Fetch Flashcard Sets
+export async function fetchFlashcardSets(semesterId = null, courseId = null, searchTerm = '', isRecent = false) {
+    const params = new URLSearchParams({ action: 'fetchFlashcardSets' }); // Explicitly pass the action
+
+    // Append parameters conditionally
+    if (semesterId) params.append('semester_id', semesterId);
+    if (courseId) params.append('course_id', courseId);
+    if (searchTerm) params.append('search', searchTerm); // Add search term if provided
+    params.append('is_recent', isRecent ? '1' : '0'); // Pass boolean as 1 or 0
+
+    try {
+        const response = await fetch('UTSutils.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString(),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            return data.data; // Return the array of flashcard sets
+        } else {
+            console.error('Failed to fetch flashcard sets:', data.message);
+            return [];
+        }
+    } catch (error) {
+        console.error('Error fetching flashcard sets:', error);
+        return [];
+    }
+}
+
 // Fetch goal sets
 export async function fetchGoalSets(id = null, container = null) {
     const params = new URLSearchParams({ action: 'fetchGoalSets' });

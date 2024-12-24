@@ -12,6 +12,55 @@ $user_id = $_SESSION['user_id'];
 $action = $_POST['action'] ?? null;
 
 /**
+ * Fetch flashcard sets for a user with optional filters.
+ */
+function fetchFlashcardSets($userId, $semesterId = null, $courseId = null, $searchTerm = '', $isRecent = false) {
+    global $conn;
+
+    $query = "SELECT * FROM flashcard_sets WHERE user_id = ?";
+    $params = [$userId];
+    $types = "i";
+
+    // Apply conditional filters
+    if ($semesterId !== null) {
+        $query .= " AND semester_id = ?";
+        $params[] = $semesterId;
+        $types .= "i";
+    }
+
+    if ($courseId !== null) {
+        $query .= " AND course_id = ?";
+        $params[] = $courseId;
+        $types .= "i";
+    }
+
+    if (!empty($searchTerm)) {
+        $query .= " AND set_name LIKE ?";
+        $params[] = "%" . $searchTerm . "%";
+        $types .= "s";
+    }
+
+    if ($isRecent) {
+        $query .= " ORDER BY last_updated DESC LIMIT 2";
+    }
+
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param($types, ...$params);
+
+    if (!$stmt->execute()) {
+        error_log("SQL Error (fetchFlashcardSets): " . $stmt->error);
+        return false;
+    }
+
+    $result = $stmt->get_result();
+    $flashcardSets = $result->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+
+    return $flashcardSets;
+}
+
+/**
  * Fetch goal sets for a user.
  */
 function fetchGoalSets($userId, $id = null, $container = null) {
@@ -272,7 +321,7 @@ function fetchCourses($userId, $semesterId = null, $courseId = null) {
     // Log the semesterId for debugging
     //error_log("fetchCourses called with userId: $userId, semesterId: " . var_export($semesterId, true) . ", courseId: " . var_export($courseId, true));
 
-    $query = "SELECT c.course_id, c.course_name AS name, c.subject, c.professor, c.total_points, c.start_time, c.end_time, 
+    $query = "SELECT c.course_id, c.course_name AS name, c.subject, c.professor, c.total_points_possible, c.total_points_earned, c.start_time, c.end_time, 
                      c.monday, c.tuesday, c.wednesday, c.thursday, c.friday, c.saturday, c.sunday, c.course_color AS color, 
                      c.prefix, c.course_number, s.semester_id, s.name AS semester_name
               FROM courses c
@@ -329,6 +378,19 @@ if ($action === 'fetchGoalSets') {
     $container = $_POST['container'] ?? null;
     $goalSets = fetchGoalSets($user_id, $id, $container);
     echo json_encode(['success' => true, 'data' => $goalSets]);
+} elseif ($action === 'fetchFlashcardSets') {
+    $semesterId = $_POST['semester_id'] ?? null;
+    $courseId = $_POST['course_id'] ?? null;
+    $searchTerm = $_POST['search'] ?? '';
+    $isRecent = isset($_POST['is_recent']) && $_POST['is_recent'] == '1';
+
+    $flashcardSets = fetchFlashcardSets($user_id, $semesterId, $courseId, $searchTerm, $isRecent);
+
+    if ($flashcardSets === false) {
+        echo json_encode(['success' => false, 'message' => 'Failed to fetch flashcard sets.']);
+    } else {
+        echo json_encode(['success' => true, 'data' => $flashcardSets]);
+    }
 } elseif ($action === 'fetchGoals') {
     $id = $_POST['id'] ?? null;
     $goalSetId = $_POST['goal_set_id'] ?? null;

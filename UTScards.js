@@ -209,7 +209,7 @@ async function loadCourses() {
 
         // Populate the dropdown with fetched courses
         courses.forEach(course => {
-            console.log("Course ID:", course.course_id, "Course Name:", course.course_name);
+            //console.log("Course ID:", course.course_id, "Course Name:", course.course_name);
             const option = document.createElement('option');
             option.value = course.course_id;
             option.textContent = `${course.prefix} ${course.course_number}: ${course.name}`; // Combine prefix and course_number
@@ -306,7 +306,7 @@ function saveSet() {
 
     if (setId) requestData.set_id = setId; // Include set_id for editing
 
-    console.log("Saving set:", { setName, courseId }); // Debugging log
+    //console.log("Saving set:", { setName, courseId }); // Debugging log
 
     return fetch(API_URL, {
         method: 'POST',
@@ -317,7 +317,7 @@ function saveSet() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Save set response:", data); // Debugging log
+        //console.log("Save set response:", data); // Debugging log
         if (data.status === 'success') {
             alert(data.message);
             document.getElementById("setCreationModal").removeAttribute("data-edit-set-id");
@@ -344,7 +344,7 @@ function saveSet() {
 
 function editFlashcardSet(setId, setName, courseName) {
 
-    console.log("Editing set:", { setId, setName, courseName });
+    //console.log("Editing set:", { setId, setName, courseName });
 
     // Open the modal
     document.getElementById("setCreationModal").style.display = "flex";
@@ -379,7 +379,7 @@ function editFlashcardSet(setId, setName, courseName) {
 window.editFlashcardSet = editFlashcardSet;
 
 function deleteFlashcardSet(setId) {
-    console.log(`Deleting set with ID: ${setId}`);
+    //console.log(`Deleting set with ID: ${setId}`);
     // Implement deletion logic here
     if (confirm("Are you sure you want to delete this flashcard set?")) {
         fetch(API_URL, {
@@ -440,7 +440,7 @@ function handleSetUpload() {
             header: true,
             skipEmptyLines: true,
             complete: function (results) {
-                console.log("Parsed results:", results.data);
+                //console.log("Parsed results:", results.data);
 
                 // Validate the headers
                 const expectedHeaders = ["Question", "Answer"];
@@ -469,7 +469,7 @@ function handleSetUpload() {
                         return;
                     }
 
-                    console.log("Uploading flashcards in chunks...");
+                    //console.log("Uploading flashcards in chunks...");
 
                     // Split flashcards into chunks of 20 rows
                     const chunkSize = 20;
@@ -480,7 +480,7 @@ function handleSetUpload() {
 
                     // Upload each chunk sequentially
                     for (const chunk of chunks) {
-                        console.log("Uploading chunk:", chunk);
+                        //console.log("Uploading chunk:", chunk);
                         try {
                             const response = await fetch(API_URL, {
                                 method: 'POST',
@@ -496,7 +496,7 @@ function handleSetUpload() {
 
                             const data = await response.json();
                             if (data.status === 'success') {
-                                console.log("Chunk uploaded successfully:");
+                                //console.log("Chunk uploaded successfully:");
                                 //alert("Flashcards uploaded successfully!");
                                 
                             } else {
@@ -556,7 +556,7 @@ function openFlashcardModal(setId, flashcardId = null, question = '', answer = '
         answerInput.value = answer;
         modal.setAttribute('data-edit-flashcard-id', flashcardId); // Set flashcard ID for editing
         saveButton.textContent = 'Save Changes'; // Optional: Update button text
-        console.log(`Editing FC ID: ${flashcardId}`);
+        //console.log(`Editing FC ID: ${flashcardId}`);
     } else {
         // For creating a new flashcard
         heading.textContent = 'Create New Flashcard';
@@ -595,7 +595,7 @@ function saveFlashcard(setId = null, question = null, answer = null) {
     // Use the provided setId, or fetch from the modal if not provided
     const finalSetId = setId || document.getElementById("fcCreationModal")?.getAttribute("data-set-id");
 
-    console.log('Save flashcard called with setId:', setId);
+    //console.log('Save flashcard called with setId:', setId);
     
 
     // Validate inputs
@@ -632,7 +632,7 @@ function saveFlashcard(setId = null, question = null, answer = null) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Save flashcard response:", data); // Debugging log
+        //console.log("Save flashcard response:", data); // Debugging log
 
         if (data.status === 'success') {
             alert(data.message);
@@ -680,7 +680,7 @@ function deleteFlashcard(flashcardId) {
 
     const setId = document.getElementById("flashcardDisplayModal").getAttribute("data-set-id");
 
-    console.log('Set ID:', setId);
+    //console.log('Set ID:', setId);
 
     if (confirm("Are you sure you want to delete this flashcard?")) {
         fetch(API_URL, {
@@ -695,7 +695,7 @@ function deleteFlashcard(flashcardId) {
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Delete flashcard response:", data);
+            //console.log("Delete flashcard response:", data);
             if (data.status === 'success') {
                 alert(data.message);
 
@@ -703,14 +703,14 @@ function deleteFlashcard(flashcardId) {
                 
                 const flashcardSetElement = document.querySelector(`.study-set[data-set-id="${setId}"]`);
                 
-                console.log('Flashcard Set Element:', flashcardSetElement);
+                //console.log('Flashcard Set Element:', flashcardSetElement);
 
                 if (flashcardSetElement) {
                     let currentCount = parseInt(flashcardSetElement.getAttribute('data-card-count'), 10);
                     if (!isNaN(currentCount)) {
                         
                         currentCount -= 1; // Decrement the count
-                        console.log('Current count:', currentCount);
+                        //console.log('Current count:', currentCount);
                         
 
                         if (currentCount <= 0) {
@@ -776,7 +776,7 @@ function toggleMasterStatus(flashcardId) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Toggle Master Status response:", data);
+        //console.log("Toggle Master Status response:", data);
 
         if (data.status === 'success') {
             alert(data.message);
@@ -808,7 +808,7 @@ function loadFlashcards(setId) {
     fetch(`${FLASHCARDS_URL}&set_id=${setId}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Flashcards response:", data);
+            //console.log("Flashcards response:", data);
 
             if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
                 
@@ -837,11 +837,11 @@ function loadFlashcards(setId) {
                     displayCard(window.currentFlashcards[window.currentFlashcardIndex]);
 
                 } else {
-                    console.log("No non-mastered FCs found for this set.");
+                    //console.log("No non-mastered FCs found for this set.");
                     alert("All FCs in this set are mastered."); // Show an alert message
                 }
             } else {
-                console.log("Flashcards array is empty for this set.");
+                //console.log("Flashcards array is empty for this set.");
                 alert("No flashcards found for this set."); // Show an alert message
             }
         })
@@ -851,8 +851,8 @@ function loadFlashcards(setId) {
 
 function displayCard(flashcard) {
 
-    console.log(`Displaying card with Set ID: ${flashcard.setId}, Flashcard ID: ${flashcard.flashcardId}`);
-    console.log(`Current FC Index: ${window.currentFlashcardIndex}`);
+    //console.log(`Displaying card with Set ID: ${flashcard.setId}, Flashcard ID: ${flashcard.flashcardId}`);
+    //console.log(`Current FC Index: ${window.currentFlashcardIndex}`);
 
     const cardModal = document.getElementById('flashcardDisplayModal'); 
 
@@ -998,7 +998,7 @@ function showPreviousFlashcard() {
 
 function openOverviewModal(setId) {
 
-    console.log(`Opening overview modal for set ID: ${setId}`);
+    //console.log(`Opening overview modal for set ID: ${setId}`);
     fetch(`${FLASHCARDS_URL}&set_id=${setId}`)
         .then(response => response.json())
         .then(data => {
@@ -1121,7 +1121,7 @@ async function populateCourseButtons(semesterId = null) {
     container.innerHTML = ''; // Clear any existing buttons
 
     // Log the semesterId to verify its value
-    console.log(`Populating course buttons for semesterId: ${semesterId}, type: ${typeof semesterId}`);
+    //console.log(`Populating course buttons for semesterId: ${semesterId}, type: ${typeof semesterId}`);
 
     try {
         // Fetch courses with optional semester filter
@@ -1136,12 +1136,12 @@ async function populateCourseButtons(semesterId = null) {
                 button.textContent = `${course.prefix} ${course.course_number}: ${course.name}`;
                 button.setAttribute('data-course-id', course.course_id);
                 // Log the courseId to verify
-                console.log(`Course button set: ${course.course_id}`);
+                //console.log(`Course button set: ${course.course_id}`);
 
                 // Add click event listener to the button
                 button.addEventListener('click', () => {
                     const courseId = button.getAttribute('data-course-id');
-                    console.log(`Course ID selected: ${courseId}`);
+                    //console.log(`Course ID selected: ${courseId}`);
                     loadFlashcardSets(null, courseId); // Filter FC sets by course ID and semester
                 });
 
@@ -1164,9 +1164,28 @@ async function populateCourseButtons(semesterId = null) {
     }
 }
 
+// Function to check for set_id in the URL and load the corresponding flashcards
+function checkAndLoadFlashcards() {
+    // Get the query parameters from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const setId = urlParams.get('set_id'); // Extract the set_id parameter
+
+    console.log('checkAndLoadFlashcards called.');
+
+    if (setId) {
+        console.log(`Loading flashcards for set_id: ${setId}`);
+        loadFlashcards(setId); // Call the existing loadFlashcards function
+    } else {
+        console.log('No set_id found in URL.');
+        // Optional: Handle cases where no set_id is found, if needed
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Load flashcard sets into the container
     loadFlashcardSets();
+
+    
     
     // Event listeners for modal buttons
     const saveSetButton = document.getElementById("saveSetBtn");
@@ -1189,6 +1208,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    
+
     // Populate semester buttons dynamically
     populateSemesterButtons().then(() => {
         // Add event listeners to dynamically created semester buttons
@@ -1199,7 +1220,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentSemesterId = semesterId; // Update global variable
                 
                 // Log the semesterId to verify
-                console.log(`Semester ID selected: ${semesterId}`);
+                //console.log(`Semester ID selected: ${semesterId}`);
                 
                 // Dynamically populate course buttons for the selected semester
                 populateCourseButtons(semesterId);
@@ -1212,6 +1233,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Populate course buttons initially for all courses
     populateCourseButtons();
+
 
     // Add event listener for the "All Semesters" button (if always in static HTML)
     document.getElementById('allSemestersBtn').addEventListener('click', () => {
@@ -1229,7 +1251,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('searchBox').addEventListener('keydown', (event) => {
         if (event.key === 'Enter') { // Check if the Enter key was pressed
             const searchTerm = event.target.value.trim(); // Get the search term
-            console.log(`Search initiated with term: ${searchTerm}`); // Debugging log
+            //console.log(`Search initiated with term: ${searchTerm}`); // Debugging log
 
             // Call loadMCQSets with the search term
             loadFlashcardSets(null, null, searchTerm); // Pass null for semesterId and courseId
@@ -1244,4 +1266,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Close dropdowns if clicking outside of any dropdown
     document.addEventListener('click', closeAllDropdowns);
+
+    /*const urlParams = new URLSearchParams(window.location.search);
+    const setId = urlParams.get('set_id'); // Extract the set_id parameter
+
+    console.log('checkAndLoadFlashcards called.');
+
+    if (setId) {
+        console.log(`Loading flashcards for set_id: ${setId}`);
+        loadFlashcards(setId); // Call the existing loadFlashcards function
+    } else {
+        console.log('No set_id found in URL.');
+        // Optional: Handle cases where no set_id is found, if needed
+    }*/
+
+    checkAndLoadFlashcards();
+
 });

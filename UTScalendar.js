@@ -1,6 +1,6 @@
 import { openFromCalendar } from './UTSevents.js';
 import { getCombinedEventsAndCourses, getCurrentSemester } from './UTScalendarHelper.js';
-import { callEditCourse } from './UTSmodals.js';
+import { openCourseFromCalendar } from './UTScourseManager.js';
 
 const todaysDate = new Date(); // Always represents today's date
 let currentDate = new Date(); // Tracks the currently displayed month
@@ -418,7 +418,7 @@ async function renderWeekViewEvents() {
                     eventBlock.addEventListener("click", () => {
                         if (event.type === 'course') {
                             console.log('This is a course!');
-                            callEditCourse(event.id);
+                            openCourseFromCalendar(event.id);
                         } else {
                             console.log(`This is a ${event.type}!`);
                             openFromCalendar(event.type, event.id);
@@ -478,7 +478,7 @@ async function renderMonthViewEvents() {
                     eventBar.addEventListener("click", () => {
                         if (item.type === 'course') {
                             console.log('This is a course!');
-                            callEditCourse(item.id);
+                            openCourseFromCalendar(item.id);
                         } else {
                             console.log(`This is a ${item.type} with id: ${item.id}!`);
                             openFromCalendar(item.type, item.id);

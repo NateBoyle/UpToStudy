@@ -5,7 +5,7 @@
     padding: 20px;
     grid-template-columns: 3fr 2fr; /* Main grid layout with two columns */
     grid-template-rows: auto auto auto; /* Flexible row heights */
-    height: 105vh; /* Full viewport height */
+    height: 120vh; /* Full viewport height */
     box-sizing: border-box; /* Ensure padding is included in height calculation */
     margin-top: 100px; /* Add margin to ensure no overlap with headers */
 }
@@ -163,7 +163,7 @@
     gap: 10px;
     grid-column: 1 / 2; /* Occupy the left column */
     grid-row: 2 / 3; /* Place below the calendar */
-    height: 100%; /* Stretch to fill its grid cell */
+    height: 80%; /* Stretch to fill its grid cell */
     
 }
 
@@ -191,21 +191,137 @@
 .flashcards-container {
     grid-column: 2 / 3; /* Occupy the right column */
     grid-row: 2 / 3; /* Place below assignments */
-    height: 100%; /* Stretch to fill its grid cell */
+    height: 80%; /* Stretch to fill its grid cell */
+    background-color: #1d1d1d; /* Darker gray for the outer container */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .flashcards-container .flashcards-grid {
+    background-color: #2C2C2C; /* Light gray for the inner content area */
+    border-radius: 10px;
     display: flex;
     gap: 10px;
+    height: 70%; /* Match the height of the inner container */
+    box-sizing: border-box; /* Ensure padding is included in size */
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
 }
 
-.flashcard {
-    flex: 1;
-    background-color: #424FC6;
+/*** STUDY SET DISPLAY STYLINGS ****/
+.study-set {
+    position: relative; /* Enable absolute positioning within this container */
+    width: 400px;
+    height: 250px;
+    background: #2C2C2C;
+    border: 1px solid #ddd;
+    border-radius: 20px;
     color: white;
-    border-radius: 10px;
-    padding: 10px;
+    display: flex;
+    flex-direction: column; /* Stacks h2 and p vertically */
+    align-items: center; /* Centers content horizontally */
+    justify-content: center; /* Centers content vertically */
     text-align: center;
+}
+
+.studySetClickable {
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+
+    /* Add the following properties */
+    width: 200px; /* Or another value based on your layout */
+    margin: 0 auto;   /* Center the clickable area within the card */
+    text-align: center; /* Ensure text remains centered */
+}
+
+.study-set:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.study-set.hover-effect {
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly lighter color */
+}
+
+.study-set-header h2 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 10px; /* Adjusts the space between h2 and p */
+}
+
+.study-set-header p {
+    font-size: 16px;
+    color: #DDDDDD;
+    margin-top: 0;
+}
+
+.options-button-container {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+}
+
+.options-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px; /* Smaller ellipsis */
+    cursor: pointer;
+}
+
+.options-menu {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    width: 150px; /* Wider dropdown menu */
+    text-align: center;
+    justify-content: center;
+}
+
+.options-menu button {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    padding: 5px 0;
+    font-size: 14px; /* Smaller font for dropdown options */
+}
+
+.options-menu button:hover {
+    background-color: #444;
+}
+
+.progress-bar-container {
+    max-width: 250px; /* Full width of the card */
+    height: 10px; /* Height of the progress bar */
+    background-color: #292828; /* Light gray background */
+    border-radius: 5px; /* Rounded edges */
+    overflow: hidden; /* Ensure the progress bar stays within bounds */
+    border: 2px solid white; /* Add white border */
+    margin: 0 auto; /* Center the container */
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4caf50; /* Green bar */
+    transition: width 0.3s ease; /* Smooth transition */
+    border-radius: 5px; /* Match container edges */
 }
 
 /* STYLING FOR MODALS */

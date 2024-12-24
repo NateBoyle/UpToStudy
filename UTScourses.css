@@ -332,6 +332,17 @@
     margin-top: 30px;
 }
 
+#gradeLabel {
+    font-size: 1.2rem; /* Adjust the size as needed */
+    margin-top: 10px; /* Add space above the label */
+    font-weight: bold; /* Makes the grade stand out */
+    display: block; /* Ensures it behaves like a block element */
+}
+
+#pointsAndGrade {
+    font-weight:normal /* Makes the grade stand out */
+}
+
 /* Define Semester Modal Styling
 /* Modal Background */
 .modal {
