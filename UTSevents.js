@@ -63,8 +63,15 @@ export async function populateContainer(containerId, fetchFunction, type, course
             return;
         }
 
-        // Sort items by due_date in descending order (most recent first)
-        items.sort((a, b) => new Date(b.due_date) - new Date(a.due_date));
+        // Sort items:
+        // 1. By `status` to put 'Completed' and 'Graded' at the bottom
+        // 2. By `due_date` within the same `status`
+        items.sort((a, b) => {
+          const statusOrder = ['Uncompleted', 'Completed', 'Graded'];
+          const statusComparison = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
+          if (statusComparison !== 0) return statusComparison;
+          return new Date(a.due_date) - new Date(b.due_date); // Sort by due_date within same status
+        });
 
         for (const item of items) {
             const itemId = type === 'assignment' ? item.assignment_id : item.to_do_id;
@@ -72,8 +79,6 @@ export async function populateContainer(containerId, fetchFunction, type, course
             // Combine due_date and due_time into a single Date object
             const dueDateTime = new Date(`${item.due_date}T${item.due_time || '00:00'}`);
 
-            // Determine if the item is overdue
-            const isOverdue = dueDateTime < todaysDate && !item.is_completed;
 
             const listItem = document.createElement('div');
             listItem.className = 'list-item';
@@ -81,33 +86,31 @@ export async function populateContainer(containerId, fetchFunction, type, course
             listItem.setAttribute('data-id', itemId); // Store unique ID
             listItem.setAttribute('data-type', type); // Store type (assignment or to-do)
             listItem.style.backgroundColor = item.color; // Apply the color if it has one
-            listItem.innerHTML = `
-                <span class="text">${item.title}</span>
-                <span class="details">Due: ${formatDate(item.due_date)}</span>
-            `;
-
-            // Styling and content for completed items
-            if (item.is_completed) {
-              //listItem.style.backgroundColor = '#5DD970'; // Set a green background for completed
-              listItem.style.color = 'white'; // Set text color to white
+            // Determine content and styling based on the status and overdue state
+            if (item.status === 'Uncompleted') {
+              // Determine if the item is overdue
+              const isOverdue = dueDateTime < todaysDate;
               listItem.innerHTML = `
                   <span class="text">${item.title}</span>
-                  <span class="details">COMPLETED</span>
+                  <span class="details">${isOverdue ? 'OVERDUE: ' + formatDate(item.due_date) : 'Due: ' + formatDate(item.due_date)}</span>
               `;
-            }
-            // Apply overdue styles
-            else if (isOverdue) {
-              listItem.style.backgroundColor = 'black'; // Set background to black
-              listItem.style.border = '2px solid red'; // Set border to red
-              listItem.style.color = 'red'; // Set font color to red
-              listItem.innerHTML = `
-                <span class="text">${item.title}</span>
-                <span class="details">OVERDUE: ${formatDate(item.due_date)}</span>
-            `;
-            } else {
-              if (courseColor) {
-                  listItem.style.backgroundColor = item.color; // Apply the fetched color
-              } // Else, let the CSS default background color take over
+              if (isOverdue) {
+                  listItem.style.backgroundColor = 'black'; // Optional style for overdue
+                  listItem.style.border = '2px solid red'; // Highlight overdue with a red border
+                  listItem.style.color = 'red'; // Optional text color for overdue
+              }
+            } else if (item.status === 'Completed') {
+                listItem.innerHTML = `
+                    <span class="text">${item.title}</span>
+                    <span class="details">COMPLETED</span>
+                `;
+                listItem.style.color = 'white'; // Optional styling for completed items
+            } else if (item.status === 'Graded') {
+                listItem.innerHTML = `
+                    <span class="text">${item.title}</span>
+                    <span class="details">GRADED: ${item.points_earned} / ${item.points_possible}</span>
+                `;
+                listItem.style.color = 'gold'; // Optional styling for graded items
             }
 
             // Add click event listener
@@ -187,6 +190,14 @@ export async function openModal(entity, modalId, item) {
 
   const submitButton = modal.querySelector('button[type="submit"]'); // Target submit button within the form
   const modalTitle = modal.querySelector('h2'); // Select the first <h2> within the modal
+
+  const statusLabel = form.querySelector('label[for="status"]'); // Reference the Status label
+  const statusDropdown = form.querySelector('[name="status"]'); // Reference to the status dropdown
+
+  const pointsEarnedInput = form.querySelector('[name="points_earned"]'); // Reference the points_earned input
+  if (pointsEarnedInput) {
+    pointsEarnedInput.style.display = 'none'; // Hide the input for non-assignments
+  }
   
   if (item) {
     // Populate form fields from the item object
@@ -204,30 +215,28 @@ export async function openModal(entity, modalId, item) {
     form.dataset.id = item.id; // Store the item ID for context
     //console.log(`Open Modal with ID: ${item.id}`);
 
+    // Set the status dropdown value
+    if (statusDropdown && statusLabel) {
+      // Existing item: Show the Status label and dropdown
+      statusLabel.style.display = 'block';
+      statusDropdown.style.display = 'block';
+      statusDropdown.value = item.status || 'Uncompleted'; // Default to "Uncompleted" if status is missing
+      
+    }
+
     // Edit submit button within the specific form
     submitButton.textContent = 'Save'; // Updates the button text
 
-    // Show Complete and Delete buttons
-    if (entity != 'event') {
-      const completeButton = modal.querySelector('#completeButton'); // Reference the button
-      completeButton.style.display = 'block';
-      completeButton.onclick = (e) => {
-        if (confirm(`Are you sure you want to complete ${item.title}?`)) {
-          console.log(`Completing item: ${item.id}`);
-          completeEntity(entity, item.id)
+
+    const deleteButton = modal.querySelector('#deleteButton'); // Reference the button
+    if (deleteButton) {
+      deleteButton.style.display = 'block';
+      deleteButton.onclick = () => {
+        if (confirm(`Are you sure you want to delete this ${entity.charAt(0).toUpperCase() + entity.slice(1)}?`)) {
+          deleteEntity(entity, item.id); // Call deleteEntity directly
         }
       };
     }
-
-    const deleteButton = modal.querySelector('#deleteButton'); // Reference the button
-    deleteButton.style.display = 'block';
-
-    // Set up Delete button event listener
-    deleteButton.onclick = () => {
-      if (confirm(`Are you sure you want to delete this ${entity.charAt(0).toUpperCase() + entity.slice(1)}?`)) {
-        deleteEntity(entity, item.id); // Call deleteEntity directly
-      }
-    };
 
     // Edit title within the specific form
     if (entity === "assignment") {
@@ -236,7 +245,9 @@ export async function openModal(entity, modalId, item) {
       } else {
         modalTitle.textContent = 'Edit Assignment'; // Change the title
       }
-      
+
+      pointsEarnedInput.style.display = 'block'; // Show the input for existing assignments
+
     } else if (entity === "toDo") {
       modalTitle.textContent = 'Edit To-Do'; // Change the title
     } else {
@@ -245,13 +256,26 @@ export async function openModal(entity, modalId, item) {
 
   } else {
 
-    modal.querySelector('#completeButton').style.display = 'none';
-    modal.querySelector('#deleteButton').style.display = 'none';
+    form.dataset.id = ''; // Ensure no ID is set for new items
+
+    // Set the status dropdown default
+    if (statusDropdown && statusLabel) {
+      // New item: Hide the Status label and dropdown
+      statusLabel.style.display = 'none';
+      statusDropdown.style.display = 'none';
+    }
+
+    // Hide delete button
+    const deleteButton = modal.querySelector('#deleteButton');
+    if (deleteButton) {
+      deleteButton.style.display = 'none';
+    }
 
     // Edit submit button and title within the specific form
     if (entity === "assignment") {
       modalTitle.textContent = 'New Assignment'; // Change the title
       submitButton.textContent = 'Add Assignment';
+      
     } else if (entity === "toDo") {
       modalTitle.textContent = 'New To-Do'; // Change the title
       submitButton.textContent = 'Create To-Do';
@@ -293,7 +317,7 @@ function validateFields(form, entity) {
     const dueDate = form.querySelector('[name="due_date"]');
     const dueTime = form.querySelector('[name="due_time"]');
     const courseId = form.querySelector('[name="course_id"]');
-    const points = form.querySelector('[name="points"]');
+    const points = form.querySelector('[name="points_possible"]');
 
     if (!dueDate.value) {
       errors.push('Due date is required.');
@@ -428,30 +452,6 @@ async function saveEntity(event, entity, modalId) {
   }
 }
 
-// Complete Functionality
-async function completeEntity(entity, id) {
-  try {
-      const response = await fetch('UTSevents.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-              action: 'complete',
-              entity: entity, // 'assignment' or 'toDo'
-              id: id
-          })
-      });
-
-      const data = await response.json();
-      if (data.success) {
-          console.log(`${entity} with ID ${id} marked as complete.`);
-          refreshEvents(); // Refresh the UI (reload calendar/list)
-      } else {
-          console.error(`Failed to mark ${entity} with ID ${id} as complete:`, data.message);
-      }
-  } catch (error) {
-      console.error(`Error marking ${entity} with ID ${id} as complete:`, error);
-  }
-}
 
 // Delete Functionality
 export async function deleteEntity(entity, id) {

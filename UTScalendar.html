@@ -199,11 +199,19 @@
                         <input type="date" id="dueDate" name="due_date">
                         <input type="time" name="due_time" />
                         <textarea id="description" name="description" placeholder="Enter assignment details (optional)"></textarea>
-                        <input type="number" id="points" name="points" placeholder="Enter total points">
+                        <input type="number" id="points_possible" name="points_possible" placeholder="Enter points possible">
+                        <input type="number" id="points_earned" name="points_earned" placeholder="Enter points earned (grade)">
+                        <div class="form-group">
+                            <label for="status">Status:</label>
+                            <select name="status" id="status">
+                              <option value="Uncompleted">Uncompleted</option>
+                              <option value="Completed">Completed</option>
+                              <option value="Graded">Graded</option>
+                            </select>
+                        </div>
                         <!-- Button Container -->
                         <div class="button-container">
                             <button type="submit" id="saveAssignmentBtn">Add Assignment</button>
-                            <button type="button" id="completeButton">Complete</button>
                             <button type="button" id="deleteButton">Delete</button>
                         </div>
                       </form>
@@ -238,10 +246,16 @@
                         <input type="date" name="due_date"  />
                         <input type="time" name="due_time" />
                         <textarea name="description" placeholder="Description"></textarea>
+                        <div class="form-group">
+                            <label for="status">Status:</label>
+                            <select name="status" id="status">
+                              <option value="Uncompleted">Uncompleted</option>
+                              <option value="Completed">Completed</option>
+                            </select>
+                        </div>
                         <!-- Button Container -->
                         <div class="button-container">
                             <button type="submit" id="saveToDoBtn">Create To-Do</button>
-                            <button type="button" id="completeButton">Complete</button>
                             <button type="button" id="deleteButton">Delete</button>
                         </div>
                       </form>

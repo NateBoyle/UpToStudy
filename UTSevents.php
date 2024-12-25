@@ -69,17 +69,18 @@ function addAssignment() {
     $dueDate = $_POST['due_date'];
     $dueTime = $_POST['due_time'];
     $description = $_POST['description'] ?? null;
-    $points = $_POST['points'] ?? null;
+    $pointsPossible = $_POST['points_possible'] ?? null; // Updated field
+    $status = $_POST['status'] ?? 'Uncompleted'; // Default to 'Uncompleted' if not provided
 
     if (!$title || !$courseId || !$dueDate) {
         echo json_encode(['success' => false, 'message' => 'Missing required fields.']);
         return;
     }
 
-    $query = "INSERT INTO assignments (user_id, course_id, title, description, due_date, due_time, points)
-              VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO assignments (user_id, course_id, title, description, due_date, due_time, points_possible, status)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('iissssd', $userId, $courseId, $title, $description, $dueDate, $dueTime, $points);
+    $stmt->bind_param('iissssds', $userId, $courseId, $title, $description, $dueDate, $dueTime, $pointsPossible, $status);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Assignment added successfully.']);
@@ -98,16 +99,28 @@ function editAssignment() {
     $dueDate = $_POST['due_date'];
     $dueTime = $_POST['due_time'];
     $description = $_POST['description'] ?? null;
-    $points = $_POST['points'] ?? null;
+    $pointsPossible = $_POST['points_possible'] ?? null; // Updated field
+    $pointsEarned = $_POST['points_earned'] ?? null; // New field
+    $status = $_POST['status'] ?? 'Uncompleted'; // Default to 'Uncompleted' if not provided
 
     if (!$assignmentId || !$title) {
         echo json_encode(['success' => false, 'message' => 'Missing required fields.']);
         return;
     }
 
-    $query = "UPDATE assignments SET title = ?, course_id = ?, description = ?, due_date = ?, due_time = ?, points = ? WHERE assignment_id = ?";
+    // Prepare and execute query
+    $query = "UPDATE assignments 
+              SET title = ?, 
+                  course_id = ?, 
+                  description = ?, 
+                  due_date = ?, 
+                  due_time = ?, 
+                  points_possible = ?, 
+                  points_earned = ?, 
+                  status = ? 
+              WHERE assignment_id = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('sisssdi', $title, $courseId, $description, $dueDate, $dueTime, $points, $assignmentId);
+    $stmt->bind_param('sisssddsi', $title, $courseId, $description, $dueDate, $dueTime, $pointsPossible, $pointsEarned, $status, $assignmentId);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Assignment updated successfully.']);
@@ -149,14 +162,15 @@ function addToDo() {
     $dueDate = $_POST['due_date'];
     $dueTime = $_POST['due_time'];
     $description = $_POST['description'] ?? null; // Optional
+    $status = $_POST['status'] ?? 'Uncompleted'; // Default to 'Uncompleted'
 
     if (!$title || !$dueDate) {
         echo json_encode(['success' => false, 'message' => 'Title and due date are required.']);
         return;
     }
 
-    $stmt = $conn->prepare("INSERT INTO to_do (user_id, course_id, title, due_date, due_time, description) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('iissss', $userId, $courseId, $title, $dueDate, $dueTime, $description);
+    $stmt = $conn->prepare("INSERT INTO to_do (user_id, course_id, title, due_date, due_time, description, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('iisssss', $userId, $courseId, $title, $dueDate, $dueTime, $description, $status);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'To-Do added successfully.']);
@@ -176,14 +190,22 @@ function editToDo() {
     $dueDate = $_POST['due_date'];
     $dueTime = $_POST['due_time'];
     $description = $_POST['description'] ?? null; // Optional
+    $status = $_POST['status'] ?? 'Uncompleted'; // Default to 'Uncompleted' if not provided
 
     if (!$toDoId || !$title || !$dueDate) {
         echo json_encode(['success' => false, 'message' => 'To-Do ID, title, and due date are required.']);
         return;
     }
 
-    $stmt = $conn->prepare("UPDATE to_do SET title = ?, course_id = ?, due_date = ?, due_time = ?, description = ? WHERE to_do_id = ?");
-    $stmt->bind_param('sisssi', $title, $courseId, $dueDate, $dueTime, $description, $toDoId);
+    $stmt = $conn->prepare("UPDATE to_do 
+                            SET title = ?, 
+                                course_id = ?, 
+                                due_date = ?, 
+                                due_time = ?, 
+                                description = ?, 
+                                status = ? 
+                            WHERE to_do_id = ?");
+    $stmt->bind_param('sissssi', $title, $courseId, $dueDate, $dueTime, $description, $status, $toDoId);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'To-Do updated successfully.']);

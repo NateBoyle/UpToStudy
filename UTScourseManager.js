@@ -461,9 +461,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    const assignmentForm = document.getElementById('assignmentForm');
+    /*const assignmentForm = document.getElementById('assignmentForm');
     if (assignmentForm) {
         assignmentForm.addEventListener('submit', (e) => saveEntity(e, 'assignment', 'assignmentModal'));
-    }
+    }*/
 
 });
