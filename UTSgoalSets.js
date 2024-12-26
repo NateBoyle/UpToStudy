@@ -196,7 +196,7 @@ export async function openGoalSetModal(goalSet = null) {
         deleteButton.style.display = 'block';
         deleteButton.onclick = async () => {
             if (confirm('Are you sure you want to delete this Goal Set?')) {
-                await deleteEntity('goalSet', id);
+                await deleteEntity('goalSet', goalSet.id);
                 modal.style.display = 'none';
             }
         };
@@ -334,16 +334,20 @@ async function completeGoal(id) {
 
 async function deleteEntity(entity, id) {
     try {
-        const response = await fetch('UTSgoals.php', {
-            method: 'DELETE',
+        const response = await fetch('UTSgoalSets.php', {
+            method: 'POST', // Use POST to send the action field
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ entity, id }),
+            body: new URLSearchParams({
+                action: 'delete', // Specify the action as 'delete'
+                entity,           // Include the entity (e.g., goalSet or goal)
+                id,               // Include the ID of the item to delete
+            }),
         });
 
         const result = await response.json();
         if (result.success) {
             alert(`${entity.charAt(0).toUpperCase() + entity.slice(1)} deleted successfully!`);
-            populateGoalSets(); // Reload UI
+            window.location.reload(); // Reload UI
         } else {
             alert(`Error: ${result.message}`);
         }
@@ -389,6 +393,28 @@ async function populateGoalLists() {
 
             // Handle response
             if (goals.length > 0) {
+
+                // Sort the goals array
+                goals.sort((a, b) => {
+                    // Sort by completion status: incomplete (0) before complete (1)
+                    if (a.is_completed !== b.is_completed) {
+                        return a.is_completed - b.is_completed;
+                    }
+
+                    // Sort by due date (null values go last)
+                    const dateA = a.due_date ? new Date(a.due_date) : null;
+                    const dateB = b.due_date ? new Date(b.due_date) : null;
+
+                    if (dateA === null && dateB === null) {
+                        return 0; // Both null
+                    } else if (dateA === null) {
+                        return 1; // `a` has no due date, so it goes after `b`
+                    } else if (dateB === null) {
+                        return -1; // `b` has no due date, so it goes after `a`
+                    } else {
+                        return dateB - dateA; // Descending order for due dates
+                    }
+                });
 
                 goals.forEach(goal => {
 

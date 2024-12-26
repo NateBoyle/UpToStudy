@@ -3,6 +3,9 @@
 // Define the environment: 'development' or 'production'
 define('ENVIRONMENT', 'development'); // Change to 'production' for live sites
 
+// Set the default timezone
+date_default_timezone_set('America/Los_Angeles');
+
 // Enable error reporting (switch based on environment)
 if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
     ini_set('display_errors', 1);

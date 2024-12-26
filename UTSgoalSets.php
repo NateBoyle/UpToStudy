@@ -180,12 +180,6 @@ function deleteGoalSet() {
         return;
     }
 
-    // First, delete all goals in the goal set
-    $deleteGoals = $conn->prepare("DELETE FROM goals WHERE goal_set_id = ?");
-    $deleteGoals->bind_param('i', $goalSetId);
-    $deleteGoals->execute();
-    $deleteGoals->close();
-
     // Then, delete the goal set
     $deleteGoalSet = $conn->prepare("DELETE FROM goal_sets WHERE id = ?");
     $deleteGoalSet->bind_param('i', $goalSetId);

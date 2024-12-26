@@ -13,96 +13,87 @@ function updateLastActivity() {
 
     $sessionId = session_id(); // Retrieve current session ID
 
-    // Update last activity time
-    $_SESSION['last_activity'] = time();
-
-    // Update last_activity in the database for this session
-    $sessionId = session_id(); // Get the current session ID
-    $lastActivity = date('Y-m-d H:i:s', $_SESSION['last_activity']);
-
     $updateQuery = "UPDATE login_logout_history 
-                    SET last_activity = '$lastActivity' 
-                    WHERE session_id = '$sessionId' AND logout_time IS NULL";
+                    SET last_activity = CURRENT_TIMESTAMP 
+                    WHERE session_id = ? AND logout_time IS NULL";
 
     // Execute the query
-    if (!$conn->query($updateQuery)) {
-        error_log("Failed to update last_activity: " . $conn->error);
+    if ($stmt = $conn->prepare($updateQuery)) {
+        // Bind the parameters
+        $stmt->bind_param('s', $sessionId);
+
+        // Execute the statement
+        if (!$stmt->execute()) {
+            error_log("Failed to update last_activity: " . $stmt->error);
+        }
+
+        // Close the statement
+        $stmt->close();
+    } else {
+        error_log("Failed to prepare statement for updating last_activity: " . $conn->error);
     }
+}
+
+// Retrieve the 'updateLastActivity' parameter from the request
+$updateLastActivity = true; // Default to true
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $updateLastActivity = isset($input['updateLastActivity']) 
+    ? filter_var($input['updateLastActivity'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) 
+    : true;
 }
 
 // Define a function to check authentication and session validity
 function checkAuthentication() {
     $response = [];
 
-    
-
     // Check if the user is logged in
     if (isset($_SESSION['user_id'])) {
-
-        
 
         global $conn;
 
         // Check for session expiration (optional)
-        $timeout_duration = 2700; // Session timeout in seconds (30)
-        $sessionId = session_id(); // Retrieve current session ID
+        $timeout_duration = 1800; // Session timeout in seconds 
 
-        $test = time();
+        // Assuming you already have the user's session ID
+        $sessionId = session_id(); // Retrieve the current session ID
 
-        error_log("Hello! From auth check. Time: {$test}, Last Activity: {$_SESSION['last_activity']}. ");
+        // Query to get the last_activity field
+        $query = "SELECT last_activity FROM login_logout_history WHERE session_id = ? AND logout_time IS NULL LIMIT 1";
+        $stmt = $conn->prepare($query);
 
-        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout_duration)) {
-            
-
-            // Check the database for the most recent session data
-            $query = "SELECT logout_time, last_activity 
-                    FROM login_logout_history 
-                    WHERE user_id = ? 
-                        AND logout_time = (
-                            SELECT MAX(logout_time) 
-                            FROM login_logout_history 
-                            WHERE user_id = ? AND logout_time IS NOT NULL
-                        ) 
-                    LIMIT 1";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("ii", $_SESSION['user_id'], $_SESSION['user_id']);
+        if ($stmt) {
+            $stmt->bind_param("s", $sessionId); // Bind the session ID parameter
             $stmt->execute();
             $result = $stmt->get_result();
 
-            if ($result->num_rows === 0) {
-                error_log("No results");
-            }
-            
-
-
             if ($result->num_rows > 0) {
-                $session = $result->fetch_assoc();
-                $logoutTime = $session['logout_time'] ? strtotime($session['logout_time']. ' UTC') : null; // Convert to UTC
-                $lastActivity = strtotime($session['last_activity']); // Convert last_activity to UNIX timestamp
-
-                error_log("last_activity: {$lastActivity},
-                    logout_time: {$logoutTime},
-                    timeout_duration: {$timeout_duration} seconds.");
-    
-                // If logout_time matches last_activity, skip handleLogout
-                if (!is_null($logoutTime) && $logoutTime <= $lastActivity) {
-                    error_log("User_id {$_SESSION['user_id']}:
-                        last_activity: {$lastActivity},
-                        logout_time: {$logoutTime},
-                        timeout_duration: {$timeout_duration} seconds.");
-
-
-                    updateLastActivity();
-
-                    $response['authenticated'] = true;
-                    $response['user_id'] = $_SESSION['user_id'];
-                    $response['username'] = $_SESSION['username'] ?? null; // Include additional user data
-                    return $response;
-                }
+                $row = $result->fetch_assoc();
+                $_SESSION['last_activity'] = $row['last_activity']; // Store last_activity in session
+                error_log("Last activity time stored in session: " . $_SESSION['last_activity']); // Log the information
+            } else {
+                error_log("No last activity found for the current session."); // Log no results found
             }
+
+            $stmt->close(); // Close the statement
+        } else {
+            error_log("Failed to prepare statement: " . $conn->error); // Log statement preparation failure
+        }
+
+
+        // Get the current time
+        $current_time = time(); // Unix timestamp
+        $readable_time = date('Y-m-d H:i:s', $current_time); // Human-readable format
+
+        $lastActivityUnix = strtotime($_SESSION['last_activity']);
+
+        error_log("Hello! From auth check. Time (readable): {$readable_time} | UNIX: {$current_time}, Last Activity: {$_SESSION['last_activity']} | {$lastActivityUnix}. ");
+
+        if (isset($_SESSION['last_activity']) && ($current_time - strtotime($_SESSION['last_activity']) > $timeout_duration)) {
+
 
             error_log("Session timeout for user_id {$_SESSION['user_id']}:
-                last_activity: {$_SESSION['last_activity']},
+                last_activity: ".strtotime($_SESSION['last_activity']).",
                 current_time: " . time() . ",
                 timeout_duration: {$timeout_duration} seconds.");
 
@@ -113,7 +104,9 @@ function checkAuthentication() {
 
         } else {
 
-            updateLastActivity();
+            if ($GLOBALS['updateLastActivity']) {
+                updateLastActivity();
+            }
 
             $response['authenticated'] = true;
             $response['user_id'] = $_SESSION['user_id'];
@@ -127,29 +120,6 @@ function checkAuthentication() {
 
     return $response;
 }
-
-// Handle specific POST actions
-/*if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
-
-    if ($action === 'logout') {
-        handleLogout();
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'Logged out successfully.'
-        ]);
-        exit;
-    }
-
-    if ($action === 'window_closed') {
-        handleLogout();
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'Logged out due to window closure.'
-        ]);
-        exit;
-    }
-}*/
 
 // Run the session check
 $response = checkAuthentication();

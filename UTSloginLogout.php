@@ -52,23 +52,27 @@ function handleLogin() {
             $stmt_active_session->execute();
             $result_active_session = $stmt_active_session->get_result();
 
-            $timeout_duration = 300; // Timeout in seconds
+            $timeout_duration = 30; // Timeout in seconds
+
             $current_time = time();
+            $readable_time = date('Y-m-d H:i:s', $current_time); // Human-readable format
 
             if ($result_active_session->num_rows > 0) {
                 
                 $session = $result_active_session->fetch_assoc();
                 $last_activity = strtotime($session['last_activity']);
 
+                error_log("Hello! From login. Time (readable): {$readable_time} | UNIX: {$current_time}, Last Activity: {$session['last_activity']} | {$last_activity}. ");
+
                 // Check if the session has timed out
                 if (($current_time - $last_activity) > $timeout_duration) {
                     // Perform automatic logout by updating logout_time
                     $session_id = $session['session_id'];
                     $query_auto_logout = "UPDATE login_logout_history 
-                                          SET logout_time = FROM_UNIXTIME(?), manual_logout = 0 
+                                          SET logout_time = ?, manual_logout = 0 
                                           WHERE session_id = ?";
                     $stmt_auto_logout = $conn->prepare($query_auto_logout);
-                    $stmt_auto_logout->bind_param("is", $last_activity, $session_id);
+                    $stmt_auto_logout->bind_param("ss", $session['last_activity'], $session_id);
                     $stmt_auto_logout->execute();
                 } else {
                     // Deny login due to active session
@@ -86,8 +90,8 @@ function handleLogin() {
             // Insert into login_logout_history
             $ip_address = $_SERVER['REMOTE_ADDR'];
             $session_id = session_id();
-            $query_insert_session = "INSERT INTO login_logout_history (user_id, session_id, ip_address, login_time)
-                                     VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
+            $query_insert_session = "INSERT INTO login_logout_history (user_id, session_id, ip_address, login_time, last_activity)
+                                     VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
             $stmt_insert_session = $conn->prepare($query_insert_session);
 
             if ($stmt_insert_session === false) {

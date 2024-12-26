@@ -2,41 +2,34 @@
 const UTSsessionManager = (() => {
     const apiEndpoint = 'UTSauth_check.php'; // Endpoint for session authentication checks
     const logoutEndpoint = 'UTSloginLogout.php'; // Endpoint for logout requests
+    const authCheckInterval = 5 * 60 * 1000; // Interval for authentication checks (30 minutes)
 
     // Redirects to the welcome page if the user is not authenticated or session has expired
-    async function redirectToWelcomeIfUnauthenticated() {
+    async function authenticateAndGetDetails(updateLastActivity = true) {
         try {
-            const response = await fetch(apiEndpoint);
+            const response = await fetch(apiEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ updateLastActivity }),
+            });
             const data = await response.json();
 
             if (!data.authenticated) {
                 console.log(data.message || 'Session inactive. Redirecting to welcome page...');
                 window.location.href = 'UTSwelcome.html';
+                return null; // Authentication failed
             } else {
                 console.log('User authenticated:', data);
+                return data; // Return user details
             }
         } catch (error) {
             console.error('Error checking authentication:', error);
+            return null; // Handle authentication check error
         }
     }
 
-    // Retrieves user details from the session
-    async function getUserDetails() {
-        try {
-            const response = await fetch(apiEndpoint);
-            const data = await response.json();
-
-            if (data.authenticated) {
-                return data; // Contains fields like user_id, username, role, etc.
-            } else {
-                console.log(data.message || 'User not authenticated. No details available.');
-                return null;
-            }
-        } catch (error) {
-            console.error('Error retrieving user details:', error);
-            return null;
-        }
-    }
 
     // Logs out the user and redirects to the welcome page
     async function logoutUser() {
@@ -61,9 +54,21 @@ const UTSsessionManager = (() => {
         }
     }
 
+    // Periodic authentication check
+    async function startAuthCheckInterval() {
+        console.log('Interval started:');
+        setInterval(async () => {
+            
+            const userDetails = await authenticateAndGetDetails(false);
+            if (userDetails) {
+                console.log('Session validated periodically:', userDetails, ` Current time: ${new Date().toISOString()}`);
+            }
+        }, authCheckInterval);
+    }
+
     // Initializes session-related UI updates and checks
     async function initializeSession() {
-        const userDetails = await getUserDetails();
+        const userDetails = await authenticateAndGetDetails();
         const userInitialElement = document.getElementById('userInitial');
 
         if (userDetails) {
@@ -72,6 +77,10 @@ const UTSsessionManager = (() => {
                 const firstInitial = userDetails.username.charAt(0).toUpperCase();
                 userInitialElement.textContent = firstInitial;
             }
+
+            // Start periodic authentication checks
+            await startAuthCheckInterval();
+
         } else if (userInitialElement) {
             userInitialElement.textContent = 'N/A';
         }
@@ -110,8 +119,8 @@ const UTSsessionManager = (() => {
 
     // Publicly exposed methods
     return {
-        redirectToWelcomeIfUnauthenticated,
-        getUserDetails,
+        authenticateAndGetDetails,
+        //getUserDetails,
         logoutUser,
         initializeSession,
         setupProfileDropdown,
@@ -121,7 +130,7 @@ const UTSsessionManager = (() => {
 // Event listener for DOM content loaded
 document.addEventListener('DOMContentLoaded', async () => {
     // Redirect to welcome if session is inactive
-    await UTSsessionManager.redirectToWelcomeIfUnauthenticated();
+    //await UTSsessionManager.redirectToWelcomeIfUnauthenticated();
 
     // Initialize session UI
     await UTSsessionManager.initializeSession();
