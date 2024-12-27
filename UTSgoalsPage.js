@@ -129,18 +129,18 @@ function calculateStreak(dates) {
     
     // Get today's date in YYYY-MM-DD format
     const today = new Date();
-    const todayString = today.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
+    const todayString = today.toLocaleDateString('en-CA'); // Local date in YYYY-MM-DD format
 
-    //console.log(`dates: ${dates}`);
-    //console.log(`Today: ${todayString}`);
+    console.log(`dates: ${dates}`);
+    console.log(`Today: ${todayString}`);
     
     for (let i = 0; i < dates.length; i++) {
         const expectedDate = new Date(today);
         expectedDate.setDate(today.getDate() - streak); // Expected consecutive date
 
-        const expectedDateString = expectedDate.toISOString().split('T')[0]; // Expected date in YYYY-MM-DD
+        const expectedDateString = expectedDate.toLocaleDateString('en-CA');  // Expected date in YYYY-MM-DD
 
-        //console.log(`expectedDateString: ${expectedDateString}, activityDate: ${dates[i]}`);
+        console.log(`expectedDateString: ${expectedDateString}, activityDate: ${dates[i]}`);
 
         // Compare strings directly
         if (dates[i] === expectedDateString) {
@@ -150,7 +150,7 @@ function calculateStreak(dates) {
         }
     }
 
-    //console.log(`Final streak: ${streak}`);
+    console.log(`Final streak: ${streak}`);
 
     document.getElementById("streakNumber").textContent = streak;
 }

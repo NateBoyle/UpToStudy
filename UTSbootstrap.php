@@ -8,6 +8,9 @@ if (session_status() === PHP_SESSION_NONE) {
 // Include database connection
 require 'UTSdb_connection.php';
 
+// Set the default timezone
+date_default_timezone_set('America/Los_Angeles');
+
 register_shutdown_function(function() use ($conn) {
     // Close database connection
     if (isset($conn) && $conn) {

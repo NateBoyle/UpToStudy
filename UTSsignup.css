@@ -8,6 +8,7 @@ body {
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
     min-height: 100vh; /* Ensure full viewport height */
+    text-align: left;
 }
 /* Form Container */
 form {
@@ -22,6 +23,7 @@ form {
     gap: 30px; /* Space between form elements */
     box-sizing: border-box; /* Include padding in width/height */
     justify-content: space-between; /* Pushes elements to fill available space */
+    margin-top: 50px;
 }
 
 label {
@@ -103,4 +105,9 @@ input[type="submit"]:hover {
     min-height: 16px; /* Reserve space for the error message */
     display: block; /* Ensure it takes up space even when empty */
     margin-top: 5px;
+}
+
+#editProfileHeader {
+    text-align: center;
+    font-size: 40px;
 }

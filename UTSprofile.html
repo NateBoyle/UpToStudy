@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="UTSicon2.png">
+
+    <link rel="stylesheet" href="UTScss.css">
+    <link rel="stylesheet" href="UTSsignup.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery library -->
+
+    
+
+    <style>
+        @font-face {
+            font-family: UTSfont;
+            src: url(PlusJakartaSans-Medium.TTF);
+        }
+    </style>
+    
+    <title>Edit Profile</title>
+</head>
+
+<body>
+
+    <!-- Header Container -->
+    <div class="header">
+              
+        <!-- Left Side: Logo -->
+        <a href="UTStemplate.html">
+            <img src="UTSicon2.png" alt="UpToStudy Logo">
+        </a>
+
+        
+
+        <!-- Center: Navigation Links -->
+        <div class="nav-links">
+            <a href="UTSdash.html" class="nav-item">Dashboard</a>
+            <a href="UTScalendar.html" class="nav-item">Calendar</a>
+            <a href="UTScourses.html" class="nav-item">Courses</a>
+            <a href="UTScards.html" class="nav-item">Study</a>
+            <a href="UTSgoals.html" class="nav-item">Goals</a>
+        </div>
+
+        <!-- Right Side: User Initial -->
+        <div class="user-initial" id="userInitial">N</div>
+
+        <!-- Dropdown Modal for Profile Options -->
+        <div id="profileDropdown" class="profile-dropdown">
+            <button class="dropdown-option" id="editProfileBtn">Edit Profile</button>
+            <button class="dropdown-option" id="logoutBtn">Logout</button>
+        </div>
+
+    </div>
+    
+    <form id="editProfileForm" method="post">
+        <label for="editProfileHeader" id="editProfileHeader">Edit Profile</label>
+        <div>
+            <label for="full_name">Full Name</label>
+            <input type="text" id="full_name" name="full_name" placeholder="e.g., John Doe">
+            <span class="error" id="fullNameError"></span>
+        </div>
+        <div>
+            <label for="email">Email Address</label>
+            <input type="text" id="email" name="email" placeholder="e.g., johndoe@gmail.com">
+            <span class="error" id="emailError"></span>
+        </div>
+        <div>
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="##########">
+            <span class="error" id="phoneError"></span>
+        </div>
+        <div>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Must be at least 8 characters">
+            <span class="error" id="usernameError"></span>
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="8 or more characters with at least one lower, uppercase, number, and special character">
+            <span class="error" id="passwordError"></span>
+            <!-- Show Password Checkbox -->
+            <div class="checkbox-container">
+                <input type="checkbox" onclick="showPassword()">
+                <label>Show Password</label>
+            </div>
+            
+        </div>
+
+        <!-- Submit Button -->
+        <div class="submit-container">
+            <input type="submit" name="submit" value="Submit">
+        </div>
+
+    </form>
+    
+
+    <script>
+        function showPassword() {
+            var x = document.getElementById("password");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
+
+    <script src="UTSsessionManager.js"></script>
+    <script src="UTSprofile.js"></script>
+
+
+</body>
+
+</html>

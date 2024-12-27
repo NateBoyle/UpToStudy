@@ -18,6 +18,9 @@ function handleGoalSetAction($action) {
         case 'delete':
             deleteGoalSet();
             break;
+        case 'changeGoalSet': // New case
+            changeGoalSet();
+            break;
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action for goal set.']);
             break;
@@ -45,6 +48,55 @@ function handleGoalAction($action) {
 }
 
 // GOAL SET FUNCTIONS
+// New changeGoalSet Function
+function changeGoalSet() {
+    global $conn;
+
+    $userId = $_SESSION['user_id']; // Assuming user_id is in the session
+    $currentGoalSetId = $_POST['currentGoalSetId'] ?? null;
+    $goalSetId = $_POST['goalSetId'] ?? null;
+    $containerId = $_POST['containerId'] ?? null;
+
+    // Validate required parameters
+    if (!$goalSetId || !$containerId) {
+        echo json_encode(['success' => false, 'message' => 'Goal set ID and container ID are required.']);
+        return;
+    }
+
+    try {
+        // Begin transaction
+        $conn->begin_transaction();
+
+        // Step 1: Unassign the current goal set if it exists
+        if ($currentGoalSetId) {
+            $stmt = $conn->prepare("UPDATE goal_sets SET container = NULL WHERE id = ? AND user_id = ?");
+            $stmt->bind_param('ii', $currentGoalSetId, $userId);
+            if (!$stmt->execute()) {
+                throw new Exception("Failed to unassign the current goal set.");
+            }
+            $stmt->close();
+        }
+
+        // Step 2: Assign the new goal set to the container
+        $stmt = $conn->prepare("UPDATE goal_sets SET container = ? WHERE id = ? AND user_id = ?");
+        $stmt->bind_param('iii', $containerId, $goalSetId, $userId);
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to assign the new goal set.");
+        }
+        $stmt->close();
+
+        // Commit transaction
+        $conn->commit();
+
+        echo json_encode(['success' => true, 'message' => 'Goal set reassigned successfully.']);
+    } catch (Exception $e) {
+        // Roll back transaction on error
+        $conn->rollback();
+        error_log('Error in changeGoalSet: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Failed to reassign goal set.']);
+    }
+}
+
 function validateContainer($userId, $container, $goalSetId = null) {
     global $conn;
 

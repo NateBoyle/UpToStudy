@@ -46,6 +46,114 @@ async function populateCourseDropdown() {
     }
 }
 
+async function populateGoalSetDropdown() {
+    // Get the dropdown element
+    const dropdown = document.getElementById("goalSetDropdown");
+    
+    // Clear existing options
+    dropdown.innerHTML = "";
+
+    try {
+        // Fetch goal sets
+        const goalSets = await fetchGoalSets();
+
+        // Check if goal sets are available
+        if (goalSets.length === 0) {
+            const noOptionsMessage = document.createElement("option");
+            noOptionsMessage.value = "";
+            noOptionsMessage.textContent = "No goal sets available";
+            noOptionsMessage.disabled = true;
+            dropdown.appendChild(noOptionsMessage);
+            return;
+        }
+
+        // Populate the dropdown with new options
+        goalSets.forEach(goalSet => {
+            const option = document.createElement("option");
+            option.value = goalSet.id; // Use the id as the value
+            option.textContent = goalSet.title; // Display the title in the dropdown
+            dropdown.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error populating goal set dropdown:", error);
+        const errorMessage = document.createElement("option");
+        errorMessage.value = "";
+        errorMessage.textContent = "Error loading goal sets";
+        errorMessage.disabled = true;
+        dropdown.appendChild(errorMessage);
+    }
+}
+
+async function openChangeSetModal(container) {
+    // Get modal and buttons
+    const modal = document.getElementById("changeSetModal");
+    const confirmButton = document.getElementById("confirmChangeSet");
+    const closeButton = document.getElementById("closeChangeSetModal");
+
+    // Populate the dropdown
+    await populateGoalSetDropdown();
+
+    // Confirm button handler
+    confirmButton.onclick = async () => {
+        const dropdown = document.getElementById("goalSetDropdown");
+        const selectedGoalSet = dropdown.value; // Get the selected goal set
+        const currentGoalSetId = document.getElementById(`goalSet${container}`).getAttribute('data-set-id'); // Retrieve current ID
+
+        
+        
+
+        // Define the entity and action
+        const entity = 'goalSet';
+        const action = 'changeGoalSet';
+
+        
+
+        try {
+
+            console.log(`Reassigning container ${container} to ${entity} ${selectedGoalSet} and unassigning from ${currentGoalSetId}`);
+
+            // Construct the request payload
+            const data = {
+                currentGoalSetId: currentGoalSetId,
+                containerId: container,
+                goalSetId: selectedGoalSet
+            };
+
+            // Make the backend call
+            const response = await fetch('UTSgoalSets.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ entity, action, ...data }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                console.log('Reassignment successful');
+                alert('Container reassignment successful'); // Display success message
+                modal.style.display = "none"; // Close the modal
+                window.location.reload(); // Refresh the page
+            } else {
+                console.error('Reassignment failed:', result.message);
+                alert('Failed to reassign the goal set. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error during reassignment:', error);
+            alert('An error occurred. Please check your connection and try again.');
+        }
+    };
+
+    // Close button handler
+    closeButton.onclick = () => {
+        modal.style.display = "none"; // Close the modal
+    };
+
+    // Change modal display to visible
+    modal.style.display = "flex";
+
+}
+
+
 export async function openGoalModal(goal = null, goalSetId = null) {
 
     console.log(`openGoalModal called`);
@@ -486,9 +594,12 @@ export async function populateGoalSets() {
             // Find the goal set for this container
             const goalSet = goalSets.find((set) => set.container == i);
 
-            console.log(`GoalSetID: ${goalSet.id}, set container: ${goalSet.container} i: ${i}`)
+            
 
             if (goalSet) {
+
+                console.log(`GoalSetID: ${goalSet.id}, set container: ${goalSet.container} i: ${i}`)
+                
                 // Populate the title and set data attributes
                 goalSetTitle.textContent = goalSet.title;
                 goalSetList.setAttribute('data-set-id', goalSet.id);
@@ -533,22 +644,16 @@ document.addEventListener("DOMContentLoaded", () => {
         newGoalSetButton.addEventListener('click', () => openGoalSetModal());
     }
 
+    if (document.getElementById("changeSetButton1")) {
+        document.getElementById("changeSetButton1").addEventListener("click", () => openChangeSetModal(1));
+    }
     
-
-    //populateGoalSets();
+    if (document.getElementById("changeSetButton2")) {
+        document.getElementById("changeSetButton2").addEventListener("click", () => openChangeSetModal(2));
+    }
     
-    /*// Open Goal Creation Modal
-    document.getElementById('setGoalButton').addEventListener('click', async () => {
-        const modal = document.getElementById('goalCreationModal');
-        modal.style.display = 'flex'; // Show the modal (flex aligns content in the center)
+    if (document.getElementById("changeSetButton3")) {
+        document.getElementById("changeSetButton3").addEventListener("click", () => openChangeSetModal(3));
+    }
 
-        // Populate the course dropdown
-        await populateCourseDropdown();
-
-        // Close Goal Creation Modal
-        document.getElementById('closeGoalCreation').addEventListener('click', () => {
-            const modal = document.getElementById('goalCreationModal');
-            modal.style.display = 'none'; // Hide the modal
-        });
-    });*/
 });

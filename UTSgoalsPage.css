@@ -191,6 +191,30 @@
     align-items: center;
 }
 
+/* For Webkit browsers (Chrome, Edge, Safari) */
+.goal-list::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+    /*height: 12px;  Height for horizontal scrollbars */
+}
+
+.goal-list::-webkit-scrollbar-thumb {
+    background-color: #888; /* Color of the scrollbar thumb */
+    border-radius: 6px; /* Round the thumb edges */
+    border: 3px solid transparent; /* Space around the thumb */
+    background-clip: padding-box; /* Ensure the border shows */
+}
+
+.goal-list::-webkit-scrollbar-thumb:hover {
+    background-color: #393939; /* Darker color when hovered */
+}
+
+.goal-list::-webkit-scrollbar-track {
+    background-color: #555555; /* Background of the scrollbar track */
+    border: 1px solid #888;
+    border-radius: 6px; /* Round the track edges */
+}
+
+
 .goal-list li {
     background-color: #1F1F1F;
     padding: 10px;

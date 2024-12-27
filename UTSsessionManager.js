@@ -93,6 +93,7 @@ const UTSsessionManager = (() => {
     function setupProfileDropdown() {
         const userInitialElement = document.getElementById('userInitial');
         const profileDropdown = document.getElementById('profileDropdown');
+        const editProfileBtn = document.getElementById('editProfileBtn'); // Get the Edit Profile button
 
         if (userInitialElement && profileDropdown) {
             // Toggle dropdown visibility on profile icon click
@@ -112,6 +113,16 @@ const UTSsessionManager = (() => {
                     profileDropdown.style.display = 'none';
                 }
             });
+
+            // Add event listener for Edit Profile button
+            if (editProfileBtn) {
+                editProfileBtn.addEventListener('click', () => {
+                    window.location.href = 'UTSprofile.html'; // Navigate to the Edit Profile page
+                });
+            } else {
+                console.error('Edit Profile button not found.');
+            }
+
         } else {
             console.error('Profile dropdown or user initial element not found.');
         }
