@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="UTSicon2.png">
+
+    <link rel="stylesheet" href="UTSticket.css">
+    <link rel="stylesheet" href="UTScss.css">
+    
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery library -->
+
+    
+
+    <style>
+        @font-face {
+            font-family: UTSfont;
+            src: url(PlusJakartaSans-Medium.TTF);
+        }
+    </style>
+    
+    <title>Support Ticket</title>
+</head>
+
+<body>
+
+    <!-- Header Container -->
+    <div class="header">
+              
+        <!-- Left Side: Logo -->
+        <a href="UTStemplate.html">
+            <img src="UTSicon2.png" alt="UpToStudy Logo">
+        </a>
+
+        
+
+        <!-- Center: Navigation Links -->
+        <div class="nav-links">
+            <a href="UTSdash.html" class="nav-item">Dashboard</a>
+            <a href="UTScalendar.html" class="nav-item">Calendar</a>
+            <a href="UTScourses.html" class="nav-item">Courses</a>
+            <a href="UTScards.html" class="nav-item">Study</a>
+            <a href="UTSgoals.html" class="nav-item">Goals</a>
+        </div>
+
+        <!-- Right Side: User Initial -->
+        <div class="user-initial" id="userInitial">N</div>
+
+        <!-- Dropdown Modal for Profile Options -->
+        <div id="profileDropdown" class="profile-dropdown">
+            <button class="dropdown-option" id="editProfileBtn">Edit Profile</button>
+            <button class="dropdown-option" id="logoutBtn">Logout</button>
+        </div>
+
+    </div>
+    
+    <div class="support-form-container">
+        <h2>Submit a Support Ticket</h2>
+        <form id="supportTicketForm" method="post">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" placeholder="Enter the subject" required>
+    
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Describe your issue" required></textarea>
+    
+            <div class="submit-container"> 
+                <button type="submit" id="submitButton">Submit Ticket</button>
+            </div>
+        </form>
+    </div>
+    
+
+
+
+    <script src="UTSsessionManager.js"></script>
+    <script src="UTSticket.js"></script>
+
+
+
+</body>
+
+</html>

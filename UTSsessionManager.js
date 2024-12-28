@@ -94,6 +94,8 @@ const UTSsessionManager = (() => {
         const userInitialElement = document.getElementById('userInitial');
         const profileDropdown = document.getElementById('profileDropdown');
         const editProfileBtn = document.getElementById('editProfileBtn'); // Get the Edit Profile button
+        const supportTicketBtn = document.getElementById('supportTicketBtn'); // Get the Support Ticket button
+        const currentPage = window.location.pathname;
 
         if (userInitialElement && profileDropdown) {
             // Toggle dropdown visibility on profile icon click
@@ -119,8 +121,17 @@ const UTSsessionManager = (() => {
                 editProfileBtn.addEventListener('click', () => {
                     window.location.href = 'UTSprofile.html'; // Navigate to the Edit Profile page
                 });
-            } else {
+            } else if (currentPage === '/UTSprofile.html') {
                 console.error('Edit Profile button not found.');
+            }
+
+            // Add event listener for Support Ticket button
+            if (supportTicketBtn) {
+                supportTicketBtn.addEventListener('click', () => {
+                    window.location.href = 'UTSticket.html'; // Navigate to the Support Ticket page
+                });
+            } else if (currentPage === '/UTSticket.html') {
+                console.error('Support Ticket button not found.');
             }
 
         } else {

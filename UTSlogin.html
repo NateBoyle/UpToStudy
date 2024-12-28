@@ -21,35 +21,37 @@
 </head>
 
 <body>
-    <form id="loginForm" method="post">
-
-        <!-- Username Field -->
-        <div>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Please enter your username" >
-            <span class="error" id="usernameError"></span>
-        </div>
-
-        <!-- Password Field -->
-        <div>
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Please enter your password" >
-            <span class="error" id="passwordError"></span>
-
-            <!-- Show Password Checkbox -->
-            <div class="checkbox-container">
-                <input type="checkbox" onclick="showPassword()">
-                <label>Show Password</label>
+    <div class="log-in-container">
+        <form id="loginForm" method="post">
+            <h1 style="text-align: center;">Welcome Back!</h1>
+            <!-- Username Field -->
+            <div>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Please enter your username" >
+                <span class="error" id="usernameError"></span>
             </div>
-        </div>
-
-        <!-- Submit Button -->
-        <div class="submit-container">
-            <input type="submit" name="submit" value="Login">
-        </div>
-
-        
-    </form>
+    
+            <!-- Password Field -->
+            <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Please enter your password" >
+                <span class="error" id="passwordError"></span>
+    
+                <!-- Show Password Checkbox -->
+                <div class="checkbox-container">
+                    <input type="checkbox" onclick="showPassword()">
+                    <label>Show Password</label>
+                </div>
+            </div>
+    
+            <!-- Submit Button -->
+            <div class="submit-container">
+                <input type="submit" name="submit" value="Login">
+            </div>
+    
+            
+        </form>
+    </div>
 
     <script>
         function showPassword() {

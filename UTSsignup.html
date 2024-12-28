@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="UTSsignup.css">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery library -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
     
 
@@ -16,63 +17,99 @@
             src: url(PlusJakartaSans-Medium.TTF);
         }
     </style>
+
+    <style>
+        .material-symbols-outlined {
+        font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 40
+        }
+    </style>
     
     <title>Sign Up Form</title>
 </head>
 
 <body>
     
-    <form id="signupForm" method="post">
-        <div>
-            <label for="full_name">Full Name</label>
-            <input type="text" id="full_name" name="full_name" placeholder="e.g., John Doe">
-            <span class="error" id="fullNameError"></span>
-        </div>
-        <div>
-            <label for="email">Email Address</label>
-            <input type="text" id="email" name="email" placeholder="e.g., johndoe@gmail.com">
-            <span class="error" id="emailError"></span>
-        </div>
-        <div>
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" placeholder="##########">
-            <span class="error" id="phoneError"></span>
-        </div>
-        <div>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Must be at least 8 characters">
-            <span class="error" id="usernameError"></span>
-        </div>
-        <div>
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="8 or more characters with at least one lower, uppercase, number, and special character">
-            <span class="error" id="passwordError"></span>
-            <!-- Show Password Checkbox -->
-            <div class="checkbox-container">
-                <input type="checkbox" onclick="showPassword()">
-                <label>Show Password</label>
+    <div class="sign-up-container">
+        <!-- <img src="background-blob.svg" alt="Dark Background Blob" class="background-blob"/> -->
+        <form id="signupForm" method="post">
+            <h1 style="text-align: center;">Start Learning!</h1>
+            <div>
+                <label for="full_name">Full Name</label>
+                <div class="input-container">
+                    <i class="material-icons" style="opacity: 0.8">person</i>
+                    <input type="text" id="full_name" name="full_name" placeholder="e.g., John Doe">
+                </div>
+                <!-- <span class="error" id="fullNameError"></span> -->
             </div>
-            
-        </div>
-
-        <!-- Submit Button -->
-        <div class="submit-container">
-            <input type="submit" name="submit" value="Sign Up">
-        </div>
-
-    </form>
+            <div>
+                <label for="email">Email Address</label>
+                <div class="input-container">
+                    <i class="material-icons" style="opacity: 0.8">mail</i>
+                    <input type="text" id="email" name="email" placeholder="e.g., johndoe@email.com">
+                </div>
+                <!-- <span class="error" id="emailError"></span> -->
+            </div>
+            <div>
+                <label for="phone">Phone Number</label>
+                <div class="input-container">
+                    <i class="material-icons" style="opacity: 0.8">call</i>
+                    <input type="tel" id="phone" name="phone" placeholder="### - ### - ####">
+                    <!-- <span class="error" id="phoneError"></span> -->
+                </div>
+            </div>
+            <div>
+                <label for="username">Username</label>
+                <div class="input-container">
+                    <i class="material-icons" style="opacity: 0.8">face</i>
+                    <input type="text" id="username" name="username" placeholder="Must be at least 8 characters">
+                </div>
+                <!-- <span class="error" id="usernameError"></span> -->
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <div class="input-container">
+                    <i class="material-icons" style="opacity: 0.8">lock</i>
+                    <input type="password" id="password" name="password" placeholder="8 or more characters with at least one lower, uppercase, number, and special character">
+                    <i class="material-icons" style="opacity: 0.5" id="visibility_toggle" onclick="showPassword()">
+                        visibility_off
+                    </i>
+                </div>
+                <span class="error" id="passwordError"></span>
+                
+            </div>
+    
+            <!-- Submit Button -->
+            <div class="submit-container">
+                <input type="submit" name="submit" value="Sign Up">
+            </div>
+    
+        </form>
+    </div>
     
 
     <script>
         function showPassword() {
             var x = document.getElementById("password");
+            var toggle = document.getElementById("visibility_toggle");
+            if (toggle.classList.toggle("clicked")) {
+                console.log("hi!");
+            }
+
+
             if (x.type === "password") {
                 x.type = "text";
+                toggle.textContent = "visibility";
             } else {
                 x.type = "password";
+                toggle.textContent = "visibility_off";
             }
         }
     </script>
+
     <script src="UTSsignupjs.js"></script>
 </body>
 

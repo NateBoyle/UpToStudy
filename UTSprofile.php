@@ -81,7 +81,7 @@ function updateUserProfile() {
     // Check for duplicate username or email
     if (empty($errors)) {
         // Check for duplicate username
-        $username_query = "SELECT id FROM users WHERE username = ? AND id != ?";
+        $username_query = "SELECT user_id FROM users WHERE username = ? AND user_id != ?";
         $stmt = $conn->prepare($username_query);
 
         if ($stmt) {
@@ -102,7 +102,7 @@ function updateUserProfile() {
         }
 
         // Check for duplicate email
-        $email_query = "SELECT id FROM users WHERE email = ? AND id != ?";
+        $email_query = "SELECT user_id FROM users WHERE email = ? AND user_id != ?";
         $stmt = $conn->prepare($email_query);
 
         if ($stmt) {
@@ -137,7 +137,7 @@ function updateUserProfile() {
     try {
         $query = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, username = ?" .
                  ($hashedPassword ? ", password = ?" : "") .
-                 " WHERE id = ?";
+                 " WHERE user_id = ?";
         $stmt = $conn->prepare($query);
 
         if ($hashedPassword) {

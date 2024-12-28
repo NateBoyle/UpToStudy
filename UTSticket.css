@@ -1,0 +1,96 @@
+/* Form Container */
+.support-form-container {
+    background: #27292B;
+    box-shadow: 0px 8px 16px 3px rgba(0, 0, 0, 0.18);
+    border-radius: 48px;
+    padding: 40px;
+    max-width: 800px; /* Maximum width for larger screens */
+    width: 90%; /* Flexible width for smaller screens */
+    display: flex;
+    flex-direction: column; /* Stack form elements vertically */
+    gap: 30px; /* Space between form elements */
+    box-sizing: border-box; /* Include padding in width/height */
+    margin-top: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    align-items: center;
+}
+
+h2 {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 40px;
+}
+
+form {
+    text-align: left;
+}
+/* Labels */
+label {
+    font-size: 25px;
+    font-weight: 500;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    padding: 10px;
+    color: white;
+    text-align: left;
+}
+
+/* Input Fields */
+input[type="text"], textarea {
+    width: 90%;
+    border: none;
+    font-size: 18px;
+    padding: 10px;
+    background: none;
+    color: white;
+    border: 2px solid #D9D9D9;
+    border-radius: 5px;
+    outline: none; /* Remove focus outline */
+    resize: none; /* Disable resizing for textareas */
+    margin: 20px;
+    margin-bottom: 30px;
+}
+
+textarea {
+    height: 120px; /* Default height for the message textarea */
+    border-radius: 10px;
+}
+
+/* Submit Button Container */
+.submit-container {
+    display: flex;
+    justify-content: center; /* Center the button horizontally */
+    align-items: center;
+}
+
+/* Submit Button */
+#submitButton {
+    width: 50%;
+    height: 60px;
+    background: #4AB3FF;
+    border-radius: 30px;
+    color: white;
+    font-size: 24px;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#submitButton:hover {
+    background: #3a9fd8;
+}
+
+/* Error Messages */
+.error {
+    font-size: 12px;
+    color: red;
+    min-height: 16px; /* Reserve space for the error message */
+    display: block; /* Ensure it takes up space even when empty */
+    margin-top: 5px;
+}

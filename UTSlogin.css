@@ -2,28 +2,42 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: black;
+    background-color: rgba(30, 30, 30, 1);
     color: white;
     font-family: UTSfont, sans-serif;
-    display: flex; /* Use Flexbox for layout */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    min-height: 100vh; /* Ensure full viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.log-in-container {
+    display: flex;
+    background: rgba(39, 41, 43, 1);
+    border-radius: 48px;
+    box-shadow: 0px 8px 16.1px 3px rgba(0, 0, 0, 0.18);
+
+    padding: 30px;
+    max-width: 1500px;
+    width: 50%;
+
+    box-sizing: border-box;
+    justify-content: center;
+    overflow: hidden;
+
+    background: 
+    radial-gradient(circle at right center, rgba(28, 28, 28, 1), transparent 100%),
+    rgba(39, 41, 43, 1);
 }
 
 /* Form Container */
 form {
-    background: #27292B;
-    box-shadow: 0px 8px 16.1px 3px rgba(0, 0, 0, 0.18);
-    border-radius: 48px;
-    padding: 40px;
-    max-width: 600px; /* Maximum width for larger screens */
-    width: 70%; /* Flexible width for smaller screens */
     display: flex;
-    flex-direction: column; /* Stack form elements vertically */
-    gap: 30px; /* Space between form elements */
-    box-sizing: border-box; /* Include padding in width/height */
-    justify-content: space-between; /* Pushes elements to fill available space */
+    flex-direction: column;
+    gap: 30px;
+    width: 90%;
+    box-sizing: border-box;
+    justify-content: space-between;
 }
 
 /* Label Styles */
@@ -45,6 +59,7 @@ input[type="password"] {
     color: white;
     outline: none;
     border-bottom: 4px solid #D9D9D9;
+    border-radius: 10px;
 }
 
 input[type="text"]::placeholder,
@@ -60,59 +75,58 @@ input[type="password"]::placeholder {
     gap: 10px;
     font-size: 14px;
     margin-top: 10px;
-    gap: 5px; /* Space between checkbox and label */
-    margin-top: 10px; /* Add spacing above the checkbox */
+    gap: 5px;
+    margin-top: 10px;
 }
 
 .checkbox-container input[type="checkbox"] {
-    vertical-align: middle; /* Ensure the checkbox aligns with the middle of the text */
-    transform: scale(1.5); /* Optional: Adjust the checkbox size if needed */
+    vertical-align: middle;
+    transform: scale(1.5);
 }
 
 /* Checkbox Label Styles */
 .checkbox-container label {
     position: relative;
-    top: 5px; /* Adjust this value to perfectly position the label */
-    vertical-align: middle; /* Align the label text with the checkbox */
-    line-height: 3; /* Adjust line height for perfect alignment */
-    font-size: 12px; /* Decrease font size */
+    top: 5px;
+    vertical-align: middle;
+    line-height: 3;
+    font-size: 12px;
     color: white;
 }
 
-/* Error Message Styles */
-.error {
-    font-size: 12px;
-    color: red;
-    min-height: 16px; /* Reserve space for the error message */
-    display: block; /* Ensure it takes up space even when empty */
-    margin-top: 4px; /* Add spacing between the input and the error message */
-}
-
-/* Submit Button Container */
+/* SUBMIT */
 .submit-container {
     display: flex;
-    justify-content: center; /* Center the button horizontally */
-    margin-top: auto; /* Push the button towards the bottom of the form */
-    margin-bottom: 0px; /* Reduce or remove bottom margin */
+    justify-content: center;
+    margin-top: auto;
+    margin-bottom: 0px;
 }
 
-/* Submit Button */
 input[type="submit"] {
-    width: 60%;
-    height: 60px;
+    padding: 1rem 3rem;
     background: #4AB3FF;
-    border-radius: 30px;
+    border-radius: 18px;
     color: white;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 800;
     border: none;
     cursor: pointer;
     transition: background 0.3s ease;
     text-align: center;
-    margin-top: 4px;
+    margin-top: 1rem;
+    font-family: UTSfont, sans-serif;
 }
 
 input[type="submit"]:hover {
     background: #3a9fd8;
     
+}
+
+/* ERROR */
+.error {
+    font-size: 12px;
+    color: red;
+    min-height: 16px;
+    display: block;
+    margin-top: 4px;
 }
