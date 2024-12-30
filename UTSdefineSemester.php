@@ -78,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $start_date = $_POST['start_date'] ?? null;
         $end_date = $_POST['end_date'] ?? null;
 
+        // Log the variables
+        error_log("UpdateSemester - semester_id: $semester_id, semester_name: $semester_name, start_date: $start_date, end_date: $end_date");
+
         if (!$semester_id || !$semester_name || !$start_date || !$end_date) {
             echo json_encode(['success' => false, 'message' => 'All fields are required (semester_id, name, start_date, end_date).']);
             exit;
@@ -87,13 +90,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         SET name = ?, start_date = ?, end_date = ?
                         WHERE semester_id = ? AND user_id = ?";
         $updateStmt = $conn->prepare($updateQuery);
-        $updateStmt->bind_param("sssii", $semester_name, $start_date, $end_date, $semester_id, $user_id);
 
-        if ($updateStmt->execute() && $updateStmt->affected_rows > 0) {
-            echo json_encode(['success' => true, 'message' => 'Semester updated successfully.']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to update semester or no changes made.']);
+        if (!$updateStmt) {
+            echo json_encode(['success' => false, 'message' => 'Failed to prepare the update query.']);
+            exit;
         }
+    
+        $updateStmt->bind_param("sssii", $semester_name, $start_date, $end_date, $semester_id, $user_id);
+    
+        if ($updateStmt->execute()) {
+            if ($updateStmt->affected_rows > 0) {
+                echo json_encode(['success' => true, 'message' => 'Semester updated successfully.']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'No changes made to the semester.']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to execute update query.']);
+        }
+
         $updateStmt->close();
 
     } elseif ($action === 'delete') {

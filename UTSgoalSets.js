@@ -110,7 +110,7 @@ async function openChangeSetModal(container) {
 
         try {
 
-            console.log(`Reassigning container ${container} to ${entity} ${selectedGoalSet} and unassigning from ${currentGoalSetId}`);
+            //console.log(`Reassigning container ${container} to ${entity} ${selectedGoalSet} and unassigning from ${currentGoalSetId}`);
 
             // Construct the request payload
             const data = {
@@ -129,7 +129,7 @@ async function openChangeSetModal(container) {
             const result = await response.json();
 
             if (result.success) {
-                console.log('Reassignment successful');
+                //console.log('Reassignment successful');
                 alert('Container reassignment successful'); // Display success message
                 modal.style.display = "none"; // Close the modal
                 window.location.reload(); // Refresh the page
@@ -156,7 +156,7 @@ async function openChangeSetModal(container) {
 
 export async function openGoalModal(goal = null, goalSetId = null) {
 
-    console.log(`openGoalModal called`);
+    //console.log(`openGoalModal called`);
 
     const modal = document.getElementById('goalModal');
     const form = modal.querySelector('form');
@@ -285,9 +285,9 @@ export async function openGoalSetModal(goalSet = null) {
         containerRadios.forEach((radio) => {
             if (String(radio.value) === String(goalSet.container)) {
                 radio.checked = true;
-                console.log(`Radio button with value ${radio.value} is checked.`);
+                //console.log(`Radio button with value ${radio.value} is checked.`);
             } else {
-                console.log(`Radio button with value ${radio.value} is NOT checked.`);
+                //console.log(`Radio button with value ${radio.value} is NOT checked.`);
             }
         });
 
@@ -365,9 +365,9 @@ async function saveEntity(event, entity, modalId) {
     const form = event.target;
 
     // Log the form data for debugging
-    console.log('Form Data:', new FormData(form));
-    console.log('Entity:', entity);
-    console.log('Modal ID:', modalId);
+    //console.log('Form Data:', new FormData(form));
+    //console.log('Entity:', entity);
+    //console.log('Modal ID:', modalId);
 
     if (!validateFields(form, entity)) return; // Stop if validation fails
 
@@ -419,7 +419,7 @@ async function saveEntity(event, entity, modalId) {
 }
 
 async function completeGoal(id) {
-    console.log(`Attempting to complete goal with id: ${id}`);
+    //console.log(`Attempting to complete goal with id: ${id}`);
     try {
         const response = await fetch('UTSgoalSets.php', {
             method: 'POST',
@@ -562,7 +562,7 @@ async function populateGoalLists() {
                     // Add click event listener to open modal
                     listItem.addEventListener('click', () => {
                         //const id = e.currentTarget.getAttribute('data-id');
-                        console.log(`Goal id: ${goal.id}, goalsetid: ${goalSetId}`);
+                        //console.log(`Goal id: ${goal.id}, goalsetid: ${goalSetId}`);
                         openGoalModal(goal, goalSetId); // Open goal modal with the goal and goal set ID
                     });
 
@@ -598,7 +598,7 @@ export async function populateGoalSets() {
 
             if (goalSet) {
 
-                console.log(`GoalSetID: ${goalSet.id}, set container: ${goalSet.container} i: ${i}`)
+                //console.log(`GoalSetID: ${goalSet.id}, set container: ${goalSet.container} i: ${i}`)
                 
                 // Populate the title and set data attributes
                 goalSetTitle.textContent = goalSet.title;

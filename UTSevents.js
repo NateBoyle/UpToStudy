@@ -54,8 +54,24 @@ export async function populateContainer(containerId, fetchFunction, type, course
         items = await fetchFunction(null, null, null, courseId); // Fetch data (assignments or to-dos)
       }
       else {
-        //console.log(` from UTSevents ContainerId: ${containerId}`);
-        items = await fetchFunction(); // Fetch data (assignments or to-dos)
+        // Normalize today's date to start of the day
+        const startDate = new Date(todaysDate);
+        startDate.setHours(0, 0, 0, 0);
+
+        // Calculate one month from today's date
+        const endDate = new Date(startDate);
+        endDate.setMonth(startDate.getMonth() + 1);
+        endDate.setDate(0); // To handle months with varying days
+        endDate.setHours(23, 59, 59, 999); // Normalize to the end of the day
+
+        const viewStartDate = startDate.toISOString().split("T")[0];
+        const viewEndDate = endDate.toISOString().split("T")[0];
+
+        // Pass the formatted date arguments to fetchFunction
+        items = await fetchFunction(null, viewStartDate, viewEndDate);
+
+        // Exclude completed items
+        items = items.filter(item => item.status !== 'Completed');
       }  
 
         if (items.length === 0) {
@@ -105,13 +121,13 @@ export async function populateContainer(containerId, fetchFunction, type, course
                     <span class="details">COMPLETED</span>
                 `;
                 listItem.style.color = 'white'; // Optional styling for completed items
-            } else if (item.status === 'Graded') {
+            } /*else if (item.status === 'Graded') {
                 listItem.innerHTML = `
                     <span class="text">${item.title}</span>
                     <span class="details">GRADED: ${item.points_earned} / ${item.points_possible}</span>
                 `;
                 listItem.style.color = 'gold'; // Optional styling for graded items
-            }
+            }*/
 
             // Add click event listener
             listItem.addEventListener('click', (e) => {
@@ -194,10 +210,10 @@ export async function openModal(entity, modalId, item) {
   const statusLabel = form.querySelector('label[for="status"]'); // Reference the Status label
   const statusDropdown = form.querySelector('[name="status"]'); // Reference to the status dropdown
 
-  const pointsEarnedInput = form.querySelector('[name="points_earned"]'); // Reference the points_earned input
+  /*const pointsEarnedInput = form.querySelector('[name="points_earned"]'); // Reference the points_earned input
   if (pointsEarnedInput) {
     pointsEarnedInput.style.display = 'none'; // Hide the input for non-assignments
-  }
+  }*/
   
   if (item) {
     // Populate form fields from the item object
@@ -246,7 +262,7 @@ export async function openModal(entity, modalId, item) {
         modalTitle.textContent = 'Edit Assignment'; // Change the title
       }
 
-      pointsEarnedInput.style.display = 'block'; // Show the input for existing assignments
+      //pointsEarnedInput.style.display = 'block'; // Show the input for existing assignments
 
     } else if (entity === "toDo") {
       modalTitle.textContent = 'Edit To-Do'; // Change the title
@@ -317,7 +333,7 @@ function validateFields(form, entity) {
     const dueDate = form.querySelector('[name="due_date"]');
     const dueTime = form.querySelector('[name="due_time"]');
     const courseId = form.querySelector('[name="course_id"]');
-    const points = form.querySelector('[name="points_possible"]');
+    //const points = form.querySelector('[name="points_possible"]');
 
     if (!dueDate.value) {
       errors.push('Due date is required.');
@@ -334,11 +350,11 @@ function validateFields(form, entity) {
       courseId.style.border = '1px solid red';
       valid = false;
     }
-    if (!points.value || isNaN(points.value) || Number(points.value) <= 0) {
+    /*if (!points.value || isNaN(points.value) || Number(points.value) <= 0) {
       errors.push('Points must be a positive number.');
       points.style.border = '1px solid red';
       valid = false;
-    }
+    }*/
   } else if (entity === 'toDo') {
     // To-Dos
     const dueDate = form.querySelector('[name="due_date"]');

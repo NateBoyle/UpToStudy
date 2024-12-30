@@ -1,3 +1,5 @@
+import { fetchSemesters } from './UTSutils.js';
+
 function doesOverlap(existingSemesters, newStartDate, newEndDate) {
     const newStart = new Date(newStartDate);
     const newEnd = new Date(newEndDate);
@@ -39,6 +41,39 @@ async function saveSemester(semesterName, startDate, endDate) {
     }
 }
 
+async function updateSemester(semester) {
+    try {
+        console.log('UpdateSemester called with:', semester); // Log the semester object
+        const response = await fetch('UTSdefineSemester.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                action: 'update', // Specify the action as 'update'
+                semester_id: semester.semester_id, // Pass the semester's primary key
+                semester_name: document.getElementById('semesterName').value, // Updated name
+                start_date: document.getElementById('startDate').value, // Updated start date
+                end_date: document.getElementById('endDate').value, // Updated end date
+            }),
+        });
+
+        const result = await response.json();
+        console.log('Server response:', result); // Log the server's response
+
+        if (result.success) {
+            return true; // Indicate success
+        } else {
+            alert(`Error: ${result.message}`);
+            console.error('Update failed:', result.message);
+            return false; // Indicate failure
+        }
+    } catch (error) {
+        console.error('Error updating semester:', error);
+        alert('An error occurred while updating the semester.');
+        return false; // Indicate failure
+    }
+}
+
+
 function validateSemesterInputs(semesterName, startDate, endDate) {
     if (!semesterName || !startDate || !endDate) {
         alert('Please fill out all fields.');
@@ -56,7 +91,7 @@ function validateSemesterInputs(semesterName, startDate, endDate) {
     return true;
 }
 
-async function handleSaveSemester(event) {
+async function handleSaveSemester(event, semester = null) {
 
     event.preventDefault(); // Prevent form submission
 
@@ -69,8 +104,16 @@ async function handleSaveSemester(event) {
         return; // Stop if validation fails
     }
 
-    const existingSemesters = await fetchSemesters();
+    let existingSemesters = await fetchSemesters();
     console.log('Existing semesters:', existingSemesters); // Debug log
+
+    // If a semester is provided, filter it out from the existing semesters
+    if (semester) {
+        existingSemesters = existingSemesters.filter(
+            existing => existing.semester_id !== semester.semester_id
+        );
+        console.log('Filtered semesters:', existingSemesters); // Debug log
+    }
 
     // Overlap validation
     if (doesOverlap(existingSemesters, startDate, endDate)) {
@@ -78,70 +121,153 @@ async function handleSaveSemester(event) {
         return; // Stop if overlap detected
     }
 
-    // Proceed to save if validation passes
-    const isSaved = await saveSemester(semesterName, startDate, endDate);
+    let isSaved;
+
+    // If editing a semester, update it; otherwise, save it as new
+    if (semester) {
+        isSaved = await updateSemester(semester);
+    } else {
+        isSaved = await saveSemester(semesterName, startDate, endDate);
+    }
 
     if (isSaved) {
         // Reset input fields after saving successfully
         document.getElementById('semesterName').value = '';
         document.getElementById('startDate').value = '';
         document.getElementById('endDate').value = '';
-        // Only close the modal and log success if saving was successful
-        closeDefineSemesterModal();
+    
         alert('Semester saved successfully!');
-        console.log('Semester saved and modal closed.'); // Debug log
+
+        window.location.reload();
+
     } else {
         console.log('Failed to save semester. Modal remains open.'); // Debug log
     }
 }
 
-function openDefineSemesterModal() {
+async function deleteSemester(semester) {
+    try {
+        // Log the semester being deleted for debugging
+        console.log('Attempting to delete semester:', semester);
+
+        // Send the delete request to the server
+        const response = await fetch('UTSdefineSemester.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                action: 'delete', // Specify the delete action
+                semester_id: semester.semester_id, // Pass the semester ID
+            }),
+        });
+
+        const result = await response.json();
+        console.log('Server response:', result); // Log server response for debugging
+
+        if (result.success) {
+            alert('Semester deleted successfully!');
+            window.location.reload(); // Reload the page to update the UI
+            return true; // Indicate success
+        } else {
+            alert(`Error: ${result.message}`);
+            console.error('Delete failed:', result.message);
+            return false; // Indicate failure
+        }
+    } catch (error) {
+        console.error('Error deleting semester:', error);
+        alert('An error occurred while attempting to delete the semester.');
+        return false; // Indicate failure
+    }
+}
+
+function openDefineSemesterModal(semester = null) {
+
     const defineSemesterModal = document.getElementById('defineSemesterModal');
+
+    const semesterNameField = document.getElementById('semesterName');
+    const startDateField = document.getElementById('startDate');
+    const endDateField = document.getElementById('endDate');
+    const deleteSemesterButton = document.getElementById('deleteSemesterButton'); // Reference the delete button
+
+    // If semester is provided, populate the fields
+    if (semester) {
+        semesterNameField.value = semester.name || ''; // Set the 'name' or an empty string
+        startDateField.value = semester.start_date || ''; // Set the 'start_date' or an empty string
+        endDateField.value = semester.end_date || ''; // Set the 'end_date' or an empty string
+
+        deleteSemesterButton.style.display = 'inline-block'; // Show the delete button
+        deleteSemesterButton.addEventListener('click', () => deleteSemester(semester));
+
+        console.log(`Opened semester with id: ${semester.semester_id}`);
+
+        document.getElementById('saveSemesterBtn').addEventListener('click', (event) => handleSaveSemester(event, semester));
+
+    } else {
+        // Clear fields if no semester is provided
+        semesterNameField.value = '';
+        startDateField.value = '';
+        endDateField.value = '';
+
+        deleteSemesterButton.style.display = 'none'; // Hide the delete button
+
+        document.getElementById('saveSemesterBtn').addEventListener('click', (event) => handleSaveSemester(event));
+    }
+
+    // Add event listener to close button (if not already added)
+    document.getElementById('closeDefineSemester').addEventListener('click', () => {
+        defineSemesterModal.style.display = 'none';
+    });
+    
+
     defineSemesterModal.style.display = 'flex';
 }
 
-function closeDefineSemesterModal() {
-    const defineSemesterModal = document.getElementById('defineSemesterModal');
-    defineSemesterModal.style.display = 'none';
-}
 
-/*async function refreshSemesterList() {
+async function populateSemesterList() {
+    console.log(`Semesters list called`);
     try {
-        const semesters = await fetchSemesters(); // Fetch updated list of semesters
-        const semesterContainer = document.getElementById('semesterContainer'); // Your container for displaying semesters
+        // Fetch semesters from the backend
+        const semesters = await fetchSemesters(); // Assume fetchSemesters() returns an array of semester objects
 
-        // Clear existing semesters
-        semesterContainer.innerHTML = '';
+        const modal = document.getElementById('semester-modal');
+        const closeModalButton = document.querySelector('.semester-modal-close');
+        const semesterList = document.getElementById('semester-modal-list');
 
-        if (semesters.length === 0) {
-            semesterContainer.innerHTML = '<p>No semesters found.</p>'; // Show a message if no semesters exist
-            return;
-        }
+        // Clear existing content
+        semesterList.innerHTML = '';
 
-        // Loop through semesters and create UI elements for each
+        // Populate the list
         semesters.forEach(semester => {
-            const semesterElement = document.createElement('div');
-            semesterElement.className = 'semester-item';
-            semesterElement.innerHTML = `
-                <h3>${semester.name}</h3>
-                <p>Start Date: ${semester.start_date}</p>
-                <p>End Date: ${semester.end_date}</p>
-            `;
-            semesterContainer.appendChild(semesterElement);
+            const listItem = document.createElement('li');
+            listItem.textContent = semester.name; // Assume semester has a `name` property
+
+            // Add click event to call openDefineSemesterModal
+            listItem.addEventListener('click', () => openDefineSemesterModal(semester));
+
+            semesterList.appendChild(listItem);
         });
 
-        console.log('Semester list refreshed successfully.');
+        // Close modal
+        closeModalButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        modal.style.display = 'block';
+
     } catch (error) {
-        console.error('Error refreshing semester list:', error);
+        console.error('Error fetching semesters:', error);
+        semesterList.innerHTML = `<li>Error loading semesters</li>`;
     }
-}*/
+}
 
 // Event Listener Setup
 document.addEventListener('DOMContentLoaded', () => {
 
-    document.getElementById('defineSemesterBtn').addEventListener('click', openDefineSemesterModal);
+    document.getElementById('defineSemesterBtn').addEventListener('click', () => openDefineSemesterModal(null));
 
-    document.getElementById('closeDefineSemester').addEventListener('click', closeDefineSemesterModal);
+    const openModalButton = document.getElementById('viewSemestersBtn');
+    openModalButton.addEventListener('click', () => {
+        populateSemesterList(); // Populate list before showing the modal
+        
+    });
 
-    document.getElementById('saveSemesterBtn').addEventListener('click', handleSaveSemester);
 });

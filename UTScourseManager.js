@@ -99,8 +99,8 @@ export function openCourseModal(course = null) {
     
     const assignmentsLabel = document.getElementById('assignmentsLabel');
     const assignmentContainer = document.getElementById('assignmentContainer4Course');
-    const gradeLabel = document.getElementById('gradeLabel');
-    const gradeSpan = document.getElementById('pointsAndGrade');
+    //const gradeLabel = document.getElementById('gradeLabel');
+    //const gradeSpan = document.getElementById('pointsAndGrade');
 
     const addCourseBtn = document.getElementById('addCourseBtn');
     const addAssignmentBtn = document.getElementById('addAssignmentBtn');
@@ -159,16 +159,16 @@ export function openCourseModal(course = null) {
         assignmentContainer.style.display = 'flex';
         addAssignmentBtn.style.display = 'inline-block';
         deleteCourseBtn.style.display = 'inline-block';
-        gradeLabel.style.display = 'block';
+        //gradeLabel.style.display = 'block';
 
         // Populate assignments in the container
         populateContainer('assignmentContainer4Course', fetchAssignments, 'assignment', course.course_id);
 
-        // Update grade label
+        /*// Update grade label
         const totalPointsEarned = course.total_points_earned || 0;
         const totalPointsPossible = course.total_points_possible || 0;
         const letterGrade = getLetterGrade(totalPointsEarned, totalPointsPossible);
-        gradeSpan.textContent = `${totalPointsEarned}/${totalPointsPossible} (${letterGrade})`;
+        gradeSpan.textContent = `${totalPointsEarned}/${totalPointsPossible} (${letterGrade})`;*/
 
         addCourseBtn.textContent = "Save Changes";
         addCourseBtn.onclick = function(e) {
@@ -201,7 +201,7 @@ export function openCourseModal(course = null) {
         assignmentContainer.style.display = 'none';
         addAssignmentBtn.style.display = 'none';
         deleteCourseBtn.style.display = 'none';
-        gradeLabel.style.display = 'none';
+        //gradeLabel.style.display = 'none';
 
         document.querySelectorAll('#addCourseForm input, #addCourseForm select').forEach(input => {
             input.classList.remove('input-editing');

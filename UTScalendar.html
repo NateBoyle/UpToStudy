@@ -92,10 +92,10 @@
                           </select>
                         <textarea name="description" placeholder="Description"></textarea>
                         <label for="startDate">Start Date and Time:</label>
-                        <input type="date" name="start_date"  />
+                        <input type="date" name="start_date"  min="1900-01-01" max="2100-12-31"/>
                         <input type="time" name="start_time" />
                         <label for="endDate">End Date and Time:</label>
-                        <input type="date" name="end_date" />
+                        <input type="date" name="end_date" min="1900-01-01" max="2100-12-31"/>
                         <input type="time" name="end_time" />
                         <label>
                           <input type="checkbox" name="all_day" /> All Day
@@ -149,7 +149,7 @@
                 <!--Semester Buttons-->
                 <div class="sidebar-button-container">
                     <button id="defineSemesterBtn" class="sidebar-create-button">Define Semester</button>
-                    <button class="sidebar-view-button">View Semesters</button>
+                    <button id="viewSemestersBtn" class="sidebar-view-button">View Semesters</button>
                 </div>
 
                 <!-- Define Semester Modal -->
@@ -167,8 +167,21 @@
                             <label for="endDate">End Date:</label>
                             <input type="date" id="endDate" max="2999-12-31" name="end_date" required>
                             
+
                             <button type="submit" id="saveSemesterBtn">Save Semester</button>
+                            <button type="button" id="deleteSemesterButton">Delete</button>
                         </form>
+                    </div>
+                </div>
+
+                <!-- Modal Container -->
+                <div id="semester-modal" class="semester-modal">
+                    <div class="semester-modal-content">
+                        <span class="semester-modal-close">&times;</span>
+                        <h2>All Semesters</h2>
+                        <ul id="semester-modal-list">
+                            <!-- Semesters will be dynamically populated here -->
+                        </ul>
                     </div>
                 </div>
 
@@ -197,17 +210,17 @@
                           <!-- Dynamically populate courses here -->
                         </select>
                         <label for="dueDate">Due Date and Time:</label>
-                        <input type="date" id="dueDate" name="due_date">
+                        <input type="date" id="dueDate" name="due_date" min="1900-01-01" max="2100-12-31">
                         <input type="time" name="due_time" />
                         <textarea id="description" name="description" placeholder="Enter assignment details (optional)"></textarea>
-                        <input type="number" id="points_possible" name="points_possible" placeholder="Enter points possible">
-                        <input type="number" id="points_earned" name="points_earned" placeholder="Enter points earned (grade)">
+                        <!--<input type="number" id="points_possible" name="points_possible" placeholder="Enter points possible">
+                        <input type="number" id="points_earned" name="points_earned" placeholder="Enter points earned (grade)">-->
                         <div class="form-group">
                             <label for="status">Status:</label>
                             <select name="status" id="status">
                               <option value="Uncompleted">Uncompleted</option>
                               <option value="Completed">Completed</option>
-                              <option value="Graded">Graded</option>
+                              <!--<option value="Graded">Graded</option>-->
                             </select>
                         </div>
                         <!-- Button Container -->
@@ -244,7 +257,7 @@
                             <!-- Dynamically populate courses here -->
                           </select>
                         <label for="dueDate">Due Date and Time:</label>
-                        <input type="date" name="due_date"  />
+                        <input type="date" name="due_date" min="1900-01-01" max="2100-12-31" />
                         <input type="time" name="due_time" />
                         <textarea name="description" placeholder="Description"></textarea>
                         <div class="form-group">
@@ -358,7 +371,7 @@
                 <div id="assignmentContainer4Course" class="dynamic-container">
                     <!-- Assignment items will be dynamically added here -->
                 </div>
-                <label id = "gradeLabel">Total Grade: <span id="pointsAndGrade">0.00/0.00 (N/A)</span></label>
+                <!--<label id = "gradeLabel">Total Grade: <span id="pointsAndGrade">0.00/0.00 (N/A)</span></label>-->
                 <button type="button" id="closeModalBtn">&times;</button>
             </div>
         </div>
