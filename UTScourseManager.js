@@ -208,8 +208,9 @@ export function openCourseModal(course = null) {
         });
 
         addCourseBtn.textContent = "Add Course";
-        addCourseBtn.onclick = () => {
-            handleAddCourse();
+        addCourseBtn.onclick = (e) => {
+            e.preventDefault(); // Prevent default form submission
+            handleAddCourse(e);
         };
     }
 
@@ -238,6 +239,7 @@ function handleAddCourse(e) {
     formData.append('semester', document.getElementById('semesterDropdown').value);
 
     const days = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(checkbox => checkbox.value);
+    console.log('Selected days:', days);
     formData.set('daysOfWeek', JSON.stringify(days));
 
     if (!formData.has('courseColor') || !formData.get('courseColor')) {

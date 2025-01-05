@@ -30,6 +30,28 @@ const UTSsessionManager = (() => {
         }
     }
 
+    // Function to call the updateLastActivity action in PHP
+    async function updateLastActivity() {
+        try {
+            const response = await fetch('UTSauth_check.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'updateLastActivity' }), // Specify the action
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                console.log('Last activity updated successfully:', data.message);
+            } else {
+                console.error('Failed to update last activity:', data.message || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Error updating last activity:', error);
+        }
+    }
 
     // Logs out the user and redirects to the welcome page
     async function logoutUser() {
@@ -146,6 +168,7 @@ const UTSsessionManager = (() => {
         logoutUser,
         initializeSession,
         setupProfileDropdown,
+        updateLastActivity, // Expose this function
     };
 })();
 
@@ -165,4 +188,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Set up profile dropdown toggle functionality
     UTSsessionManager.setupProfileDropdown();
+
+    // Attach the updateLastActivity function to click events
+    document.addEventListener('click', () => {
+        UTSsessionManager.updateLastActivity(); // Call the function on any click
+    });
+
 });

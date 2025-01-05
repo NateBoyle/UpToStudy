@@ -115,12 +115,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prefix = isset($_POST['prefix']) && trim($_POST['prefix']) !== '' ? trim($_POST['prefix']) : null;
     $course_number = isset($_POST['courseNumber']) && trim($_POST['courseNumber']) !== '' ? trim($_POST['courseNumber']) : null;
     $total_points = isset($_POST['totalPoints']) && $_POST['totalPoints'] !== '' ? (int) $_POST['totalPoints'] : null;
-    $start_time = $_POST['startTime'] . ':00' ?? '';
-    $end_time = $_POST['endTime'] . ':00' ?? '';
+    $start_time = isset($_POST['startTime']) ? date('H:i:s', strtotime($_POST['startTime'])) : '';
+    $end_time = isset($_POST['endTime']) ? date('H:i:s', strtotime($_POST['endTime'])) : '';
     error_log("End Time received in PHP: " . $_POST['endTime']);
     $semester_id = isset($_POST['semester']) ? intval($_POST['semester']) : null;
     $grade = NULL;
+    error_log('daysOfWeek raw: ' . $_POST['daysOfWeek']);
     $days_selected = isset($_POST['daysOfWeek']) ? json_decode($_POST['daysOfWeek'], true) : []; // Decode JSON string to array
+    error_log('daysOfWeek decoded: ' . print_r($days_selected, true));
     $course_color = isset($_POST['courseColor']) && !empty(trim($_POST['courseColor'])) ? trim($_POST['courseColor']) : '#7DBC4B'; // Set default to green
     
     // Debugging statements
@@ -173,12 +175,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         error_log("Course Color before update: " . $course_color);
 
         // Prepare the SQL statement to update the course
-        $query = "UPDATE courses SET course_name = ?, subject = ?, professor = ?, prefix = ?, course_number = ?, total_points = ?, 
+        $query = "UPDATE courses SET course_name = ?, subject = ?, professor = ?, prefix = ?, course_number = ?, 
                   start_time = ?, end_time = ?, monday = ?, tuesday = ?, wednesday = ?, 
                   thursday = ?, friday = ?, saturday = ?, sunday = ?, course_color = ?, semester_id = ?
                   WHERE course_id = ? AND user_id = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("sssssissiiiiiiisiii", $course_name, $subject, $professor_name, $prefix, $course_number, $total_points,
+        $stmt->bind_param("sssssssiiiiiiisiii", $course_name, $subject, $professor_name, $prefix, $course_number, 
                             $start_time, $end_time, $mon, $tue, $wed, $thu, $fri, $sat, $sun, 
                             $course_color, $semester_id, $courseId, $user_id);
 
@@ -197,12 +199,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Prepare the SQL statement to insert the course into the database
         // Prepare the SQL statement to insert the course into the database (without grade)
         $stmt = $conn->prepare(
-            "INSERT INTO courses (user_id, course_name, subject, professor, prefix, course_number, total_points, start_time, end_time, monday, tuesday, wednesday, thursday, friday, saturday, sunday, course_color, semester_id) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO courses (user_id, course_name, subject, professor, prefix, course_number, start_time, end_time, monday, tuesday, wednesday, thursday, friday, saturday, sunday, course_color, semester_id) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            "isssssdssiiiiiiisi", 
-            $user_id, $course_name, $subject, $professor_name, $prefix, $course_number, $total_points, $start_time, $end_time, 
+            "isssssssiiiiiiisi", 
+            $user_id, $course_name, $subject, $professor_name, $prefix, $course_number, $start_time, $end_time, 
             $mon, $tue, $wed, $thu, $fri, $sat, $sun, $course_color, $semester_id
         );
 

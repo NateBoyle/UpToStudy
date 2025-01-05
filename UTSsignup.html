@@ -14,7 +14,7 @@
     <style>
         @font-face {
             font-family: UTSfont;
-            src: url(PlusJakartaSans-Medium.TTF);
+            src: url(PlusJakartaSans-Medium.ttf);
         }
     </style>
 
@@ -43,7 +43,7 @@
                     <i class="material-icons" style="opacity: 0.8">person</i>
                     <input type="text" id="full_name" name="full_name" placeholder="e.g., John Doe">
                 </div>
-                <!-- <span class="error" id="fullNameError"></span> -->
+                <span class="error" id="fullNameError"></span>
             </div>
             <div>
                 <label for="email">Email Address</label>
@@ -51,15 +51,15 @@
                     <i class="material-icons" style="opacity: 0.8">mail</i>
                     <input type="text" id="email" name="email" placeholder="e.g., johndoe@email.com">
                 </div>
-                <!-- <span class="error" id="emailError"></span> -->
+                <span class="error" id="emailError"></span>
             </div>
             <div>
                 <label for="phone">Phone Number</label>
                 <div class="input-container">
                     <i class="material-icons" style="opacity: 0.8">call</i>
                     <input type="tel" id="phone" name="phone" placeholder="### - ### - ####">
-                    <!-- <span class="error" id="phoneError"></span> -->
                 </div>
+                <span class="error" id="phoneError"></span>
             </div>
             <div>
                 <label for="username">Username</label>
@@ -67,7 +67,7 @@
                     <i class="material-icons" style="opacity: 0.8">face</i>
                     <input type="text" id="username" name="username" placeholder="Must be at least 8 characters">
                 </div>
-                <!-- <span class="error" id="usernameError"></span> -->
+                <span class="error" id="usernameError"></span>
             </div>
             <div>
                 <label for="password">Password</label>
@@ -88,6 +88,12 @@
             </div>
     
         </form>
+    </div>
+
+    <!-- Success Message (Initially Hidden) -->
+    <div id="successMessage" class="hidden">
+        <h1>Signup Successful!</h1>
+        <p>Please be on the lookout for a verification email sent to: <span id="userEmail"></span>.</p>
     </div>
     
 

@@ -14,7 +14,7 @@
     <style>
         @font-face {
             font-family: UTSfont;
-            src: url(PlusJakartaSans-Medium.TTF);
+            src: url(PlusJakartaSans-Medium.ttf);
         }
     </style>
 
@@ -184,11 +184,16 @@
                 <input type="date" id="dueDate" name="due_date">
                 <input type="time" name="due_time" />
                 <textarea id="description" name="description" placeholder="Enter assignment details (optional)"></textarea>
-                <input type="number" id="points" name="points" placeholder="Enter total points">
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select name="status" id="status">
+                      <option value="Uncompleted">Uncompleted</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                </div>
                 <!-- Button Container -->
                 <div class="button-container">
                     <button type="submit" id="saveAssignmentBtn">Add Assignment</button>
-                    <button type="button" id="completeButton">Complete</button>
                     <button type="button" id="deleteButton">Delete</button>
                 </div>
               </form>
@@ -210,10 +215,16 @@
                 <input type="date" name="due_date"  />
                 <input type="time" name="due_time" />
                 <textarea name="description" placeholder="Description"></textarea>
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select name="status" id="status">
+                      <option value="Uncompleted">Uncompleted</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                </div>
                 <!-- Button Container -->
                 <div class="button-container">
                     <button type="submit" id="saveToDoBtn">Create To-Do</button>
-                    <button type="button" id="completeButton">Complete</button>
                     <button type="button" id="deleteButton">Delete</button>
                 </div>
               </form>

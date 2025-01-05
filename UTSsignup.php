@@ -1,6 +1,10 @@
 <?php
 
+require 'UTSdb_connection.php';
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    global $conn;
 
     // Initialize error array
     $errors = [];
@@ -12,13 +16,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username1 = trim($_POST['username']);
     $password1 = trim($_POST['password']);
 
-    // Database connection variables
+    /*// Database connection variables
     $host = "localhost";
     $username2 = "root";
     $password2 = "";
     $database_name = "utsdb";
 
-    $conn = mysqli_connect($host, $username2, $password2, $database_name);
+    $conn = mysqli_connect($host, $username2, $password2, $database_name);*/
 
     if (!$conn) {
         // Return connection error
@@ -110,10 +114,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If no errors, proceed with user registration
     $password1 = password_hash($password1, PASSWORD_BCRYPT); // Hash the password
 
+    // Generate a unique verification token
+    $verification_token = bin2hex(random_bytes(16)); // Generates a 32-character token
+
+
     mysqli_begin_transaction($conn);
 
     try {
-        $insert_query = "INSERT INTO users (full_name, username, password, email, phone_number) VALUES (?, ?, ?, ?, ?)";
+        $insert_query = "INSERT INTO users (full_name, username, password, email, phone_number, verification_token) 
+                     VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($insert_query);
 
         if ($stmt === false) {
@@ -124,7 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
-        $stmt->bind_param("sssss", $full_name, $username1, $password1, $email, $phone);
+        $stmt->bind_param("ssssss", $full_name, $username1, $password1, $email, $phone, $verification_token);
 
         if ($stmt->execute()) {
             mysqli_commit($conn);

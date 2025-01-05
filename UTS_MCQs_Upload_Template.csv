@@ -1,2 +1,2 @@
 ﻿Question,Option1,Option2,Option3,Option4,CorrectOption
-"Instructions: Columns A-E should be text (strings), column F should be numbers (integers) e.g., 1,2,3,4,12,123,1234,13,134,14,23,234,24 etc. *Upload function will skip this row*",,,,,
+"Instructions: Columns A-E should be text (strings), column F should be numbers (integers) e.g., 1,2,3,4,12,123,1234,13,134,14,23,234,24 etc. *Delete this row*",,,,,

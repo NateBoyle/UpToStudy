@@ -77,8 +77,9 @@
 /*** INDIVIDUAL MCQ DISPLAY STYLING ***/ 
 #flashcardDisplayModal .fcModal-content {
     position: relative;
-    width: 400px;
-    height: 300px;
+    min-width: 400px;
+    max-width: 600px;
+    min-height: 300px;
     background: #2C2C2C;
     padding: 20px;
     border-radius: 10px;
@@ -100,6 +101,7 @@
     white-space: normal;
     overflow-wrap: break-word;
     margin: 0 auto;
+    margin-bottom: 15px;
     max-width: calc(100% - 60px);
 }
 
@@ -111,7 +113,7 @@
 #flashcardContent p {
     font-size: 18px;
     line-height: 1.5;
-    margin-top: 15px;
+    margin: 20px;
 }
 
 /* Navigation Buttons for Flashcards */
@@ -136,6 +138,7 @@
 
 /* Toggle Answer Button */
 #toggleAnswerBtn {
+    margin-top: 15px;
     position: absolute;
     bottom: 20px;
     align-self: center;

@@ -25,26 +25,20 @@ function updateLastActivity() {
         // Execute the statement
         if (!$stmt->execute()) {
             error_log("Failed to update last_activity: " . $stmt->error);
+            return ['status' => 'error', 'message' => 'Database update failed'];
         }
 
         // Close the statement
         $stmt->close();
+        return ['status' => 'success', 'message' => 'Last activity updated'];
     } else {
         error_log("Failed to prepare statement for updating last_activity: " . $conn->error);
+        return ['status' => 'error', 'message' => 'Database query preparation failed'];
     }
 }
 
-// Retrieve the 'updateLastActivity' parameter from the request
-$updateLastActivity = true; // Default to true
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $updateLastActivity = isset($input['updateLastActivity']) 
-    ? filter_var($input['updateLastActivity'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) 
-    : true;
-}
-
 // Define a function to check authentication and session validity
-function checkAuthentication() {
+function checkAuthentication($updateLastActivity) {
     $response = [];
 
     // Check if the user is logged in
@@ -80,7 +74,6 @@ function checkAuthentication() {
             error_log("Failed to prepare statement: " . $conn->error); // Log statement preparation failure
         }
 
-
         // Get the current time
         $current_time = time(); // Unix timestamp
         $readable_time = date('Y-m-d H:i:s', $current_time); // Human-readable format
@@ -90,7 +83,6 @@ function checkAuthentication() {
         error_log("Hello! From auth check. Time (readable): {$readable_time} | UNIX: {$current_time}, Last Activity: {$_SESSION['last_activity']} | {$lastActivityUnix}. ");
 
         if (isset($_SESSION['last_activity']) && ($current_time - strtotime($_SESSION['last_activity']) > $timeout_duration)) {
-
 
             error_log("Session timeout for user_id {$_SESSION['user_id']}:
                 last_activity: ".strtotime($_SESSION['last_activity']).",
@@ -104,7 +96,7 @@ function checkAuthentication() {
 
         } else {
 
-            if ($GLOBALS['updateLastActivity']) {
+            if ($updateLastActivity) {
                 updateLastActivity();
             }
 
@@ -121,18 +113,25 @@ function checkAuthentication() {
     return $response;
 }
 
-// Run the session check
-$response = checkAuthentication();
+// Handle POST requests
+$response = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $action = $input['action'] ?? null;
 
-// Expose the user_id for use in other scripts
-if ($response['authenticated']) {
-    $user_id = $_SESSION['user_id'];
+    if ($action === 'updateLastActivity') {
+        // Call updateLastActivity directly
+        $response = updateLastActivity();
+    } else {
+        // Default to authentication check
+        $updateLastActivity = isset($input['updateLastActivity']) 
+            ? filter_var($input['updateLastActivity'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) 
+            : true;
+        $response = checkAuthentication($updateLastActivity);
+    }
 }
 
-// If this script is accessed directly, return the JSON response
-if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'])) {
-    header('Content-Type: application/json');
-    echo json_encode($response);
-    exit;
-}
-?>
+// Return the response as JSON
+header('Content-Type: application/json');
+echo json_encode($response);
+exit;

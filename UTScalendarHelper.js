@@ -367,3 +367,4 @@ export async function getCombinedEventsAndCourses(currentDate, isWeekView = fals
         return [];
     }
 }
+

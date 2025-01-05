@@ -265,9 +265,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('defineSemesterBtn').addEventListener('click', () => openDefineSemesterModal(null));
 
     const openModalButton = document.getElementById('viewSemestersBtn');
-    openModalButton.addEventListener('click', () => {
-        populateSemesterList(); // Populate list before showing the modal
-        
-    });
+    if (openModalButton) { // Check if the element exists
+        openModalButton.addEventListener('click', () => {
+            populateSemesterList(); // Populate list before showing the modal
+        });
+    }
 
 });

@@ -191,3 +191,35 @@ input[type="submit"]:hover {
     font-size: 35px;
     margin-bottom: 20px;
 }
+
+.hidden {
+    display: none;
+}
+.visible {
+    display: block;
+}
+
+#successMessage {
+    /*display: none;  Initially hidden */
+    position: absolute;
+    top: 45%; /* Adjust this value to move it higher or lower */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white; /* Adjust the color as needed */
+    /*font-family: 'Plus Jakarta Sans', Arial, sans-serif;  Use your font */
+    font-size: 1.5rem; /* Adjust the font size */
+    /* background-color: rgba(0, 0, 0, 0.8); Optional: Add a background for contrast */
+    padding: 20px; /* Add padding around the message */
+    border-radius: 10px; /* Rounded corners for better aesthetics */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+}
+
+#loginLink {
+    color: white;
+    text-decoration: none;
+}
+
+#loginLink:hover {
+    text-decoration: underline;
+}

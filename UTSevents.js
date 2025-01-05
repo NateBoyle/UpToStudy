@@ -75,7 +75,10 @@ export async function populateContainer(containerId, fetchFunction, type, course
       }  
 
         if (items.length === 0) {
-            container.innerHTML = `<p class="empty-message">No ${type}s available.</p>`;
+            // Capitalize the first letter of 'toDo' if type is 'toDo'
+            const displayType = type === 'toDo' ? type.charAt(0).toUpperCase() + type.slice(1) : type;
+            
+            container.innerHTML = `<p class="empty-message">No ${displayType}s available.</p>`;
             return;
         }
 
