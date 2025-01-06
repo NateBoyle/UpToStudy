@@ -18,10 +18,13 @@ class MCQSet {
      * @param {number} numQuestions - The number of questions in the set.
      * @param {number} questionsMastered - The number of mastered questions in the set.
      */
-    constructor(setId, setName, courseName, numQuestions, questionsMastered = 0) {
+    constructor(setId, setName, courseName, courseId, coursePrefix, courseNumber, numQuestions, questionsMastered = 0) {
         this.setId = setId;
         this.setName = setName;
         this.courseName = courseName;
+        this.courseId = courseId;
+        this.coursePrefix = coursePrefix;
+        this.courseNumber = courseNumber;
         this.numQuestions = numQuestions;
         this.questionsMastered = questionsMastered;
     }
@@ -44,7 +47,7 @@ class MCQSet {
             <div class="study-set-header">
                 <h2>${this.setName}</h2>
             </div>
-            <p>Course: ${this.courseName || 'N/A'}</p>
+            <p>Course: ${this.coursePrefix + ' ' +  this.courseNumber || 'N/A'}</p>
             <p>${this.numQuestions || 0}&nbsp; questions &nbsp;&nbsp;|&nbsp;&nbsp; ${this.questionsMastered || 0}&nbsp; mastered</p>
             <div class="progress-bar-container">
                 <div class="progress-bar" style="width: ${masteredPercentage}%;"></div>
@@ -75,7 +78,7 @@ class MCQSet {
         optionsMenu.style.display = "none"; // Hidden by default
         optionsMenu.innerHTML = `
             <button onclick="openMCQModal(${this.setId})">Add Questions</button>
-            <button onclick="editMCQSet(${this.setId}, '${this.setName}', '${this.courseName}')">Edit/Upload Set</button>
+            <button onclick="editMCQSet(${this.setId}, '${this.setName}', '${this.courseId}')">Edit/Upload Set</button>
             <button onclick="deleteMCQSet(${this.setId})">Delete Set</button>
             <button onclick="openMCQOverviewModal(${this.setId})">View All</button>
         `;
@@ -261,7 +264,10 @@ function loadMCQSets(semesterId = null, courseId = null, searchTerm = '') {
                     const mcqSet = new MCQSet(
                         setData.set_id, 
                         setData.set_name, 
-                        setData.course_name, 
+                        setData.course_name,
+                        setData.course_id,
+                        setData.prefix,
+                        setData.course_number,
                         setData.num_questions,
                         setData.questions_mastered // Field for questions mastered
                     );
@@ -346,8 +352,8 @@ function saveMCQSet() {
     });
 }
 
-function editMCQSet(setId, setName, courseName) {
-    console.log("Editing MCQ set:", { setId, setName, courseName });
+function editMCQSet(setId, setName, courseId) {
+    console.log("Editing MCQ set:", { setId, setName, courseId });
 
     // Open the modal
     document.getElementById("setCreationModal").style.display = "flex";
@@ -363,15 +369,15 @@ function editMCQSet(setId, setName, courseName) {
     loadCourses().then(() => {
         const courseDropdown = document.getElementById("courseDropdown");
 
-        // Find and select the option matching courseName
+        // Find and select the option matching courseId
         const optionToSelect = Array.from(courseDropdown.options).find(
-            option => option.textContent === courseName
+            option => option.value === courseId.toString() // Assuming courseId is a number or string
         );
 
         if (optionToSelect) {
             courseDropdown.value = optionToSelect.value; // Set the selected course
         } else {
-            console.warn(`Course name "${courseName}" not found in dropdown.`);
+            console.warn(`Course ID "${courseId}" not found in dropdown.`);
         }
     });
     

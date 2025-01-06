@@ -21,10 +21,13 @@ class FlashcardSet {
      * * @param {number} cardsMastered - The number of mastered flashcards in the set.
      */
 
-    constructor(setId, setName, courseName, numCards, cardsMastered = 0) {
+    constructor(setId, setName, courseName, courseId, coursePrefix, courseNumber, numCards, cardsMastered = 0) {
         this.setId = setId;
         this.setName = setName;
         this.courseName = courseName;
+        this.courseId = courseId;
+        this.coursePrefix = coursePrefix;
+        this.courseNumber = courseNumber;
         this.numCards = numCards;
         this.cardsMastered = cardsMastered;
     }
@@ -49,7 +52,7 @@ class FlashcardSet {
             <div class="study-set-header">
                 <h2>${this.setName}</h2>
             </div>
-            <p>Course: ${this.courseName || 'N/A'}</p>
+            <p>Course: ${this.coursePrefix + ' ' +  this.courseNumber || 'N/A'}</p>
             <p>${this.numCards || 0}&nbsp; cards &nbsp;&nbsp;|&nbsp;&nbsp; ${this.cardsMastered || 0}&nbsp; mastered</p>
             <div class="progress-bar-container">
                 <div class="progress-bar" style="width: ${masteredPercentage}%;"></div>
@@ -81,7 +84,7 @@ class FlashcardSet {
         optionsMenu.style.display = "none"; // Hidden by default
         optionsMenu.innerHTML = `
             <button onclick="openFlashcardModal(${this.setId})">Add Cards Manually</button>
-            <button onclick="editFlashcardSet(${this.setId}, '${this.setName}', '${this.courseName}')">Edit/Upload Set</button>
+            <button onclick="editFlashcardSet(${this.setId}, '${this.setName}', '${this.courseId}')">Edit/Upload Set</button>
             <button onclick="deleteFlashcardSet(${this.setId})">Delete Set</button>
             <button onclick="openOverviewModal(${this.setId})">View All</button>
         `;
@@ -256,6 +259,9 @@ function loadFlashcardSets(semesterId = null, courseId = null, searchTerm = '') 
                         setData.set_id, 
                         setData.set_name, 
                         setData.course_name, 
+                        setData.course_id,
+                        setData.prefix,
+                        setData.course_number,
                         setData.num_cards,
                         setData.cards_mastered // New field for cards mastered
                     );
@@ -342,7 +348,7 @@ function saveSet() {
     });
 }
 
-function editFlashcardSet(setId, setName, courseName) {
+function editFlashcardSet(setId, setName, courseId) {
 
     //console.log("Editing set:", { setId, setName, courseName });
 
@@ -363,13 +369,13 @@ function editFlashcardSet(setId, setName, courseName) {
 
         // Find and select the option matching courseName
         const optionToSelect = Array.from(courseDropdown.options).find(
-            option => option.textContent === courseName
+            option => option.value === courseId.toString() // Assuming courseId is a number or string
         );
 
         if (optionToSelect) {
             courseDropdown.value = optionToSelect.value; // Set the selected course
         } else {
-            console.warn(`Course name "${courseName}" not found in dropdown.`);
+            console.warn(`Course name "${courseId}" not found in dropdown.`);
         }
     });
     

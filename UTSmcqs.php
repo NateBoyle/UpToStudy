@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // Retrieve MCQ sets with associated course names
         $query = "SELECT ms.set_id, ms.set_name, ms.course_id, ms.num_questions, ms.questions_mastered, 
-                 c.course_name, s.semester_id, s.name AS semester_name
+                 c.course_name, c.prefix, c.course_number, s.semester_id, s.name AS semester_name
                 FROM mcq_sets AS ms
                 LEFT JOIN courses AS c ON ms.course_id = c.course_id
                 LEFT JOIN semesters AS s ON c.semester_id = s.semester_id
