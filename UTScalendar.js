@@ -378,6 +378,8 @@ async function renderWeekViewEvents() {
         document.querySelectorAll(".event-block").forEach(block => block.remove());
 
         const timeSlotHeight = 50; // Fixed height for each time slot (e.g., 50px)
+        const eventWidth = 100; // Based on your updated CSS, events are now 100% wide of the time slot
+
 
         // Loop through the combined events grouped by day
         combinedEvents.forEach(({ key: day, combined }) => {
@@ -389,9 +391,12 @@ async function renderWeekViewEvents() {
             // Map day to grid column (0 = Sunday)
             const column = parseInt(day, 10); // Use `day` as a numeric index for the column
 
+            // Initialize an overlap counter for this day
+            let overlapCounter = 0;
+
             // Iterate over the combined events for this day
             combined.forEach(event => {
-                const { title, startTime, endTime, color } = event;
+                const { title, startTime, endTime, color, overlap } = event;
 
                 // Map times to grid rows and calculate heights
                 const startRow = calculateTimeSlot(startTime); // Map start time to grid row
@@ -413,6 +418,29 @@ async function renderWeekViewEvents() {
                     eventBlock.style.backgroundColor = color || "#424FC6"; // Default color
                     eventBlock.style.height = `${eventHeight}px`; // Set height
                     eventBlock.style.top = `${startOffset}px`;
+
+                    // Overlap handling
+                    if (overlap === 1) {
+                        // Count total overlapping events for this time slot
+                        const totalOverlappingEvents = combined.filter(e => e.overlap === 1).length;
+                        // Adjust width based on total overlapping events
+                        const adjustedWidth = eventWidth / totalOverlappingEvents;
+                        eventBlock.style.width = `${adjustedWidth}%`;
+                        
+                        // Use overlapCounter for positioning
+                        if (overlapCounter === 0) {
+                            overlapCounter = 1;
+                        } else {
+                            overlapCounter++;
+                        }
+                        // Adjust position for each overlapping event
+                        eventBlock.style.left = `${(adjustedWidth * (overlapCounter - 1))}%`;
+                    } else {
+                        // If no overlap, reset counter and use default width
+                        overlapCounter = 1;
+                        eventBlock.style.width = `${eventWidth}%`;
+                        // No need to set left as it's handled by CSS being 100% width
+                    }
 
                     // Add an onclick event
                     eventBlock.addEventListener("click", () => {

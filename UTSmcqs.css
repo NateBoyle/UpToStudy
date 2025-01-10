@@ -122,10 +122,12 @@
 #mcqContent h2 {
     position: relative; /* Keeps the question within the flow */
     top: 0; /* Ensures it stays at the top of the modal */
+    margin-top: 20px;
     margin-bottom: 30px; /* Add consistent spacing below the question */
+    padding-top: 10px;
     font-size: 1.2em; /* Maintain visibility */
     font-weight: bold; /* Make the question stand out */
-    text-align: center; /* Center-align the question text */
+    text-align: left; /* Center-align the question text */
     line-height: 1.5; /* Improve readability */
 }
 

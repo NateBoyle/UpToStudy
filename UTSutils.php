@@ -17,7 +17,12 @@ $action = $_POST['action'] ?? null;
 function fetchFlashcardSets($userId, $semesterId = null, $courseId = null, $searchTerm = '', $isRecent = false) {
     global $conn;
 
-    $query = "SELECT * FROM flashcard_sets WHERE user_id = ?";
+    // Retrieve flashcard sets with associated course names
+    $query = "SELECT fs.set_id, fs.set_name, fs.course_id, fs.num_cards, fs.cards_mastered, c.course_name, c.prefix, c.course_number 
+                  FROM flashcard_sets AS fs
+                  LEFT JOIN courses AS c ON fs.course_id = c.course_id
+                  LEFT JOIN semesters AS s ON c.semester_id = s.semester_id
+                  WHERE fs.user_id = ?";
     $params = [$userId];
     $types = "i";
 

@@ -180,7 +180,7 @@ async function loadRecentFlashcardSets() {
                     <div class="study-set-header">
                         <h2>${set.set_name}</h2>
                     </div>
-                    <p>Course: ${set.course_name || 'N/A'}</p>
+                    <p>Course: ${set.prefix + ' ' +  set.course_number || 'N/A'}</p>
                     <p>${set.num_cards || 0} cards | ${set.cards_mastered || 0} mastered</p>
                     <div class="progress-bar-container">
                         <div class="progress-bar" style="width: ${(set.cards_mastered / set.num_cards) * 100 || 0}%;"></div>

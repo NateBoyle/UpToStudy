@@ -179,6 +179,41 @@ export async function getCurrentCourses(currentDate, isWeekView = false, isDash 
     }
 }
 
+function modifyEventsForDisplay(events) {
+    let discreteEvents = [];
+
+    events.forEach(event => {
+        const startDate = new Date(event.start_date + 'T00:00:00');
+        const endDate = new Date(event.end_date + 'T00:00:00');
+        const eventId = event.event_id;
+        const eventTitle = event.title;
+        const startTime = event.start_time;
+        const endTime = event.end_time;
+
+        // Loop through each day from start to end date
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            let dayDate = new Date(d);
+            dayDate.setHours(0, 0, 0, 0); // Reset time to midnight
+
+            // Create a modified event for each day
+            let modifiedEvent = {
+                //...event, // Copy all properties from the original event
+                event_id: eventId,
+                title: eventTitle, // Preserve the original title
+                start_date: dayDate.toISOString().split('T')[0], // Set to the current day in the loop
+                start_time: dayDate.toDateString() === startDate.toDateString() ? startTime : '00:00:00',
+                end_time: dayDate.toDateString() === endDate.toDateString() ? endTime : '23:59:59'
+            };
+
+            discreteEvents.push(modifiedEvent);
+        }
+    });
+
+    //console.log('discrete events:', discreteEvents);
+    return discreteEvents;
+    
+}
+
 // Get events within time range
 export async function getCurrentEvents(currentDate, isWeekView = false, isDash = false) {
 
@@ -250,6 +285,10 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
             fetchToDos(null, viewStartDate, viewEndDate),
             fetchEvents(null, viewStartDate, viewEndDate),
         ]);
+
+        // Log the contents of events as they are fetched
+        //console.log('Fetched events:', events);
+        let discreteEvents = modifyEventsForDisplay(events);
         
         
 
@@ -316,17 +355,56 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
         // Process each type of event
         assignments.forEach(assignment => processEvent(assignment, "assignment"));
         toDos.forEach(toDo => processEvent(toDo, "toDo"));
-        events.forEach(event => processEvent(event, "event"));
+        discreteEvents.forEach(event => processEvent(event, "event"));
 
         // Sort results
         result.sort((a, b) => (isWeekView ? a.key - b.key : new Date(a.key) - new Date(b.key)));
 
-        
+        // Log the result before returning it
+        //console.log('getCurrentEvents result:', result);
+
         return result;
     } catch (error) {
         console.error("Error in getCurrentEvents:", error);
         return [];
     }
+}
+
+function addOverlapField(combined) {
+    // If there's only one event, no need to check for overlap
+    if (combined.length <= 1) {
+        return combined.map(event => ({ ...event, overlap: 0 }));
+    }
+
+    // For multiple events, check for overlaps
+    const eventsWithOverlap = combined.map((eventA, indexA) => {
+        let hasOverlap = 0;
+        for (let indexB = 0; indexB < combined.length; indexB++) {
+            if (indexA !== indexB) {
+                const eventB = combined[indexB];
+                // Check if there's an overlap
+                if (isOverlapping(eventA, eventB)) {
+                    hasOverlap = 1;
+                    break; // Once an overlap is found, no need to continue checking
+                }
+            }
+        }
+        // Return a new object with the overlap property
+        return { ...eventA, overlap: hasOverlap };
+    });
+
+    return eventsWithOverlap;
+}
+
+function isOverlapping(eventA, eventB) {
+    // Convert times to Date objects for comparison
+    let startA = new Date(`1970-01-01T${eventA.startTime}Z`);
+    let endA = new Date(`1970-01-01T${eventA.endTime}Z`);
+    let startB = new Date(`1970-01-01T${eventB.startTime}Z`);
+    let endB = new Date(`1970-01-01T${eventB.endTime}Z`);
+
+    // Check for overlap
+    return (startA < endB && endA > startB);
 }
 
 export async function getCombinedEventsAndCourses(currentDate, isWeekView = false, isDash = false) {
@@ -354,13 +432,18 @@ export async function getCombinedEventsAndCourses(currentDate, isWeekView = fals
             const events = eventsByDate.find(entry => entry.key === key)?.events || [];
 
             // Combine and sort by startTime
-            const combined = [...courses, ...events].sort((a, b) => a.startTime.localeCompare(b.startTime));
+            let combined = [...courses, ...events].sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+            // Check for overlap if it's week view and there's more than one item
+            if (isWeekView && combined.length > 1) {
+                combined = addOverlapField(combined);
+            } 
 
             // Push to final results
             combinedResults.push({ key, combined });
         });
 
-        //console.log(combinedResults);
+        //console.log(`Combined results: `, combinedResults);
         return combinedResults; // Array with keys (days/dates) and sorted combined data
     } catch (error) {
         console.error("Error combining courses and events:", error);

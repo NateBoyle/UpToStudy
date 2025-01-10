@@ -152,7 +152,7 @@ export async function populateContainer(containerId, fetchFunction, type, course
 
 // Open Modal from Calendar helper function
 export async function openFromCalendar(type, id) {
-  //console.log(`Type: ${type}, Id: ${id}`);
+  console.log(`Type: ${type}, Id: ${id}`);
   try {
     let item;
 
@@ -185,7 +185,7 @@ export async function openFromCalendar(type, id) {
     // Call openModal with the fetched item
     if (item) {
       item.id = id;
-      //console.log(`Type: ${type}, Id: ${id}, Item: ${item}`);
+      console.log(`Type: ${type}, Id: ${id}, Item: ${item}`);
       openModal(type, `${type}Modal`, item); // Modal ID should match the type (e.g., assignmentModal)
     }
 
@@ -212,19 +212,17 @@ export async function openModal(entity, modalId, item) {
 
   const statusLabel = form.querySelector('label[for="status"]'); // Reference the Status label
   const statusDropdown = form.querySelector('[name="status"]'); // Reference to the status dropdown
-
-  /*const pointsEarnedInput = form.querySelector('[name="points_earned"]'); // Reference the points_earned input
-  if (pointsEarnedInput) {
-    pointsEarnedInput.style.display = 'none'; // Hide the input for non-assignments
-  }*/
   
   if (item) {
     // Populate form fields from the item object
     Object.keys(item).forEach(key => {
         const input = form.querySelector(`[name="${key}"]`);
         if (input) {
-          // Check if it's the course dropdown
-          if (key === 'course_id' && !item[key]) {
+          if (input.type === 'checkbox') {
+            // Convert 1 to true, 0 to false
+            input.checked = item[key] === 1;
+          } // Check if it's the course dropdown
+          else if (key === 'course_id' && !item[key]) {
               input.value = ''; // Reset to default if no course is associated
           } else {
               input.value = item[key]; // Populate other fields as usual
@@ -305,6 +303,36 @@ export async function openModal(entity, modalId, item) {
   }
 
   modal.style.display = 'flex'; // Show modal
+
+  // New code to handle 'All Day' checkbox
+  const allDayCheckbox = form.querySelector('[name="all_day"]');
+  const startTime = form.querySelector('[name="start_time"]');
+  const endTime = form.querySelector('[name="end_time"]');
+
+  if (allDayCheckbox) {
+    allDayCheckbox.addEventListener('change', function() {
+      if (this.checked) {
+        startTime.disabled = true;
+        startTime.style.opacity = '0.5'; // Dim the input
+        endTime.disabled = true;
+        endTime.style.opacity = '0.5'; // Dim the input
+      } else {
+        startTime.disabled = false;
+        startTime.style.opacity = '1'; // Restore full opacity
+        endTime.disabled = false;
+        endTime.style.opacity = '1'; // Restore full opacity
+      }
+    });
+
+    // Check if the checkbox is already checked on modal open
+    if (allDayCheckbox.checked) {
+      startTime.disabled = true;
+      startTime.style.opacity = '0.5';
+      endTime.disabled = true;
+      endTime.style.opacity = '0.5';
+    }
+  }
+
 }
 
 // Form Validation
@@ -361,18 +389,18 @@ function validateFields(form, entity) {
   } else if (entity === 'toDo') {
     // To-Dos
     const dueDate = form.querySelector('[name="due_date"]');
-    const dueTime = form.querySelector('[name="due_time"]');
+    //const dueTime = form.querySelector('[name="due_time"]');
 
     if (!dueDate.value) {
       errors.push('Due date is required.');
       dueDate.style.border = '1px solid red';
       valid = false;
     }
-    if (!dueTime.value) {
+    /*if (!dueTime.value) {
       errors.push('Due time is required.');
       dueTime.style.border = '1px solid red';
       valid = false;
-    }
+    }*/
   } else if (entity === 'event') {
     // Events
     const startDate = form.querySelector('[name="start_date"]');
@@ -440,8 +468,25 @@ async function saveEntity(event, entity, modalId) {
 
   const data = {};
   [...form.elements].forEach(input => {
-    if (input.name) data[input.name] = input.value;
+    if (input.name) {
+      if (input.type === 'checkbox') {
+        data[input.name] = input.checked ? 1 : 0; // Handle checkbox
+      } else {
+        data[input.name] = input.value;
+      }
+    }
   });
+
+  // Handle All Day events
+  if (data.all_day === 1) {
+    data.start_time = '00:00:00';
+    data.end_time = '23:59:00'; // Set end time to cover the entire last day
+  }
+
+  // Check if due_time is empty or not set, then set it to '00:00:00'
+  if (!data.due_time || data.due_time === '') {
+    data.due_time = '00:00:00'; // Adjust this format if your application expects a different one
+  }
 
   //console.log('Id sent to backend:', id);
 

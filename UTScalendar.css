@@ -518,9 +518,9 @@
 /* Week View Event Blocks */
 .week-grid .time-slot .event-block {
     position: absolute; /* Ensure placement within the grid */
-    width: 70%;  /*Constrain width within the grid column */
+    width: 100%;  /*Constrain width within the grid column */
     top: 0; /* Align to the top of the grid row */
-    left: 12%; /* Center horizontally (95% width with 2.5% left offset) */
+    /*left: 12%; /* Center horizontally (95% width with 2.5% left offset) */
     background-color: var(--event-color, #424FC6); /* Default color */
     color: white; /* Text color */
     font-size: 0.7rem; /* Slightly larger font for week view */

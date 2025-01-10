@@ -93,6 +93,7 @@ export async function openCourseFromCalendar(courseId) {
 
 export function openCourseModal(course = null) {
 
+
     const modal = document.getElementById('modal');
     const form = document.getElementById('addCourseForm');
     const modalHeading = document.getElementById('modalHeading');
@@ -113,8 +114,8 @@ export function openCourseModal(course = null) {
     // Call loadSemesters to populate the dropdown
     loadSemesters().then(() => {
         // After semesters are loaded, set the selected value
-        /*const semesterDropdown = document.getElementById('semesterDropdown');
-        semesterDropdown.value = course.semester_id || "";*/
+        const semesterDropdown = document.getElementById('semesterDropdown');
+        semesterDropdown.value = course.semester_id || "";
     });
 
     const closeModalBtn = document.getElementById('closeModalBtn');
