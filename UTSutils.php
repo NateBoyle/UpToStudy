@@ -248,12 +248,15 @@ function fetchEvents($userId, $id = null, $startDate = null, $endDate = null) {
         $types .= "i";
     } elseif ($startDate && $endDate) {
         // Fetch by date range if start and end dates are provided
-        $query .= " AND (start_date BETWEEN ? AND ? OR end_date BETWEEN ? AND ?)";
+        $query .= " AND (start_date BETWEEN ? AND ? OR end_date BETWEEN ? AND ?) OR 
+                    (recurrence != 'None' AND repeat_end_date BETWEEN ? AND ?)";
         $params[] = $startDate;
         $params[] = $endDate;
         $params[] = $startDate;
         $params[] = $endDate;
-        $types .= "ssss";
+        $params[] = $startDate;
+        $params[] = $endDate;
+        $types .= "ssssss";
     }
 
     //error_log("Received Parameters: ID: $id, Start Date: $startDate, End Date: $endDate");

@@ -208,10 +208,44 @@ export async function openModal(entity, modalId, item) {
   await populateCourseDropdown(modalId); // Populate courses
 
   const submitButton = modal.querySelector('button[type="submit"]'); // Target submit button within the form
+  const deleteButton = modal.querySelector('#deleteButton');
   const modalTitle = modal.querySelector('h2'); // Select the first <h2> within the modal
 
   const statusLabel = form.querySelector('label[for="status"]'); // Reference the Status label
   const statusDropdown = form.querySelector('[name="status"]'); // Reference to the status dropdown
+
+  // New code to handle 'All Day' checkbox
+  const allDayCheckbox = form.querySelector('[name="all_day"]');
+  const noSchoolDayCheckbox = form.querySelector('[name="no_school_day"]');
+  const startTime = form.querySelector('[name="start_time"]');
+  const endTime = form.querySelector('[name="end_time"]');
+  const recurrenceDropdown = form.querySelector('[name="recurrence"]');
+
+  // Set up event listener for 'All Day' checkbox changes
+  if (allDayCheckbox) {
+    allDayCheckbox.addEventListener('change', function() {
+      if (this.checked) {
+        startTime.disabled = true;
+        startTime.style.opacity = '0.5';
+        endTime.disabled = true;
+        endTime.style.opacity = '0.5';
+        if (noSchoolDayCheckbox) {
+          noSchoolDayCheckbox.disabled = false;
+          noSchoolDayCheckbox.style.opacity = '1';
+        }
+      } else {
+        startTime.disabled = false;
+        startTime.style.opacity = '1';
+        endTime.disabled = false;
+        endTime.style.opacity = '1';
+        if (noSchoolDayCheckbox) {
+          noSchoolDayCheckbox.disabled = true;
+          noSchoolDayCheckbox.style.opacity = '0.5';
+          noSchoolDayCheckbox.checked = false;
+        }
+      }
+    }); 
+  }
   
   if (item) {
     // Populate form fields from the item object
@@ -224,6 +258,9 @@ export async function openModal(entity, modalId, item) {
           } // Check if it's the course dropdown
           else if (key === 'course_id' && !item[key]) {
               input.value = ''; // Reset to default if no course is associated
+          } else if (key === 'recurrence') {
+            // Set the value for the recurrence dropdown
+            recurrenceDropdown.value = item[key] || 'None';
           } else {
               input.value = item[key]; // Populate other fields as usual
           }
@@ -241,11 +278,39 @@ export async function openModal(entity, modalId, item) {
       
     }
 
+    // Set the recurrence dropdown value if it exists
+    if (recurrenceDropdown) {
+      recurrenceDropdown.style.display = 'block';
+      recurrenceDropdown.value = item.recurrence || 'None'; // Default to "None" if recurrence is missing
+    }
+
+    // Handle initial state for existing events
+    if (allDayCheckbox && noSchoolDayCheckbox) {
+      // Set the initial state of 'All Day' checkbox
+      allDayCheckbox.checked = item.all_day === 1; // Assuming 'all_day' is the name in your data structure
+
+      if (allDayCheckbox.checked) {
+        startTime.disabled = true;
+        startTime.style.opacity = '0.5';
+        endTime.disabled = true;
+        endTime.style.opacity = '0.5';
+        noSchoolDayCheckbox.disabled = false;
+        noSchoolDayCheckbox.style.opacity = '1';
+      } else {
+        noSchoolDayCheckbox.disabled = true;
+        noSchoolDayCheckbox.style.opacity = '0.5';
+        noSchoolDayCheckbox.checked = false;
+      }
+      
+      // Set 'No school day' checkbox based on existing item data
+      if (item.no_school_day === 1) {
+        noSchoolDayCheckbox.checked = true;
+      }
+    }
+
     // Edit submit button within the specific form
     submitButton.textContent = 'Save'; // Updates the button text
 
-
-    const deleteButton = modal.querySelector('#deleteButton'); // Reference the button
     if (deleteButton) {
       deleteButton.style.display = 'block';
       deleteButton.onclick = () => {
@@ -269,6 +334,7 @@ export async function openModal(entity, modalId, item) {
       modalTitle.textContent = 'Edit To-Do'; // Change the title
     } else {
       modalTitle.textContent = 'Edit Event'; // Change the title
+      
     }
 
   } else {
@@ -283,7 +349,6 @@ export async function openModal(entity, modalId, item) {
     }
 
     // Hide delete button
-    const deleteButton = modal.querySelector('#deleteButton');
     if (deleteButton) {
       deleteButton.style.display = 'none';
     }
@@ -303,35 +368,6 @@ export async function openModal(entity, modalId, item) {
   }
 
   modal.style.display = 'flex'; // Show modal
-
-  // New code to handle 'All Day' checkbox
-  const allDayCheckbox = form.querySelector('[name="all_day"]');
-  const startTime = form.querySelector('[name="start_time"]');
-  const endTime = form.querySelector('[name="end_time"]');
-
-  if (allDayCheckbox) {
-    allDayCheckbox.addEventListener('change', function() {
-      if (this.checked) {
-        startTime.disabled = true;
-        startTime.style.opacity = '0.5'; // Dim the input
-        endTime.disabled = true;
-        endTime.style.opacity = '0.5'; // Dim the input
-      } else {
-        startTime.disabled = false;
-        startTime.style.opacity = '1'; // Restore full opacity
-        endTime.disabled = false;
-        endTime.style.opacity = '1'; // Restore full opacity
-      }
-    });
-
-    // Check if the checkbox is already checked on modal open
-    if (allDayCheckbox.checked) {
-      startTime.disabled = true;
-      startTime.style.opacity = '0.5';
-      endTime.disabled = true;
-      endTime.style.opacity = '0.5';
-    }
-  }
 
 }
 
@@ -419,23 +455,33 @@ function validateFields(form, entity) {
       endDate.style.border = '1px solid red';
       valid = false;
     }
-    if (startDate.value && endDate.value && new Date(startDate.value) > new Date(endDate.value)) {
-      errors.push('Start date cannot be later than end date.');
-      startDate.style.border = '1px solid red';
-      endDate.style.border = '1px solid red';
-      valid = false;
-    }
-    if (!allDay.checked) {
-      // Validate time only if all-day is not selected
-      if (!startTime.value) {
-        errors.push('Start time is required.');
-        startTime.style.border = '1px solid red';
+    if (startDate.value && endDate.value ) {
+      if (new Date(startDate.value) > new Date(endDate.value)) {
+        errors.push('Start date cannot be later than end date.');
+        startDate.style.border = '1px solid red';
+        endDate.style.border = '1px solid red';
         valid = false;
-      }
-      if (!endTime.value) {
-        errors.push('End time is required.');
-        endTime.style.border = '1px solid red';
-        valid = false;
+      } else if (!allDay.checked) {
+        // Only compare times and check for existence if it's not an all-day event
+        if (!startTime.value) {
+          errors.push('Start time is required.');
+          startTime.style.border = '1px solid red';
+          valid = false;
+        } else if (!endTime.value) {
+          errors.push('End time is required.');
+          endTime.style.border = '1px solid red';
+          valid = false;
+        } else {
+          const startDateTime = new Date(`${startDate.value}T${startTime.value}`);
+          const endDateTime = new Date(`${endDate.value}T${endTime.value}`);
+        
+          if (startDateTime > endDateTime) {
+            errors.push('Start time cannot be later than end time.');
+            startTime.style.border = '1px solid red';
+            endTime.style.border = '1px solid red';
+            valid = false;
+          }
+        }
       }
     }
   }

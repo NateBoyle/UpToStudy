@@ -252,14 +252,17 @@ function addEvent() {
     $endTime = $_POST['end_time'] ?? null; // Optional
     $description = $_POST['description'] ?? null; // Optional
     $allDay = $_POST['all_day'] ?? 0; // Defaults to 0 (false)
+    $noSchoolDay = $_POST['no_school_day'] ?? 0; // New field, defaults to 0 (false)
+    $recurrence = $_POST['recurrence'] ?? 'None'; // New field, defaults to 'None'
+    $repeatEndDate = $_POST['repeat_end_date'] ?? null; // New field, can be null
 
     if (!$title || !$startDate) {
         echo json_encode(['success' => false, 'message' => 'Title and start date are required.']);
         return;
     }
 
-    $stmt = $conn->prepare("INSERT INTO events (user_id, course_id, title, description, start_date, start_time, end_date, end_time, all_day) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('iissssssi', $userId, $courseId, $title, $description, $startDate, $startTime, $endDate, $endTime, $allDay);
+    $stmt = $conn->prepare("INSERT INTO events (user_id, course_id, title, description, start_date, start_time, end_date, end_time, all_day, no_school_day, recurrence, repeat_end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('iissssssisss', $userId, $courseId, $title, $description, $startDate, $startTime, $endDate, $endTime, $allDay, $noSchoolDay, $recurrence, $repeatEndDate);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Event added successfully.']);
@@ -282,15 +285,18 @@ function editEvent() {
     $endTime = $_POST['end_time'] ?? null; // Optional
     $description = $_POST['description'] ?? null; // Optional
     $allDay = $_POST['all_day'] ?? 0; // Defaults to 0 (false)
+    $noSchoolDay = $_POST['no_school_day'] ?? 0; // New field, defaults to 0 (false)
+    $recurrence = $_POST['recurrence'] ?? 'None'; // New field, defaults to 'None'
+    $repeatEndDate = $_POST['repeat_end_date'] ?? null; // New field, can be null
 
     if (!$eventId || !$title || !$startDate) {
         echo json_encode(['success' => false, 'message' => 'Event ID, title, and start date are required.']);
         return;
     }
 
-    $stmt = $conn->prepare("UPDATE events SET title = ?, course_id = ?, description = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?, all_day = ? WHERE event_id = ?");
-    $stmt->bind_param('sisssssii', $title, $courseId, $description, $startDate, $startTime, $endDate, $endTime, $allDay, $eventId);
-
+    $stmt = $conn->prepare("UPDATE events SET title = ?, course_id = ?, description = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?, all_day = ?, no_school_day = ?, recurrence = ?, repeat_end_date = ? WHERE event_id = ?");
+    $stmt->bind_param('sisssssiisssi', $title, $courseId, $description, $startDate, $startTime, $endDate, $endTime, $allDay, $noSchoolDay, $recurrence, $repeatEndDate, $eventId);
+    
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Event updated successfully.']);
     } else {

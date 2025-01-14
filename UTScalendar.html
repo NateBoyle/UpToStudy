@@ -100,6 +100,21 @@
                         <label>
                           <input type="checkbox" name="all_day" /> All Day
                         </label>
+                        <label>
+                            <input type="checkbox" name="no_school_day" disabled /> No school day
+                          </label>
+                        <!-- Add recurrence options -->
+                        <div class="recurrence-options">
+                            <label for="recurrence">Recurrence:</label>
+                            <select name="recurrence">
+                                <option value="None">None</option>
+                                <option value="Daily">Daily</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Monthly">Monthly</option>
+                            </select>
+                            <label for="repeat_end_date">Repeat Until:</label>
+                            <input type="date" name="repeat_end_date" min="1900-01-01" max="2100-12-31" />
+                        </div>
                         <!-- Button Container -->
                         <div class="button-container">
                             <button type="submit" id="saveEventBtn">Save Event</button>
