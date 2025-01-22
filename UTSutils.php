@@ -237,26 +237,21 @@ function fetchToDos($userId, $id = null, $startDate = null, $endDate = null) {
 function fetchEvents($userId, $id = null, $startDate = null, $endDate = null) {
     global $conn;
 
-    $query = "SELECT * FROM events WHERE user_id = ?";
+    $query = "SELECT * FROM events_occurrences WHERE user_id = ?";
     $params = [$userId];
     $types = "i";
 
-    // Fetch by ID if provided
+    // Fetch by occurrence ID if provided
     if ($id) {
-        $query .= " AND event_id = ?";
+        $query .= " AND occurrence_id = ?";
         $params[] = $id;
         $types .= "i";
     } elseif ($startDate && $endDate) {
         // Fetch by date range if start and end dates are provided
-        $query .= " AND (start_date BETWEEN ? AND ? OR end_date BETWEEN ? AND ?) OR 
-                    (recurrence != 'None' AND repeat_end_date BETWEEN ? AND ?)";
+        $query .= " AND start_date BETWEEN ? AND ?";
         $params[] = $startDate;
         $params[] = $endDate;
-        $params[] = $startDate;
-        $params[] = $endDate;
-        $params[] = $startDate;
-        $params[] = $endDate;
-        $types .= "ssssss";
+        $types .= "ss";
     }
 
     //error_log("Received Parameters: ID: $id, Start Date: $startDate, End Date: $endDate");

@@ -82,27 +82,35 @@
                 <!-- EVENT CREATION MODAL -->
                 <div id="eventModal" class="creationModal">
                     <div class="modal-content">
-                      <span class="close">&times;</span>
-                      <h2>New Event</h2>
-                      <form id="eventForm">
-                        <input type="text" name="title" placeholder="Title"  />
+                    <span class="close">×</span>
+                    <h2>New Event</h2>
+                    <div class="edit-choice">
+                        <label><input type="radio" name="editType" value="event" checked> Event</label>
+                        <label><input type="radio" name="editType" value="occurrence"> Occurrence</label>
+                    </div>
+                    <form id="eventForm">
+                        <input type="text" name="title" placeholder="Title" />
                         <select id="course" name="course_id" >
                             <option value="" disabled selected>Select course (optional)</option>
                             <!-- Dynamically populate courses here -->
-                          </select>
+                        </select>
                         <textarea name="description" placeholder="Description"></textarea>
-                        <label for="startDate">Start Date and Time:</label>
-                        <input type="date" name="start_date"  min="1900-01-01" max="2100-12-31"/>
+                        <label for="date">Date:</label>
+                        <input type="date" name="start_date" min="1900-01-01" max="2100-12-31"/>
+                        
+                        <div class="time-selectors">
+                        <label for="start_time">Start and End Times:</label>
                         <input type="time" name="start_time" />
-                        <label for="endDate">End Date and Time:</label>
-                        <input type="date" name="end_date" min="1900-01-01" max="2100-12-31"/>
                         <input type="time" name="end_time" />
+                        </div>
+                        
                         <label>
-                          <input type="checkbox" name="all_day" /> All Day
+                        <input type="checkbox" name="all_day" /> All Day
                         </label>
                         <label>
                             <input type="checkbox" name="no_school_day" disabled /> No school day
-                          </label>
+                        </label>
+                        
                         <!-- Add recurrence options -->
                         <div class="recurrence-options">
                             <label for="recurrence">Recurrence:</label>
@@ -112,16 +120,16 @@
                                 <option value="Weekly">Weekly</option>
                                 <option value="Monthly">Monthly</option>
                             </select>
-                            <label for="repeat_end_date">Repeat Until:</label>
-                            <input type="date" name="repeat_end_date" min="1900-01-01" max="2100-12-31" />
+                            <label for="end_date" style="display: none;">End Date:</label>
+                            <input type="date" name="end_date" min="1900-01-01" max="2100-12-31" style="display: none;"/>
                         </div>
+                        
                         <!-- Button Container -->
                         <div class="button-container">
                             <button type="submit" id="saveEventBtn">Save Event</button>
-                            <button type="button" id="completeButton">Complete</button>
                             <button type="button" id="deleteButton">Delete</button>
                         </div>
-                      </form>
+                    </form>
                     </div>
                 </div>
                 <!-- Updated static days header -->

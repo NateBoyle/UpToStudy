@@ -179,44 +179,7 @@ export async function getCurrentCourses(currentDate, isWeekView = false, isDash 
     }
 }
 
-function modifyEventsForDisplay(events) {
-    let discreteEvents = [];
-
-    events.forEach(event => {
-        const startDate = new Date(event.start_date + 'T00:00:00');
-        const endDate = new Date(event.end_date + 'T00:00:00');
-        const eventId = event.event_id;
-        const eventTitle = event.title;
-        const startTime = event.start_time;
-        const endTime = event.end_time;
-
-        // Loop through each day from start to end date
-        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-            let dayDate = new Date(d);
-            dayDate.setHours(0, 0, 0, 0); // Reset time to midnight
-
-            // Create a modified event for each day
-            let modifiedEvent = {
-                //...event, // Copy all properties from the original event
-                event_id: eventId,
-                title: eventTitle, // Preserve the original title
-                start_date: dayDate.toISOString().split('T')[0], // Set to the current day in the loop
-                start_time: dayDate.toDateString() === startDate.toDateString() ? startTime : '00:00:00',
-                end_time: dayDate.toDateString() === endDate.toDateString() ? endTime : '23:59:59'
-            };
-
-            discreteEvents.push(modifiedEvent);
-        }
-    });
-
-    //console.log('discrete events:', discreteEvents);
-    return discreteEvents;
-    
-}
-
-// Get events within time range
 export async function getCurrentEvents(currentDate, isWeekView = false, isDash = false) {
-
     if (!currentDate) {
         console.error("Current date is not defined.");
         return [];
@@ -225,7 +188,6 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
     if (cachedDate.toISOString().split("T")[0] !== currentDate.toISOString().split("T")[0]) {
         // Clear caches if dates are different
         cachedDate = currentDate;
-
     }
 
     // Determine the view range
@@ -234,120 +196,71 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
         // Custom 5-day range
         const startDate = new Date(currentDate);
         startDate.setHours(0, 0, 0, 0); // Normalize to midnight local time
-
         const endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + 4); // 5-day range
         endDate.setHours(23, 59, 59, 999); // Normalize end date to the end of the day
-
         viewStartDate = startDate.toISOString().split("T")[0];
         viewEndDate = endDate.toISOString().split("T")[0];
-
-        //console.log(`Events start date (Dash): ${startDate}`);
-        //console.log(`Events end date (Dash): ${endDate}`);
-        
     } else if (isWeekView) {
         // Week view range
         const weekStart = new Date(currentDate);
         weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Set to Sunday
         weekStart.setHours(0, 0, 0, 0); // Normalize to midnight local time
-
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekStart.getDate() + 6); // Set to Saturday
         weekEnd.setHours(23, 59, 59, 999); // Normalize to the end of the day
-
         viewStartDate = weekStart.toISOString().split("T")[0];
         viewEndDate = weekEnd.toISOString().split("T")[0];
-
-        //console.log(`Week view start date: ${weekStart}`);
-        //console.log(`Week view end date: ${weekEnd}`);
     } else {
+        // Month view range
         const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // First day
         const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // Last day
-
         viewStartDate = monthStart.toISOString().split("T")[0];
         viewEndDate = monthEnd.toISOString().split("T")[0];
     }
 
-    //console.log(`Events view start date: ${viewStartDate}`);
-    //console.log(`Events view end date: ${viewEndDate}`);
-
     try {
         const result = [];
 
-        // Initialize assignments, toDos, and events
-        let assignments = [];
-        let toDos = [];
-        let events = [];
-
-        
-        [assignments, toDos, events] = await Promise.all([
+        // Fetch data
+        const [assignments, toDos, events] = await Promise.all([
             fetchAssignments(null, viewStartDate, viewEndDate),
             fetchToDos(null, viewStartDate, viewEndDate),
             fetchEvents(null, viewStartDate, viewEndDate),
         ]);
 
-        // Log the contents of events as they are fetched
-        //console.log('Fetched events:', events);
-        let discreteEvents = modifyEventsForDisplay(events);
-        
-        
-
         // Helper function to process events
         const processEvent = (event, type) => {
             let startDate = event.due_date || event.start_date;
             let startTime = event.due_time || event.start_time || "00:00:00";
-            let endTime; 
-            let id;
-
-
-            // Adjust assignments/to-dos to mimic event start/end times
-            if (type === "assignment" || type === "toDo") {
-                // Parse startTime into hours and minutes
-                const [hours, minutes, seconds] = startTime.split(":").map(Number);
-                const startDateTime = new Date();
-                startDateTime.setHours(hours, minutes + 30, seconds || 0, 0); // Add 30 minutes
-                endTime = startDateTime.toTimeString().split(" ")[0]; // Extract time in hh:mm:ss format
-                if (type === "assignment") {
-                    id = event.assignment_id;
-                } else {
-                    id = event.to_do_id;
-                }
-
-            } else {
-                endTime = event.end_time || "23:59:59"; // Default end time for all-day events
-                id = event.event_id;
-            }
-
-            // Determine the color (use event.color if available, else default to #5DD970)
-            const color = event.color || "#5DD970";
+            let endTime = event.end_time || (type === "assignment" || type === "toDo" ? new Date().toTimeString().split(" ")[0] : "23:59:59");
+            let id = type === "assignment" ? event.assignment_id : type === "toDo" ? event.to_do_id : event.occurrence_id; // Changed to occurrence_id for events
+            let color = event.color || "#5DD970";
 
             const dayOrDate = isWeekView
                 ? new Date(`${startDate}T${startTime}`).getDay() // Day of the week
                 : startDate; // Exact date
 
-            const existingEntry = result.find(entry => entry.key === dayOrDate);
-            if (existingEntry) {
-                existingEntry.events.push({
+            if (result.some(entry => entry.key === dayOrDate)) {
+                result.find(entry => entry.key === dayOrDate).events.push({
                     title: event.title,
                     id,
                     startTime,
                     endTime,
                     type,
-                    color, // Add color to the event
+                    color
                 });
             } else {
                 result.push({
                     key: dayOrDate,
-                    events: [
-                        {
-                            title: event.title,
-                            id,
-                            startTime,
-                            endTime,
-                            type,
-                            color, // Add color to the event
-                        },
-                    ],
+                    events: [{
+                        title: event.title,
+                        id,
+                        startTime,
+                        endTime,
+                        type,
+                        color
+                    }]
                 });
             }
         };
@@ -355,13 +268,10 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
         // Process each type of event
         assignments.forEach(assignment => processEvent(assignment, "assignment"));
         toDos.forEach(toDo => processEvent(toDo, "toDo"));
-        discreteEvents.forEach(event => processEvent(event, "event"));
+        events.forEach(event => processEvent(event, "event"));
 
         // Sort results
         result.sort((a, b) => (isWeekView ? a.key - b.key : new Date(a.key) - new Date(b.key)));
-
-        // Log the result before returning it
-        //console.log('getCurrentEvents result:', result);
 
         return result;
     } catch (error) {

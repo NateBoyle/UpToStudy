@@ -186,13 +186,118 @@ export async function openFromCalendar(type, id) {
     if (item) {
       item.id = id;
       console.log(`Type: ${type}, Id: ${id}, Item: ${item}`);
-      openModal(type, `${type}Modal`, item); // Modal ID should match the type (e.g., assignmentModal)
+      if (type === 'event') {
+        openEventModal(item); // Use openEventModal for events
+      } else {
+        openModal(type, `${type}Modal`, item); // Use openModal for assignments and todos
+      }
     }
 
   } catch (error) {
       console.error(`Error handling event click for type: ${type}, ID: ${id}`, error);
       alert('Failed to load event details. Please try again.');
   }
+}
+
+export async function openEventModal(item) {
+  const modal = document.getElementById('eventModal');
+  const form = modal.querySelector('form');
+  const editChoice = modal.querySelector('.edit-choice'); // Assuming 'edit-choice' is the class for the radio buttons container
+
+  form.reset(); // Clear previous values
+  delete form.dataset.id; // Clear stored ID for new records
+  await populateCourseDropdown('eventModal'); // Populate courses
+
+  const submitButton = modal.querySelector('button[type="submit"]');
+  const deleteButton = modal.querySelector('#deleteButton');
+  const modalTitle = modal.querySelector('h2');
+
+  const allDayCheckbox = form.querySelector('[name="all_day"]');
+  const noSchoolDayCheckbox = form.querySelector('[name="no_school_day"]');
+  const startTime = form.querySelector('[name="start_time"]');
+  const endTime = form.querySelector('[name="end_time"]');
+  const recurrenceDropdown = form.querySelector('[name="recurrence"]');
+  const endDateInput = form.querySelector('[name="end_date"]');
+  const endDateLabel = form.querySelector('label[for="end_date"]');
+
+  // Helper function to manage form state
+  function updateFormState(editType) {
+    const isAllDay = allDayCheckbox.checked;
+    const isRecurring = recurrenceDropdown.value !== 'None';
+
+    // Manage time fields based on 'All Day'
+    if (startTime) startTime.disabled = isAllDay;
+    if (endTime) endTime.disabled = isAllDay;
+    if (noSchoolDayCheckbox) {
+      noSchoolDayCheckbox.disabled = !isAllDay;
+      noSchoolDayCheckbox.style.opacity = isAllDay ? '1' : '0.5';
+    }
+
+    // Manage recurrence and end date fields
+    if (recurrenceDropdown) {
+      recurrenceDropdown.disabled = editType !== 'event';
+      recurrenceDropdown.style.display = editType === 'event' ? 'block' : 'none';
+    }
+    if (endDateInput && endDateLabel) {
+      endDateInput.disabled = editType !== 'event' || !isRecurring;
+      endDateInput.style.display = (editType === 'event' && isRecurring) ? 'block' : 'none';
+      endDateLabel.style.display = (editType === 'event' && isRecurring) ? 'block' : 'none';
+    }
+  }
+
+  // Event listeners
+  if (allDayCheckbox) allDayCheckbox.addEventListener('change', () => updateFormState(document.querySelector('input[name="editType"]:checked').value));
+  if (recurrenceDropdown) recurrenceDropdown.addEventListener('change', () => updateFormState(document.querySelector('input[name="editType"]:checked').value));
+
+  // Radio buttons for edit type
+  const eventRadio = modal.querySelector('input[name="editType"][value="event"]');
+  const occurrenceRadio = modal.querySelector('input[name="editType"][value="occurrence"]');
+
+  if (eventRadio && occurrenceRadio) {
+    eventRadio.addEventListener('change', () => updateFormState('event'));
+    occurrenceRadio.addEventListener('change', () => updateFormState('occurrence'));
+  }
+
+  // Handle existing occurrence or new event
+  if (item) {
+    // Populate form with existing occurrence data
+    Object.keys(item).forEach(key => {
+      const input = form.querySelector(`[name="${key}"]`);
+      if (input) {
+        if (input.type === 'checkbox') {
+          input.checked = item[key] === 1;
+        } else if (key === 'course_id' && !item[key]) {
+          input.value = '';
+        } else {
+          input.value = item[key];
+        }
+      }
+    });
+
+    form.dataset.id = item.id;
+    occurrenceRadio.checked = true; // Default to editing the occurrence
+    updateFormState('occurrence');
+
+    submitButton.textContent = 'Save';
+    deleteButton.style.display = 'block';
+    deleteButton.onclick = () => {
+      if (confirm(`Are you sure you want to delete this ${document.querySelector('input[name="editType"]:checked').value === 'event' ? 'Event' : 'Occurrence'}?`)) {
+        deleteEntity(document.querySelector('input[name="editType"]:checked').value, item.id);
+      }
+    };
+    modalTitle.textContent = 'Edit Occurrence';
+
+  } else { // New event scenario
+    form.dataset.id = '';
+    deleteButton.style.display = 'none';
+    submitButton.textContent = 'Save Event';
+    modalTitle.textContent = 'New Event';
+
+    if (editChoice) editChoice.style.display = 'none'; // Hide edit choice for new events
+    updateFormState('event'); // Default to event series creation
+  }
+
+  modal.style.display = 'flex';
 }
 
 // Add/Update Modal Workflow
@@ -214,56 +319,17 @@ export async function openModal(entity, modalId, item) {
   const statusLabel = form.querySelector('label[for="status"]'); // Reference the Status label
   const statusDropdown = form.querySelector('[name="status"]'); // Reference to the status dropdown
 
-  // New code to handle 'All Day' checkbox
-  const allDayCheckbox = form.querySelector('[name="all_day"]');
-  const noSchoolDayCheckbox = form.querySelector('[name="no_school_day"]');
-  const startTime = form.querySelector('[name="start_time"]');
-  const endTime = form.querySelector('[name="end_time"]');
-  const recurrenceDropdown = form.querySelector('[name="recurrence"]');
 
-  // Set up event listener for 'All Day' checkbox changes
-  if (allDayCheckbox) {
-    allDayCheckbox.addEventListener('change', function() {
-      if (this.checked) {
-        startTime.disabled = true;
-        startTime.style.opacity = '0.5';
-        endTime.disabled = true;
-        endTime.style.opacity = '0.5';
-        if (noSchoolDayCheckbox) {
-          noSchoolDayCheckbox.disabled = false;
-          noSchoolDayCheckbox.style.opacity = '1';
-        }
-      } else {
-        startTime.disabled = false;
-        startTime.style.opacity = '1';
-        endTime.disabled = false;
-        endTime.style.opacity = '1';
-        if (noSchoolDayCheckbox) {
-          noSchoolDayCheckbox.disabled = true;
-          noSchoolDayCheckbox.style.opacity = '0.5';
-          noSchoolDayCheckbox.checked = false;
-        }
-      }
-    }); 
-  }
-  
   if (item) {
     // Populate form fields from the item object
     Object.keys(item).forEach(key => {
         const input = form.querySelector(`[name="${key}"]`);
         if (input) {
           if (input.type === 'checkbox') {
-            // Convert 1 to true, 0 to false
             input.checked = item[key] === 1;
-          } // Check if it's the course dropdown
-          else if (key === 'course_id' && !item[key]) {
+          } else if (key === 'course_id' && !item[key]) {
               input.value = ''; // Reset to default if no course is associated
-          } else if (key === 'recurrence') {
-            // Set the value for the recurrence dropdown
-            recurrenceDropdown.value = item[key] || 'None';
-          } else {
-              input.value = item[key]; // Populate other fields as usual
-          }
+          } 
         }
     });
     form.dataset.id = item.id; // Store the item ID for context
@@ -271,41 +337,9 @@ export async function openModal(entity, modalId, item) {
 
     // Set the status dropdown value
     if (statusDropdown && statusLabel) {
-      // Existing item: Show the Status label and dropdown
       statusLabel.style.display = 'block';
       statusDropdown.style.display = 'block';
       statusDropdown.value = item.status || 'Uncompleted'; // Default to "Uncompleted" if status is missing
-      
-    }
-
-    // Set the recurrence dropdown value if it exists
-    if (recurrenceDropdown) {
-      recurrenceDropdown.style.display = 'block';
-      recurrenceDropdown.value = item.recurrence || 'None'; // Default to "None" if recurrence is missing
-    }
-
-    // Handle initial state for existing events
-    if (allDayCheckbox && noSchoolDayCheckbox) {
-      // Set the initial state of 'All Day' checkbox
-      allDayCheckbox.checked = item.all_day === 1; // Assuming 'all_day' is the name in your data structure
-
-      if (allDayCheckbox.checked) {
-        startTime.disabled = true;
-        startTime.style.opacity = '0.5';
-        endTime.disabled = true;
-        endTime.style.opacity = '0.5';
-        noSchoolDayCheckbox.disabled = false;
-        noSchoolDayCheckbox.style.opacity = '1';
-      } else {
-        noSchoolDayCheckbox.disabled = true;
-        noSchoolDayCheckbox.style.opacity = '0.5';
-        noSchoolDayCheckbox.checked = false;
-      }
-      
-      // Set 'No school day' checkbox based on existing item data
-      if (item.no_school_day === 1) {
-        noSchoolDayCheckbox.checked = true;
-      }
     }
 
     // Edit submit button within the specific form
@@ -322,19 +356,9 @@ export async function openModal(entity, modalId, item) {
 
     // Edit title within the specific form
     if (entity === "assignment") {
-      if (!item.title) {
-        modalTitle.textContent = 'Add Assignment'; // Change the title
-      } else {
-        modalTitle.textContent = 'Edit Assignment'; // Change the title
-      }
-
-      //pointsEarnedInput.style.display = 'block'; // Show the input for existing assignments
-
+      modalTitle.textContent = item.title ? 'Edit Assignment' : 'Add Assignment';
     } else if (entity === "toDo") {
-      modalTitle.textContent = 'Edit To-Do'; // Change the title
-    } else {
-      modalTitle.textContent = 'Edit Event'; // Change the title
-      
+      modalTitle.textContent = 'Edit To-Do';
     }
 
   } else {
@@ -343,7 +367,6 @@ export async function openModal(entity, modalId, item) {
 
     // Set the status dropdown default
     if (statusDropdown && statusLabel) {
-      // New item: Hide the Status label and dropdown
       statusLabel.style.display = 'none';
       statusDropdown.style.display = 'none';
     }
@@ -355,23 +378,120 @@ export async function openModal(entity, modalId, item) {
 
     // Edit submit button and title within the specific form
     if (entity === "assignment") {
-      modalTitle.textContent = 'New Assignment'; // Change the title
+      modalTitle.textContent = 'New Assignment';
       submitButton.textContent = 'Add Assignment';
-      
     } else if (entity === "toDo") {
-      modalTitle.textContent = 'New To-Do'; // Change the title
+      modalTitle.textContent = 'New To-Do';
       submitButton.textContent = 'Create To-Do';
-    } else {
-      modalTitle.textContent = 'New Event'; // Change the title
-      submitButton.textContent = 'Save Event';
-    }
+    } 
   }
 
   modal.style.display = 'flex'; // Show modal
-
 }
 
 // Form Validation
+export function validateEventFields(form) {
+  let valid = true; // Assume form is valid initially
+  const errors = []; // Collect error messages
+  const modal = document.getElementById('eventModal');
+
+  // Reset all borders
+  [...form.elements].forEach(input => {
+    if (input.name) {
+      input.style.border = ''; // Clear any previous highlights
+    }
+  });
+
+  // Common Validation: Title
+  const title = form.querySelector('[name="title"]');
+  if (!title.value.trim()) {
+    errors.push('Title is required.');
+    title.style.border = '1px solid red';
+    valid = false;
+  }
+
+  // Event-Specific Validation
+  const startDate = form.querySelector('[name="start_date"]');
+  const endDate = form.querySelector('[name="end_date"]');
+  const allDay = form.querySelector('[name="all_day"]');
+  const startTime = form.querySelector('[name="start_time"]');
+  const endTime = form.querySelector('[name="end_time"]');
+  const recurrence = form.querySelector('[name="recurrence"]');
+
+  // Start Date validation
+  if (!startDate.value) {
+    errors.push('Start date is required.');
+    startDate.style.border = '1px solid red';
+    valid = false;
+  }
+
+  // Time validation for non-all-day events
+  if (!allDay.checked) {
+    if (!startTime.value) {
+      errors.push('Start time is required for non-all-day events.');
+      startTime.style.border = '1px solid red';
+      valid = false;
+    }
+    if (!endTime.value) {
+      errors.push('End time is required for non-all-day events.');
+      endTime.style.border = '1px solid red';
+      valid = false;
+    } else if (startTime.value >= endTime.value) {
+      errors.push('End time must be after the start time.');
+      startTime.style.border = '1px solid red';
+      endTime.style.border = '1px solid red';
+      valid = false;
+    }
+  }
+
+  // Validation specific to the base event
+  if (!isOccurrence) {
+    if (recurrence.value !== 'None') {
+      // Recurrence validation
+      if (endDate.disabled || !endDate.value) {
+        errors.push('End date is required for recurring events.');
+        // We won't highlight endDate since it might be disabled, but this error message still informs the user
+        valid = false;
+      } else {
+        const start = new Date(startDate.value);
+        const end = new Date(endDate.value);
+        let occurrenceCount = 0;
+
+        switch (recurrence.value) {
+          case 'Daily':
+            occurrenceCount = Math.min(52, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+            break;
+          case 'Weekly':
+            const dayOfWeek = start.getDay();
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+              if (d.getDay() === dayOfWeek) {
+                occurrenceCount++;
+                if (occurrenceCount >= 52) break;
+              }
+            }
+            break;
+          case 'Monthly':
+            const monthsDiff = end.getMonth() - start.getMonth() + (12 * (end.getFullYear() - start.getFullYear()));
+            occurrenceCount = Math.min(52, monthsDiff + 1); // +1 for the first month
+            break;
+        }
+
+        if (occurrenceCount > 52) {
+          errors.push("The number of occurrences exceeds the limit of 52. Please adjust the end date or choose a different recurrence.");
+          valid = false;
+        }
+      }
+    }
+  }
+
+  // Display error messages as an alert
+  if (!valid) {
+    alert(errors.join('\n'));
+  }
+
+  return valid; // Return overall validity
+}
+
 function validateFields(form, entity) {
   let valid = true; // Assume form is valid initially
   const errors = []; // Collect error messages
@@ -599,7 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newEventButton = document.getElementById('newEventButton');
     if (newEventButton) {
       newEventButton.addEventListener('click', () => {
-        openModal('event', 'eventModal'); // Open Event Modal
+        openEventModal(); // Open Event Modal
       });
     }
   
