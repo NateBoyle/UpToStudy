@@ -272,7 +272,7 @@ function addEvent() {
             generateOccurrences($eventId, $userId, $startDate, $endDate, $recurrence, $startTime, $endTime, $title, $description, $allDay, $noSchoolDay);
         } else {
             // Insert a single occurrence for non-recurring events
-            insertOccurrence($conn, $eventId, $userId, $startDate, $startTime, $endTime, $title, $description, $allDay, $noSchoolDay);
+            insertOccurrence($conn, $eventId, $userId, $startDate, $startTime, $endTime, $title, $description, $allDay, $noSchoolDay, $recurrence, $endDate);
         }
 
         echo json_encode(['success' => true, 'message' => 'Event added successfully.']);
@@ -292,7 +292,7 @@ function generateOccurrences($eventId, $userId, $startDate, $endDate, $recurrenc
     switch ($recurrence) {
         case 'Daily':
             while ($currentDate <= strtotime($endDate) && $occurrenceCount < 52) {
-                insertOccurrence($conn, $eventId, $userId, date('Y-m-d', $currentDate), $startTime, $endTime, $title, $description, $allDay, $noSchoolDay);
+                insertOccurrence($conn, $eventId, $userId, date('Y-m-d', $currentDate), $startTime, $endTime, $title, $description, $allDay, $noSchoolDay, $recurrence, $endDate);
                 $currentDate = strtotime('+1 day', $currentDate);
                 $occurrenceCount++;
             }
@@ -301,7 +301,7 @@ function generateOccurrences($eventId, $userId, $startDate, $endDate, $recurrenc
             $dayOfWeek = date('w', $currentDate); // 0 (for Sunday) through 6 (for Saturday)
             while ($currentDate <= strtotime($endDate) && $occurrenceCount < 52) {
                 if (date('w', $currentDate) == $dayOfWeek) {
-                    insertOccurrence($conn, $eventId, $userId, date('Y-m-d', $currentDate), $startTime, $endTime, $title, $description, $allDay, $noSchoolDay);
+                    insertOccurrence($conn, $eventId, $userId, date('Y-m-d', $currentDate), $startTime, $endTime, $title, $description, $allDay, $noSchoolDay, $recurrence, $endDate);
                     $occurrenceCount++;
                 }
                 $currentDate = strtotime('+1 day', $currentDate);
@@ -311,7 +311,7 @@ function generateOccurrences($eventId, $userId, $startDate, $endDate, $recurrenc
             $startDay = date('j', $currentDate); // Day of the month
             while ($currentDate <= strtotime($endDate) && $occurrenceCount < 52) {
                 if (date('j', $currentDate) == $startDay) {
-                    insertOccurrence($conn, $eventId, $userId, date('Y-m-d', $currentDate), $startTime, $endTime, $title, $description, $allDay, $noSchoolDay);
+                    insertOccurrence($conn, $eventId, $userId, date('Y-m-d', $currentDate), $startTime, $endTime, $title, $description, $allDay, $noSchoolDay, $recurrence, $endDate);
                     $occurrenceCount++;
                 }
                 $currentDate = strtotime('+1 day', $currentDate);
@@ -321,9 +321,9 @@ function generateOccurrences($eventId, $userId, $startDate, $endDate, $recurrenc
 }
 
 // Helper function to insert a single occurrence
-function insertOccurrence($conn, $eventId, $userId, $occurrenceDate, $startTime, $endTime, $title, $description, $allDay, $noSchoolDay) {
-    $stmt = $conn->prepare("INSERT INTO events_occurrences (event_id, user_id, start_date, start_time, end_time, title, description, all_day, no_school_day) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('iisssssii', $eventId, $userId, $occurrenceDate, $startTime, $endTime, $title, $description, $allDay, $noSchoolDay); // Changed to 'iii' for boolean fields
+function insertOccurrence($conn, $eventId, $userId, $occurrenceDate, $startTime, $endTime, $title, $description, $allDay, $noSchoolDay, $recurrence, $endDate) {
+    $stmt = $conn->prepare("INSERT INTO events_occurrences (event_id, user_id, start_date, start_time, end_time, title, description, all_day, no_school_day, recurrence, end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('iisssssiiss', $eventId, $userId, $occurrenceDate, $startTime, $endTime, $title, $description, $allDay, $noSchoolDay, $recurrence, $endDate); // Changed to 'iii' for boolean fields
     $stmt->execute();
     $stmt->close();
 }
@@ -331,7 +331,7 @@ function insertOccurrence($conn, $eventId, $userId, $occurrenceDate, $startTime,
 function editEvent() {
     global $conn;
 
-    $eventId = $_POST['id'];
+    $occurrenceId = $_POST['id']; // Now receiving occurrence_id
     $title = $_POST['title'];
     $courseId = !empty($_POST['course_id']) ? $_POST['course_id'] : null;
     $startDate = $_POST['start_date'];
@@ -342,22 +342,112 @@ function editEvent() {
     $allDay = $_POST['all_day'] ?? 0; // Defaults to 0 (false)
     $noSchoolDay = $_POST['no_school_day'] ?? 0; // New field, defaults to 0 (false)
     $recurrence = $_POST['recurrence'] ?? 'None'; // New field, defaults to 'None'
+    $editType = $_POST['editType'] ?? null; // Collect the radio button value
 
-    if (!$eventId || !$title || !$startDate) {
-        echo json_encode(['success' => false, 'message' => 'Event ID, title, and start date are required.']);
+    if (!$occurrenceId || !$title || !$startDate) {
+        echo json_encode(['success' => false, 'message' => 'Occurrence ID, title, and start date are required.']);
         return;
     }
 
-    $stmt = $conn->prepare("UPDATE events SET title = ?, course_id = ?, description = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?, all_day = ?, no_school_day = ?, recurrence = ? WHERE event_id = ?");
-    $stmt->bind_param('sisssssiisi', $title, $courseId, $description, $startDate, $startTime, $endDate, $endTime, $allDay, $noSchoolDay, $recurrence, $eventId);
-    
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Event updated successfully.']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Error updating event.']);
+    $oldEvent = getEvent($occurrenceId); // getEvent now handles getting event_id too
+
+    if (!$oldEvent) {
+        echo json_encode(['success' => false, 'message' => 'No event found for that occurrence.']);
+        return;
     }
 
-    $stmt->close();
+    $eventId = $oldEvent['event_id']; // We get the event_id from the getEvent result
+
+    if ($editType === 'event') { // Editing the base event series
+        $stmt = $conn->prepare("UPDATE events SET title = ?, course_id = ?, description = ?, start_date = ?, start_time = ?, end_date = ?, end_time = ?, all_day = ?, no_school_day = ?, recurrence = ? WHERE event_id = ?");
+        $stmt->bind_param('sisssssiisi', $title, $courseId, $description, $startDate, $startTime, $endDate, $endTime, $allDay, $noSchoolDay, $recurrence, $eventId);
+        
+        if ($stmt->execute()) {
+            // If start or end date or recurrence has changed, regenerate occurrences
+            if ($startDate !== $oldEvent['start_date'] || $endDate !== $oldEvent['end_date'] || $recurrence !== $oldEvent['recurrence']) {
+                // Delete all occurrences linked to this event
+                $deleteStmt = $conn->prepare("DELETE FROM events_occurrences WHERE event_id = ?");
+                $deleteStmt->bind_param('i', $eventId);
+                $deleteStmt->execute();
+                $deleteStmt->close();
+                
+                // Generate new occurrences with updated details
+                generateOccurrences($eventId, $_SESSION['user_id'], $startDate, $endDate, $recurrence, $startTime, $endTime, $title, $description, $allDay, $noSchoolDay);
+            }
+            echo json_encode(['success' => true, 'message' => 'Event series updated successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error updating event series.']);
+        }
+        $stmt->close();
+    } else if ($editType === 'occurrence') { // Editing a single occurrence
+        $stmt = $conn->prepare("UPDATE events_occurrences SET title = ?, start_date = ?, start_time = ?, end_time = ?, description = ?, all_day = ?, no_school_day = ? WHERE occurrence_id = ?");
+        $stmt->bind_param('sssssiis', $title, $startDate, $startTime, $endTime, $description, $allDay, $noSchoolDay, $occurrenceId);
+        
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Event occurrence updated successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error updating event occurrence.']);
+        }
+        $stmt->close();
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid edit type specified.']);
+    }
+}
+
+function getEvent($occurrenceId) {
+    global $conn;
+    
+    // First, query the events_occurrences table to get the event_id
+    $occurrenceStmt = $conn->prepare("SELECT event_id FROM events_occurrences WHERE occurrence_id = ?");
+    if (!$occurrenceStmt) {
+        error_log("Error preparing statement to fetch event_id: " . $conn->error);
+        return null;
+    }
+    
+    $occurrenceStmt->bind_param('i', $occurrenceId);
+    if ($occurrenceStmt->execute()) {
+        $occurrenceResult = $occurrenceStmt->get_result();
+        $row = $occurrenceResult->fetch_assoc();
+        $occurrenceStmt->close();
+        
+        if ($row) {
+            $eventId = $row['event_id'];
+            
+            // Now, query the events table with the event_id
+            $eventStmt = $conn->prepare("SELECT event_id, title, description, start_date, start_time, end_date, end_time, all_day, no_school_day, recurrence FROM events WHERE event_id = ?");
+            if (!$eventStmt) {
+                error_log("Error preparing statement to fetch event: " . $conn->error);
+                return null;
+            }
+            
+            $eventStmt->bind_param('i', $eventId);
+            if ($eventStmt->execute()) {
+                $result = $eventStmt->get_result();
+                $event = $result->fetch_assoc();
+                $eventStmt->close();
+                
+                if ($event) {
+                    return $event;
+                } else {
+                    // No event found with that event_id
+                    error_log("No event found for event_id: $eventId");
+                    return null;
+                }
+            } else {
+                error_log("Error executing query to fetch event: " . $eventStmt->error);
+                $eventStmt->close();
+                return null;
+            }
+        } else {
+            // No occurrence found with that occurrence_id
+            error_log("No occurrence found for occurrence_id: $occurrenceId");
+            return null;
+        }
+    } else {
+        error_log("Error executing query to fetch event_id: " . $occurrenceStmt->error);
+        $occurrenceStmt->close();
+        return null;
+    }
 }
 
 

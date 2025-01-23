@@ -100,6 +100,33 @@
     color: white;
 }
 
+.edit-choice {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the items horizontally */
+    gap: 20px; /* Space between radio button options */
+    margin-bottom: 20px; /* Increased bottom margin */
+}
+
+.radio-option {
+    display: inline-flex; /* Flex for aligning input and span */
+    align-items: center; /* Center align items vertically */
+}
+
+.radio-option input[type="radio"] {
+    min-width: 0; /* Reset min-width to 0 */
+    width: auto; /* Let the width be determined by content */
+    margin-right: 5px; /* Small margin to the right of the radio button */
+    margin-top: 0; /* Remove any top margin */
+    margin-bottom: 0; /* Remove any bottom margin */
+}
+
+.radio-option span {
+    font-size: 1.2em; /* Increase the font size */
+    margin-left: 0; /* No left margin on the text */
+    text-align: left;
+}
+
 /* Form Styling for All Modals */
 .creationModal form {
     display: flex;

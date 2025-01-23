@@ -217,6 +217,7 @@ export async function openEventModal(item) {
   const startTime = form.querySelector('[name="start_time"]');
   const endTime = form.querySelector('[name="end_time"]');
   const recurrenceDropdown = form.querySelector('[name="recurrence"]');
+  const recurrenceLabel = document.getElementById('recurrenceLabel');
   const endDateInput = form.querySelector('[name="end_date"]');
   const endDateLabel = form.querySelector('label[for="end_date"]');
 
@@ -229,20 +230,30 @@ export async function openEventModal(item) {
     if (startTime) startTime.disabled = isAllDay;
     if (endTime) endTime.disabled = isAllDay;
     if (noSchoolDayCheckbox) {
+      const noSchoolDayOption = noSchoolDayCheckbox.closest('.no-school-day-option');
+      if (noSchoolDayOption) {
+          noSchoolDayOption.style.display = isAllDay ? 'block' : 'none'; // Hide or show based on allDay
+      }
       noSchoolDayCheckbox.disabled = !isAllDay;
-      noSchoolDayCheckbox.style.opacity = isAllDay ? '1' : '0.5';
     }
 
     // Manage recurrence and end date fields
-    if (recurrenceDropdown) {
+    if (recurrenceDropdown && recurrenceLabel) {
       recurrenceDropdown.disabled = editType !== 'event';
       recurrenceDropdown.style.display = editType === 'event' ? 'block' : 'none';
+      recurrenceLabel.style.display = editType === 'event' ? 'block' : 'none';
     }
     if (endDateInput && endDateLabel) {
       endDateInput.disabled = editType !== 'event' || !isRecurring;
       endDateInput.style.display = (editType === 'event' && isRecurring) ? 'block' : 'none';
       endDateLabel.style.display = (editType === 'event' && isRecurring) ? 'block' : 'none';
     }
+
+    // Add this line to log or set editType in the form
+    form.dataset.editType = editType; // This sets a data attribute on the form
+    // Log the editType to console for debugging
+    console.log(`Edit Type: ${form.dataset.editType}`);
+
   }
 
   // Event listeners
@@ -274,6 +285,11 @@ export async function openEventModal(item) {
       }
     });
 
+    // Ensure the recurrence dropdown is populated correctly
+    if (recurrenceDropdown) {
+      recurrenceDropdown.value = item.recurrence || 'None';
+    }
+
     form.dataset.id = item.id;
     occurrenceRadio.checked = true; // Default to editing the occurrence
     updateFormState('occurrence');
@@ -285,7 +301,7 @@ export async function openEventModal(item) {
         deleteEntity(document.querySelector('input[name="editType"]:checked').value, item.id);
       }
     };
-    modalTitle.textContent = 'Edit Occurrence';
+    modalTitle.textContent = 'Edit Event:';
 
   } else { // New event scenario
     form.dataset.id = '';
@@ -333,7 +349,7 @@ export async function openModal(entity, modalId, item) {
         }
     });
     form.dataset.id = item.id; // Store the item ID for context
-    //console.log(`Open Modal with ID: ${item.id}`);
+    console.log(`Open Modal with ID: ${item.id}`);
 
     // Set the status dropdown value
     if (statusDropdown && statusLabel) {
@@ -417,6 +433,7 @@ export function validateEventFields(form) {
   const startTime = form.querySelector('[name="start_time"]');
   const endTime = form.querySelector('[name="end_time"]');
   const recurrence = form.querySelector('[name="recurrence"]');
+  const isOccurrence = document.querySelector('input[name="editType"]:checked').value === 'occurrence';
 
   // Start Date validation
   if (!startDate.value) {
@@ -626,8 +643,8 @@ async function saveEntity(event, entity, modalId) {
   const form = event.target;
 
   // Validate the form
-  if (!validateFields(form, entity)) {
-    return; // Stop submission if validation fails
+  if (entity === 'event' ? !validateEventFields(form) : !validateFields(form, entity)) {
+    return;
   }
 
   const id = form.dataset.id;
@@ -642,6 +659,13 @@ async function saveEntity(event, entity, modalId) {
       }
     }
   });
+
+  // Only if the entity is an event, set editType from dataset
+  if (entity === 'event') {
+    data.editType = form.dataset.editType; // Default to 'event' if not set
+    // Log the editType to console for debugging
+    console.log(`Edit Type: ${form.dataset.editType}`);
+  }
 
   // Handle All Day events
   if (data.all_day === 1) {
