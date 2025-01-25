@@ -231,36 +231,41 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
 
         // Helper function to process events
         const processEvent = (event, type) => {
+
+            // Console log to see the actual event that is passed
+            console.log(`Processing ${type}:`, event);
+
             let startDate = event.due_date || event.start_date;
             let startTime = event.due_time || event.start_time || "00:00:00";
             let endTime = event.end_time || (type === "assignment" || type === "toDo" ? new Date().toTimeString().split(" ")[0] : "23:59:59");
             let id = type === "assignment" ? event.assignment_id : type === "toDo" ? event.to_do_id : event.occurrence_id; // Changed to occurrence_id for events
             let color = event.color || "#5DD970";
 
+            // Prepare the event object
+            let eventObj = {
+                title: event.title,
+                id,
+                startTime,
+                endTime,
+                type,
+                color
+            };
+
+            // Add no_school_day field only for events of type 'event'
+            if (type === 'event') {
+                eventObj.no_school_day = event.no_school_day || false; // Default to false if not set
+            }
+
             const dayOrDate = isWeekView
                 ? new Date(`${startDate}T${startTime}`).getDay() // Day of the week
                 : startDate; // Exact date
 
             if (result.some(entry => entry.key === dayOrDate)) {
-                result.find(entry => entry.key === dayOrDate).events.push({
-                    title: event.title,
-                    id,
-                    startTime,
-                    endTime,
-                    type,
-                    color
-                });
+                result.find(entry => entry.key === dayOrDate).events.push(eventObj);
             } else {
                 result.push({
                     key: dayOrDate,
-                    events: [{
-                        title: event.title,
-                        id,
-                        startTime,
-                        endTime,
-                        type,
-                        color
-                    }]
+                    events: [eventObj]
                 });
             }
         };
@@ -342,6 +347,22 @@ function findHourlyOverlaps(combined) {
     return overlaps;
 }
 
+function filterCoursesOnNoSchoolDay(combined) {
+    // Check if there's a 'no school day' event
+    console.log('Checking for no school day:', combined);
+    const hasNoSchoolDay = combined.some(event => event.type === 'event' && event.no_school_day === 1);
+    console.log('Has no school day:', hasNoSchoolDay);
+    
+    // If there is a 'no school day' event, filter out courses
+    if (hasNoSchoolDay) {
+        console.log('Filtering courses out:', combined.filter(event => event.type !== 'course'));
+        return combined.filter(event => event.type !== 'course');
+    }
+    
+    // If there's no 'no school day' event, return the original combined array
+    return combined;
+}
+
 export async function getCombinedEventsAndCourses(currentDate, isWeekView = false, isDash = false) {
 
     //console.log('From get events: ' + currentDate);
@@ -368,6 +389,9 @@ export async function getCombinedEventsAndCourses(currentDate, isWeekView = fals
 
             // Combine and sort by startTime
             let combined = [...courses, ...events].sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+            // Apply the filter for 'no school day' events before checking for overlaps
+            combined = filterCoursesOnNoSchoolDay(combined);
 
             // Check for overlap if it's week view and there's more than one item
             if (isWeekView && combined.length > 1) {

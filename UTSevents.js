@@ -355,7 +355,9 @@ export async function openModal(entity, modalId, item) {
             input.checked = item[key] === 1;
           } else if (key === 'course_id' && !item[key]) {
               input.value = ''; // Reset to default if no course is associated
-          } 
+          } else {
+            input.value = item[key];
+          }
         }
     });
     form.dataset.id = item.id; // Store the item ID for context
