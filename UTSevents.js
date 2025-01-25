@@ -218,6 +218,7 @@ export async function openEventModal(item) {
   const endTime = form.querySelector('[name="end_time"]');
   const recurrenceDropdown = form.querySelector('[name="recurrence"]');
   const recurrenceLabel = document.getElementById('recurrenceLabel');
+  const startDateInput = form.querySelector('[name="start_date"]');
   const endDateInput = form.querySelector('[name="end_date"]');
   const endDateLabel = form.querySelector('label[for="end_date"]');
 
@@ -247,6 +248,15 @@ export async function openEventModal(item) {
       endDateInput.disabled = editType !== 'event' || !isRecurring;
       endDateInput.style.display = (editType === 'event' && isRecurring) ? 'block' : 'none';
       endDateLabel.style.display = (editType === 'event' && isRecurring) ? 'block' : 'none';
+    }
+
+    // Set the start date based on editType
+    if (startDateInput && item) {
+      if (editType === 'event' && item.series_start_date) {
+        startDateInput.value = item.series_start_date;
+      } else {
+        startDateInput.value = item.start_date;
+      }
     }
 
     // Add this line to log or set editType in the form
@@ -297,7 +307,7 @@ export async function openEventModal(item) {
     submitButton.textContent = 'Save';
     deleteButton.style.display = 'block';
     deleteButton.onclick = () => {
-      if (confirm(`Are you sure you want to delete this ${document.querySelector('input[name="editType"]:checked').value === 'event' ? 'Event' : 'Occurrence'}?`)) {
+      if (confirm(`Are you sure you want to delete this ${document.querySelector('input[name="editType"]:checked').value === 'event' ? 'event' : 'occurrence'}?`)) {
         deleteEntity(document.querySelector('input[name="editType"]:checked').value, item.id);
       }
     };
@@ -665,6 +675,7 @@ async function saveEntity(event, entity, modalId) {
     data.editType = form.dataset.editType; // Default to 'event' if not set
     // Log the editType to console for debugging
     console.log(`Edit Type: ${form.dataset.editType}`);
+    console.log(`Start Time: ${data.start_time}`);
   }
 
   // Handle All Day events

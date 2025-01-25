@@ -281,40 +281,65 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
 }
 
 function addOverlapField(combined) {
-    // If there's only one event, no need to check for overlap
-    if (combined.length <= 1) {
-        return combined.map(event => ({ ...event, overlap: 0 }));
-    }
+    const overlaps = findHourlyOverlaps(combined);
 
-    // For multiple events, check for overlaps
-    const eventsWithOverlap = combined.map((eventA, indexA) => {
-        let hasOverlap = 0;
-        for (let indexB = 0; indexB < combined.length; indexB++) {
-            if (indexA !== indexB) {
-                const eventB = combined[indexB];
-                // Check if there's an overlap
-                if (isOverlapping(eventA, eventB)) {
-                    hasOverlap = 1;
-                    break; // Once an overlap is found, no need to continue checking
-                }
+    // Process each event
+    const eventsWithOverlap = combined.map(event => {
+        let overlapInfo = { hasOverlap: false, maxOverlaps: 0, rank: [] };
+        
+        // Check each overlap in the overlaps array
+        let rank = []; // Temporary array to store all ranks
+        overlaps.forEach(overlap => {
+            if (overlap.events.includes(event)) {
+                overlapInfo.hasOverlap = true;
+                // Update maxOverlaps if this overlap has more events
+                overlapInfo.maxOverlaps = Math.max(overlapInfo.maxOverlaps, overlap.events.length);
+                // Assign rank based on placement in the overlap array
+                // Collect all ranks
+                rank.push(overlap.events.indexOf(event) + 1);
             }
+        });
+
+        // Find the minimum rank
+        if (rank.length > 0) {
+            overlapInfo.rank = Math.min(...rank);
+        } else {
+            overlapInfo.rank = 0; // Or any default value if no overlap
         }
-        // Return a new object with the overlap property
-        return { ...eventA, overlap: hasOverlap };
+
+        console.log(`Event ${event.title} has overlap info:`, overlapInfo);
+        return { ...event, overlapInfo: overlapInfo };
     });
 
     return eventsWithOverlap;
 }
 
-function isOverlapping(eventA, eventB) {
-    // Convert times to Date objects for comparison
-    let startA = new Date(`1970-01-01T${eventA.startTime}Z`);
-    let endA = new Date(`1970-01-01T${eventA.endTime}Z`);
-    let startB = new Date(`1970-01-01T${eventB.startTime}Z`);
-    let endB = new Date(`1970-01-01T${eventB.endTime}Z`);
+function findHourlyOverlaps(combined) {
+    const overlaps = [];
 
-    // Check for overlap
-    return (startA < endB && endA > startB);
+    // Iterate through each hour of the day
+    for (let hour = 0; hour < 24; hour++) {
+        let eventsInHour = combined.filter(event => {
+            const startHour = parseInt(event.startTime.split(':')[0], 10);
+            const endHour = parseInt(event.endTime.split(':')[0], 10);
+            // Check if the event starts or ends within this hour
+            return startHour <= hour && endHour > hour;
+        });
+
+        // If there are two or more events in this hour, add them to the overlaps array
+        if (eventsInHour.length >= 2) {
+            const overlapObject = {
+                hour: hour,
+                events: eventsInHour
+            };
+            overlaps.push(overlapObject);
+            // Console log to see each overlap that gets pushed, including the number of events
+            console.log(`Overlap added for hour ${hour} with ${eventsInHour.length} events:`, overlapObject);
+        
+        }
+    }
+
+    return overlaps;
 }
 
 export async function getCombinedEventsAndCourses(currentDate, isWeekView = false, isDash = false) {

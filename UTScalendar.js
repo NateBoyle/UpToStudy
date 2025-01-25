@@ -420,26 +420,18 @@ async function renderWeekViewEvents() {
                     eventBlock.style.top = `${startOffset}px`;
 
                     // Overlap handling
-                    if (overlap === 1) {
-                        // Count total overlapping events for this time slot
-                        const totalOverlappingEvents = combined.filter(e => e.overlap === 1).length;
-                        // Adjust width based on total overlapping events
-                        const adjustedWidth = eventWidth / totalOverlappingEvents;
-                        eventBlock.style.width = `${adjustedWidth}%`;
+                    if (event.overlapInfo && event.overlapInfo.hasOverlap) {
+                        // Use maxOverlaps to determine the width
+                        const width = 100 / event.overlapInfo.maxOverlaps;
+                        eventBlock.style.width = `${width}%`;
                         
-                        // Use overlapCounter for positioning
-                        if (overlapCounter === 0) {
-                            overlapCounter = 1;
-                        } else {
-                            overlapCounter++;
-                        }
-                        // Adjust position for each overlapping event
-                        eventBlock.style.left = `${(adjustedWidth * (overlapCounter - 1))}%`;
+                        // Use rank for positioning
+                        const position = (event.overlapInfo.rank - 1) * width;
+                        eventBlock.style.left = `${position}%`;
                     } else {
-                        // If no overlap, reset counter and use default width
-                        overlapCounter = 1;
+                        // Non-overlapping events take full width
                         eventBlock.style.width = `${eventWidth}%`;
-                        // No need to set left as it's handled by CSS being 100% width
+                        eventBlock.style.left = '0%';
                     }
 
                     // Add an onclick event
