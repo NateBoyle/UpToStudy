@@ -109,18 +109,59 @@ function editAssignment() {
     }
 
     // Prepare and execute query
-    $query = "UPDATE assignments 
-              SET title = ?, 
-                  course_id = ?, 
-                  description = ?, 
-                  due_date = ?, 
-                  due_time = ?, 
-                  points_possible = ?, 
-                  points_earned = ?, 
-                  status = ? 
-              WHERE assignment_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param('sisssddsi', $title, $courseId, $description, $dueDate, $dueTime, $pointsPossible, $pointsEarned, $status, $assignmentId);
+    // Fetch current course_id
+    $stmt = $conn->prepare("SELECT course_id FROM assignments WHERE assignment_id = ?");
+    $stmt->bind_param("i", $assignmentId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $oldCourseId = $row ? $row['course_id'] : null;
+    $stmt->close();
+
+    // Prepare variables for the update query
+    $color = null;
+
+    if ($oldCourseId != $courseId) {
+        // Fetch new course color
+        $stmt = $conn->prepare("SELECT course_color FROM courses WHERE course_id = ?");
+        $stmt->bind_param("i", $courseId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $color = $result->fetch_assoc()['course_color'];
+        $stmt->close();
+    }
+
+    // Prepare and execute query
+    if ($color !== null) {
+        // If color needs updating, include it in the query
+        $query = "UPDATE assignments 
+                  SET title = ?, 
+                      course_id = ?, 
+                      description = ?, 
+                      due_date = ?, 
+                      due_time = ?, 
+                      points_possible = ?, 
+                      points_earned = ?, 
+                      status = ?, 
+                      color = ?
+                  WHERE assignment_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('sisssddssi', $title, $courseId, $description, $dueDate, $dueTime, $pointsPossible, $pointsEarned, $status, $color, $assignmentId);
+    } else {
+        // If color doesn't need updating, use the original query
+        $query = "UPDATE assignments 
+                  SET title = ?, 
+                      course_id = ?, 
+                      description = ?, 
+                      due_date = ?, 
+                      due_time = ?, 
+                      points_possible = ?, 
+                      points_earned = ?, 
+                      status = ? 
+                  WHERE assignment_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('sisssddsi', $title, $courseId, $description, $dueDate, $dueTime, $pointsPossible, $pointsEarned, $status, $assignmentId);
+    }
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Assignment updated successfully.']);
@@ -197,15 +238,60 @@ function editToDo() {
         return;
     }
 
-    $stmt = $conn->prepare("UPDATE to_do 
-                            SET title = ?, 
-                                course_id = ?, 
-                                due_date = ?, 
-                                due_time = ?, 
-                                description = ?, 
-                                status = ? 
-                            WHERE to_do_id = ?");
-    $stmt->bind_param('sissssi', $title, $courseId, $dueDate, $dueTime, $description, $status, $toDoId);
+    // Fetch current course_id if it exists
+    $oldCourseId = null;
+    if ($courseId !== null) {
+        $stmt = $conn->prepare("SELECT course_id FROM to_do WHERE to_do_id = ?");
+        $stmt->bind_param("i", $toDoId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        if ($row && $row['course_id'] !== null) {
+            $oldCourseId = $row['course_id'];
+        }
+        $stmt->close();
+    }
+
+    // Prepare variables for the update query
+    $color = null;
+
+    if ($oldCourseId != $courseId && $courseId !== null) {
+        // Fetch new course color only if course_id is changing and not null
+        $stmt = $conn->prepare("SELECT course_color FROM courses WHERE course_id = ?");
+        $stmt->bind_param("i", $courseId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $color = $result->fetch_assoc()['course_color'];
+        $stmt->close();
+    }
+
+    // Prepare and execute query
+    if ($color !== null) {
+        // If color needs updating, include it in the query
+        $query = "UPDATE to_do 
+                  SET title = ?, 
+                      course_id = ?, 
+                      due_date = ?, 
+                      due_time = ?, 
+                      description = ?, 
+                      status = ?, 
+                      color = ?
+                  WHERE to_do_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('sisssssi', $title, $courseId, $dueDate, $dueTime, $description, $status, $color, $toDoId);
+    } else {
+        // If color doesn't need updating or course_id is null, use the original query
+        $query = "UPDATE to_do 
+                  SET title = ?, 
+                      course_id = ?, 
+                      due_date = ?, 
+                      due_time = ?, 
+                      description = ?, 
+                      status = ? 
+                  WHERE to_do_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('sissssi', $title, $courseId, $dueDate, $dueTime, $description, $status, $toDoId);
+    }
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'To-Do updated successfully.']);
