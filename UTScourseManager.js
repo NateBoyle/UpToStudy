@@ -100,8 +100,6 @@ export function openCourseModal(course = null) {
     
     const assignmentsLabel = document.getElementById('assignmentsLabel');
     const assignmentContainer = document.getElementById('assignmentContainer4Course');
-    //const gradeLabel = document.getElementById('gradeLabel');
-    //const gradeSpan = document.getElementById('pointsAndGrade');
 
     const addCourseBtn = document.getElementById('addCourseBtn');
     const addAssignmentBtn = document.getElementById('addAssignmentBtn');
@@ -138,6 +136,7 @@ export function openCourseModal(course = null) {
         document.getElementById('courseName').value = course.name;
         document.getElementById('prefix').value = course.prefix || '';
         document.getElementById('courseNumber').value = course.course_number || '';
+        document.getElementById('professorName').value = course.professor || '';
         document.getElementById('startTime').value = course.start_time || '';
         document.getElementById('endTime').value = course.end_time || '';
         document.getElementById('semesterDropdown').value = course.semester_id || "";
@@ -160,16 +159,10 @@ export function openCourseModal(course = null) {
         assignmentContainer.style.display = 'flex';
         addAssignmentBtn.style.display = 'inline-block';
         deleteCourseBtn.style.display = 'inline-block';
-        //gradeLabel.style.display = 'block';
+
 
         // Populate assignments in the container
         populateContainer('assignmentContainer4Course', fetchAssignments, 'assignment', course.course_id);
-
-        /*// Update grade label
-        const totalPointsEarned = course.total_points_earned || 0;
-        const totalPointsPossible = course.total_points_possible || 0;
-        const letterGrade = getLetterGrade(totalPointsEarned, totalPointsPossible);
-        gradeSpan.textContent = `${totalPointsEarned}/${totalPointsPossible} (${letterGrade})`;*/
 
         addCourseBtn.textContent = "Save Changes";
         addCourseBtn.onclick = function(e) {
@@ -374,6 +367,7 @@ async function populateCourseContainer(semesterId = null) {
                 </div>
                 <div class="course-content">
                     <p>Name: ${course.name}</p>
+                    <p>Professor: ${course.professor || "Unassigned"}</p>
                     <p>Semester: ${course.semester_name || "Unassigned"}</p>
                     <p>Time: ${startTimeFormatted} - ${endTimeFormatted}</p>
                     <p>Days: ${formattedDays}</p>

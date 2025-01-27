@@ -233,13 +233,13 @@ export async function getCurrentEvents(currentDate, isWeekView = false, isDash =
         const processEvent = (event, type) => {
 
             // Console log to see the actual event that is passed
-            console.log(`Processing ${type}:`, event);
+            //console.log(`Processing ${type}:`, event);
 
             let startDate = event.due_date || event.start_date;
             let startTime = event.due_time || event.start_time || "00:00:00";
             let endTime = event.end_time || (type === "assignment" || type === "toDo" ? new Date().toTimeString().split(" ")[0] : "23:59:59");
             let id = type === "assignment" ? event.assignment_id : type === "toDo" ? event.to_do_id : event.occurrence_id; // Changed to occurrence_id for events
-            let color = event.color || "#5DD970";
+            let color = event.color || "#808080";
 
             // Prepare the event object
             let eventObj = {
@@ -349,9 +349,9 @@ function findHourlyOverlaps(combined) {
 
 function filterCoursesOnNoSchoolDay(combined) {
     // Check if there's a 'no school day' event
-    console.log('Checking for no school day:', combined);
+    //console.log('Checking for no school day:', combined);
     const hasNoSchoolDay = combined.some(event => event.type === 'event' && event.no_school_day === 1);
-    console.log('Has no school day:', hasNoSchoolDay);
+    //console.log('Has no school day:', hasNoSchoolDay);
     
     // If there is a 'no school day' event, filter out courses
     if (hasNoSchoolDay) {

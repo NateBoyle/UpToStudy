@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $searchTerm = isset($_GET['search']) ? $_GET['search'] : null;
 
         // Retrieve MCQ sets with associated course names
-        $query = "SELECT ms.set_id, ms.set_name, ms.course_id, ms.num_questions, ms.questions_mastered, 
+        $query = "SELECT ms.set_id, ms.set_name, ms.course_id, ms.num_questions, ms.questions_mastered, c.course_color,
                  c.course_name, c.prefix, c.course_number, s.semester_id, s.name AS semester_name
                 FROM mcq_sets AS ms
                 LEFT JOIN courses AS c ON ms.course_id = c.course_id

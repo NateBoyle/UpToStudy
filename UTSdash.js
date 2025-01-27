@@ -1,6 +1,6 @@
 import { getCombinedEventsAndCourses, getCurrentSemester } from './UTScalendarHelper.js';
 import { openFromCalendar } from './UTSevents.js';
-import { openCourseModal } from './UTScourseManager.js';
+import { openCourseFromCalendar } from './UTScourseManager.js';
 import { fetchGoalSets, fetchFlashcardSets } from './UTSutils.js'; // Adjust the path to your utilities file if necessary.
 import { openGoalSetModal } from './UTSgoalSets.js';
 
@@ -83,11 +83,11 @@ async function renderDashCalendar() {
                     const eventElement = document.createElement('div');
                     eventElement.classList.add('event');
                     eventElement.textContent = event.title;
-                    eventElement.style.backgroundColor = event.color || '#5DD970';
+                    eventElement.style.backgroundColor = event.color || '#808080';
 
                     if (event.type === 'course') {
                         eventElement.addEventListener('click', () => {
-                            openCourseModal(event.id);
+                            openCourseFromCalendar(event.id);
                         });
                     } else {
                         eventElement.addEventListener('click', () => {

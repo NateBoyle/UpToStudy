@@ -17,11 +17,15 @@ class FlashcardSet {
      * @param {number} setId - The unique ID for the flashcard set.
      * @param {string} setName - The name of the flashcard set.
      * @param {string} courseName - The name of the associated course (or "N/A").
+     * @param {number} courseId - The ID of the associated course.
+     * @param {string} coursePrefix - The prefix of the course.
+     * @param {string} courseNumber - The number of the course.
      * @param {number} numCards - The number of flashcards in the set.
-     * * @param {number} cardsMastered - The number of mastered flashcards in the set.
+     * @param {number} cardsMastered - The number of mastered flashcards in the set.
+     * @param {string} courseColor - The color associated with the course.
      */
 
-    constructor(setId, setName, courseName, courseId, coursePrefix, courseNumber, numCards, cardsMastered = 0) {
+    constructor(setId, setName, courseName, courseId, coursePrefix, courseNumber, numCards, cardsMastered = 0, courseColor) {
         this.setId = setId;
         this.setName = setName;
         this.courseName = courseName;
@@ -30,6 +34,7 @@ class FlashcardSet {
         this.courseNumber = courseNumber;
         this.numCards = numCards;
         this.cardsMastered = cardsMastered;
+        this.courseColor = courseColor;
     }
 
     /**
@@ -40,6 +45,8 @@ class FlashcardSet {
 
         const setCard = document.createElement('div');
         setCard.classList.add('study-set');
+        // Set the border color using courseColor
+        setCard.style.borderColor = this.courseColor; // This line adds the border color
 
 
         // Calculate the mastered percentage
@@ -55,7 +62,7 @@ class FlashcardSet {
             <p>Course: ${this.coursePrefix + ' ' +  this.courseNumber || 'N/A'}</p>
             <p>${this.numCards || 0}&nbsp; cards &nbsp;&nbsp;|&nbsp;&nbsp; ${this.cardsMastered || 0}&nbsp; mastered</p>
             <div class="progress-bar-container">
-                <div class="progress-bar" style="width: ${masteredPercentage}%;"></div>
+                <div class="progress-bar" style="width: ${masteredPercentage}%; background-color: ${this.courseColor};"></div>
             </div>
         `;
 
@@ -263,7 +270,8 @@ function loadFlashcardSets(semesterId = null, courseId = null, searchTerm = '') 
                         setData.prefix,
                         setData.course_number,
                         setData.num_cards,
-                        setData.cards_mastered // New field for cards mastered
+                        setData.cards_mastered, // New field for cards mastered
+                        setData.course_color // New field for course color
                     );
 
                     const setElement = flashcardSet.render();

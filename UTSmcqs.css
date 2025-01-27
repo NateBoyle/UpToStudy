@@ -43,7 +43,8 @@
     margin-bottom: 20px;
 }
 
-#mcqCreationModal input[type="text"] {
+/* Update to target textareas */
+#mcqCreationModal textarea {
     width: 90%;
     padding: 12px;
     margin-bottom: 12px;
@@ -52,9 +53,10 @@
     font-size: 16px;
     background-color: #333;
     color: white;
+    resize: vertical; /* Allow vertical resizing */
 }
 
-#mcqCreationModal input[type="text"]::placeholder {
+#mcqCreationModal textarea::placeholder {
     color: white;
     opacity: 1;
 }
@@ -94,7 +96,7 @@
 #mcqDisplayModal .mcqModal-content {
     position: relative;
     width: 600px;
-    height: 600px;
+    min-height: 600px;
     background: #2C2C2C;
     padding: 20px;
     border-radius: 10px;
@@ -122,8 +124,7 @@
 #mcqContent h2 {
     position: relative; /* Keeps the question within the flow */
     top: 0; /* Ensures it stays at the top of the modal */
-    margin-top: 20px;
-    margin-bottom: 30px; /* Add consistent spacing below the question */
+    margin: 40px; /* Add consistent spacing below the question */
     padding-top: 10px;
     font-size: 1.2em; /* Maintain visibility */
     font-weight: bold; /* Make the question stand out */
@@ -139,13 +140,14 @@
 
 /* Options container styling */
 #mcqOptionsContainer {
-    max-height: 300px;
+    min-height: 300px;
     display: flex;
     flex-direction: column; /* Stack options vertically */
     align-items: flex-start; /* Align options to the left */
     gap: 10px; /* Add spacing between options */
     margin-top: 10px; /* Optional: Add some margin to separate from other elements */
     margin-left: 40px;
+    margin-bottom: 10px;
     word-wrap: break-word; /* Allow long words to wrap */
     text-align: left; /* Ensure text starts from the left */
     line-height: 1.5; /* Improve readability for multiple lines */
@@ -199,6 +201,8 @@
     font-size: 18px;
     border-radius: 5px;
     cursor: pointer;
+    margin-top: 30px;
+    margin-bottom: 10px;
     transition: background-color 0.3s ease;
 }
 

@@ -415,7 +415,7 @@ async function renderWeekViewEvents() {
                     const eventBlock = document.createElement("div");
                     eventBlock.classList.add("event-block");
                     eventBlock.textContent = title;
-                    eventBlock.style.backgroundColor = color || "#424FC6"; // Default color
+                    eventBlock.style.backgroundColor = color || "#808080"; // Default color
                     eventBlock.style.height = `${eventHeight}px`; // Set height
                     eventBlock.style.top = `${startOffset}px`;
 
@@ -492,7 +492,7 @@ async function renderMonthViewEvents() {
                     const eventBar = document.createElement("div");
                     eventBar.classList.add("event-bar");
                     eventBar.textContent = item.title; // Display the title (e.g., course prefix + number or event name)
-                    eventBar.style.backgroundColor = item.color || "#5DD970"; // Use item color or default
+                    eventBar.style.backgroundColor = item.color || "#808080"; // Use item color or default
 
                     // Add an onclick event
                     eventBar.addEventListener("click", () => {

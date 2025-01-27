@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $searchTerm = isset($_GET['search']) ? $_GET['search'] : null;
 
         // Retrieve flashcard sets with associated course names
-        $query = "SELECT fs.set_id, fs.set_name, fs.course_id, fs.num_cards, fs.cards_mastered, c.course_name, c.prefix, c.course_number 
+        $query = "SELECT fs.set_id, fs.set_name, fs.course_id, fs.num_cards, fs.cards_mastered, c.course_name, c.prefix, c.course_number, c.course_color 
                   FROM flashcard_sets AS fs
                   LEFT JOIN courses AS c ON fs.course_id = c.course_id
                   LEFT JOIN semesters AS s ON c.semester_id = s.semester_id

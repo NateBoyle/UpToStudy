@@ -372,6 +372,33 @@
     color: lightgrey; /* Subtle color for contrast */
 }
 
+.calendar-container {
+    /*height: calc(100vh - 200px); /* Adjust this value based on your header height and desired visible area */
+    overflow-y: auto;
+    /*scrollbar-width: thin;  Optional for thinner scrollbars */
+}
+
+.calendar .calendar-container::-webkit-scrollbar {
+    width: 12px;
+}
+
+.calendar .calendar-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 6px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+}
+
+.calendar .calendar-container::-webkit-scrollbar-thumb:hover {
+    background-color: #393939;
+}
+
+.calendar .calendar-container::-webkit-scrollbar-track {
+    background-color: #555555;
+    border: 1px solid #888;
+    border-radius: 6px;
+}
+
 /* Calendar Grid */
 .calendar-grid {
     display: grid; /* Use grid layout */
@@ -398,8 +425,6 @@
     display: flex;
     flex-direction: column; /* Aligns the nested grid vertically */
     height: 100%; /* Let the parent container handle height */
-    overflow-y: auto; /* Enable vertical scrolling for the week grid */
-    scrollbar-width: thin; /* Optional: Thinner scrollbars */
 }
 
 .week-grid {
@@ -408,8 +433,29 @@
     grid-template-rows: repeat(24, 50px); /* 24 rows for hours */
     max-height: calc(100vh - 200px); /* Constrain grid to fit viewport */
     overflow-y: auto; /* Enable vertical scrolling for the week grid */
-    scrollbar-width: thin; /* Optional: Thinner scrollbars */
+    /*scrollbar-width: thin; /* Optional: Thinner scrollbars */
     grid-auto-flow: column; /* Ensure items fill top-to-bottom in columns */
+}
+
+.week-grid::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+.week-grid::-webkit-scrollbar-thumb {
+    background-color: #888; /* Color of the scrollbar thumb */
+    border-radius: 6px; /* Round the thumb edges */
+    border: 3px solid transparent; /* Space around the thumb */
+    background-clip: padding-box; /* Ensure the border shows */
+}
+
+.week-grid::-webkit-scrollbar-thumb:hover {
+    background-color: #393939; /* Darker color when hovered */
+}
+
+.week-grid::-webkit-scrollbar-track {
+    background-color: #555555; /* Background of the scrollbar track */
+    border: 1px solid #888;
+    border-radius: 6px; /* Round the track edges */
 }
 
 .calendar-cell {
@@ -429,6 +475,7 @@
     position: relative; /* Ensure proper positioning for content */
     z-index: 1; /* Ensure cells are above the grid background */
     overflow: hidden;
+    min-height: 112px;
     /*width: 90%;*/
 }
 

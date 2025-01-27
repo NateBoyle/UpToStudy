@@ -70,7 +70,7 @@
     font-weight: 400;
     width: 100%;
     height: calc(100% - 86px);
-    padding: 20px 0; /* Minimal padding for consistent height */
+    padding: 15px 0; /* Minimal padding for consistent height */
     box-sizing: border-box;
     border: 2px lightgray;
 }
@@ -78,7 +78,7 @@
 /* Adjust individual paragraph styles inside course-content */
 .course-content p {
     margin: 5px 0; /* Tighter margins for less spacing between items */
-    line-height: 2.3; /* Adjust line height for tighter spacing */
+    line-height: 1.8; /* Adjust line height for tighter spacing */
 }
 
 /* Responsive adjustments for smaller screens (optional) */

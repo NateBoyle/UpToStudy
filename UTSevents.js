@@ -206,11 +206,13 @@ export async function openEventModal(item) {
 
   form.reset(); // Clear previous values
   delete form.dataset.id; // Clear stored ID for new records
-  await populateCourseDropdown('eventModal'); // Populate courses
+  //await populateCourseDropdown('eventModal'); // Populate courses
 
   const submitButton = modal.querySelector('button[type="submit"]');
   const deleteButton = modal.querySelector('#deleteButton');
   const modalTitle = modal.querySelector('h2');
+
+  const colorDropdown = form.querySelector('#color');
 
   const allDayCheckbox = form.querySelector('[name="all_day"]');
   const noSchoolDayCheckbox = form.querySelector('[name="no_school_day"]');
@@ -226,6 +228,12 @@ export async function openEventModal(item) {
   function updateFormState(editType) {
     const isAllDay = allDayCheckbox.checked;
     const isRecurring = recurrenceDropdown.value !== 'None';
+
+    // Manage color dropdown visibility
+    if (colorDropdown) {
+      colorDropdown.style.display = editType === 'event' ? 'block' : 'none';
+      colorDropdown.disabled = editType !== 'event';
+    }
 
     // Manage time fields based on 'All Day'
     if (startTime) startTime.disabled = isAllDay;
@@ -287,13 +295,18 @@ export async function openEventModal(item) {
       if (input) {
         if (input.type === 'checkbox') {
           input.checked = item[key] === 1;
-        } else if (key === 'course_id' && !item[key]) {
-          input.value = '';
         } else {
           input.value = item[key];
         }
       }
     });
+
+    // Set the initial state of the color dropdown
+    if (colorDropdown) {
+      colorDropdown.style.display = 'none'; // Initially hide for occurrence
+      colorDropdown.disabled = true;
+      colorDropdown.value = item.color || ''; // Set to the event's color or default to empty if not set
+    }
 
     // Ensure the recurrence dropdown is populated correctly
     if (recurrenceDropdown) {
@@ -318,6 +331,11 @@ export async function openEventModal(item) {
     deleteButton.style.display = 'none';
     submitButton.textContent = 'Save Event';
     modalTitle.textContent = 'New Event';
+
+    if (colorDropdown) {
+      colorDropdown.style.display = 'block'; // Show for new events (which are series by default)
+      colorDropdown.disabled = false;
+    }
 
     if (editChoice) editChoice.style.display = 'none'; // Hide edit choice for new events
     updateFormState('event'); // Default to event series creation

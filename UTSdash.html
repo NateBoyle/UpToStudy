@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>UpToStudy</title>
 
     <link rel="icon" type="image/x-icon" href="UTSicon2.png">
@@ -27,7 +30,7 @@
         <div class="header">
               
             <!-- Left Side: Logo -->
-            <a href="UTStemplate.html">
+            <a href="UTSdash.html">
                 <img src="UTS_Icon.png" alt="UpToStudy Logo">
             </a>
 
@@ -231,34 +234,69 @@
             </div>
         </div>
 
-        <!-- EVENT CREATION (EDIT) MODAL -->
+        <!-- EVENT CREATION MODAL -->
         <div id="eventModal" class="creationModal">
             <div class="modal-content">
-              <span class="close">&times;</span>
-              <h2>New Event</h2>
-              <form id="eventForm">
-                <input type="text" name="title" placeholder="Title"  />
-                <select id="course" name="course_id" >
-                    <option value="" disabled selected>Select course (optional)</option>
-                    <!-- Dynamically populate courses here -->
-                  </select>
-                <textarea name="description" placeholder="Description"></textarea>
-                <label for="startDate">Start Date and Time:</label>
-                <input type="date" name="start_date"  />
-                <input type="time" name="start_time" />
-                <label for="endDate">End Date and Time:</label>
-                <input type="date" name="end_date" />
-                <input type="time" name="end_time" />
-                <label>
-                  <input type="checkbox" name="all_day" /> All Day
-                </label>
-                <!-- Button Container -->
-                <div class="button-container">
-                    <button type="submit" id="saveEventBtn">Save Event</button>
-                    <button type="button" id="completeButton">Complete</button>
-                    <button type="button" id="deleteButton">Delete</button>
+                <span class="close">x</span>
+                <h2>New Event</h2>
+                <div class="edit-choice">
+                    <div class="radio-option">
+                        <input type="radio" name="editType" value="occurrence">
+                        <span>Occurrence</span>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="editType" value="event" checked>
+                        <span>Series</span>
+                    </div>
                 </div>
-              </form>
+                <form id="eventForm">
+                    <input type="text" name="title" placeholder="Title" />
+                    <select id="color" name="color">
+                        <option value="" selected style=" background-color: #808080; color: white;">Pick a color (Default Gray)</option>
+                        <option value="#7D1B1B" style="background-color: #7D1B1B; color: white;">Dark Red</option>
+                        <option value="#A28834" style="background-color: #A28834; color: white;">Gold</option>
+                        <option value="#514D4F" style="background-color: #514D4F; color: white;">Charcoal</option>
+                    </select>
+                    <textarea name="description" placeholder="Description"></textarea>
+                    <label for="date">Date:</label>
+                    <input type="date" name="start_date" min="1900-01-01" max="2100-12-31"/>
+                    
+                    <div class="time-selectors">
+                    <label for="start_time">Start and End Times:</label>
+                    <input type="time" name="start_time" />
+                    <input type="time" name="end_time" />
+                    </div>
+                    
+                    <div class="all-day-option">
+                        <label>
+                            <input type="checkbox" name="all_day" /> All Day
+                        </label>
+                    </div>
+                    <div class="no-school-day-option">
+                        <label>
+                            <input type="checkbox" name="no_school_day" disabled /> No school day
+                        </label>
+                    </div>
+                    
+                    <!-- Add recurrence options -->
+                    <div class="recurrence-options">
+                        <label for="recurrence" id="recurrenceLabel">Recurrence:</label>
+                        <select name="recurrence">
+                            <option value="None">None</option>
+                            <option value="Daily">Daily</option>
+                            <option value="Weekly">Weekly</option>
+                            <option value="Monthly">Monthly</option>
+                        </select>
+                        <label for="end_date" style="display: none;">End Date:</label>
+                        <input type="date" name="end_date" min="1900-01-01" max="2100-12-31" style="display: none;"/>
+                    </div>
+                    
+                    <!-- Button Container -->
+                    <div class="button-container">
+                        <button type="submit" id="saveEventBtn">Save Event</button>
+                        <button type="button" id="deleteButton">Delete</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -280,12 +318,7 @@
                     <input type="text" id="courseNumber" name="courseNumber" placeholder="Enter Course Number" />
                     <span class="error" id="courseNumberError"></span>
                     
-                    <!--<input type="text" id="subject" name="subject" placeholder="Subject">
-                    
                     <input type="text" id="professorName" name="professorName" placeholder="Professor Name">
-                    
-                     Total Points Input 
-                    <input type="number" id="totalPoints" name="totalPoints" placeholder="Total Points Possible" min="0">-->
                 
                     <!-- Split time inputs -->
                     <div id="timeInputs">
@@ -332,12 +365,14 @@
                     <label id="courseColorLabel" for="courseColor">Course Label Color</label>
                     <select id="courseColor" name="courseColor">
                         <option value="" disabled selected style="background-color: white; color: black;">Pick a color</option>
-                        <option value="#7DBC4B" style="background-color: #7DBC4B; color: white;">Green</option>
+                        <option value="#1B863F" style="background-color: #1B863F; color: white;">Green</option>
                         <option value="#E52222" style="background-color: #E52222; color: white;">Red</option>
                         <option value="#4B90D0" style="background-color: #4B90D0; color: white;">Blue</option>
                         <option value="#E5BA22" style="background-color: #E5BA22; color: black;">Yellow</option>
                         <option value="#9A4BB3" style="background-color: #9A4BB3; color: white;">Purple</option>
                         <option value="#FF8C00" style="background-color: #FF8C00; color: white;">Orange</option>
+                        <option value="#4B90D0" style="background-color: #009688; color: white;">Teal</option>
+                        <option value="#4B90D0" style="background-color: #FA5DCE; color: white;">Pink</option>
                     </select>
                     <span class="error" id="courseColorError" style="color: red; font-size: 10px; display: block; margin-bottom: 10px;"></span>
 
