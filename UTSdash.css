@@ -214,7 +214,7 @@
     width: 400px;
     height: 250px;
     background: #2C2C2C;
-    border: 1px solid #ddd;
+    border: 5px solid #ddd;
     border-radius: 20px;
     color: white;
     display: flex;

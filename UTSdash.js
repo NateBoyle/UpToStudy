@@ -172,6 +172,8 @@ async function loadRecentFlashcardSets() {
                 // Create the flashcard set container
                 const setCard = document.createElement('div');
                 setCard.classList.add('study-set');
+                // Set the border color using courseColor
+                setCard.style.borderColor = set.course_color; // This line adds the border color
 
                 // Add clickable area
                 const clickableCenter = document.createElement('div');
@@ -183,7 +185,7 @@ async function loadRecentFlashcardSets() {
                     <p>Course: ${set.prefix + ' ' +  set.course_number || 'N/A'}</p>
                     <p>${set.num_cards || 0} cards | ${set.cards_mastered || 0} mastered</p>
                     <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: ${(set.cards_mastered / set.num_cards) * 100 || 0}%;"></div>
+                        <div class="progress-bar" style="width: ${(set.cards_mastered / set.num_cards) * 100 || 0}%; background-color: ${set.course_color};"></div>
                     </div>
                 `;
 

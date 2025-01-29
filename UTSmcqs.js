@@ -1265,8 +1265,11 @@ async function populateCourseButtons(semesterId = null) {
                 button.className = 'filter-btn'; // Apply the filter-btn class
                 button.textContent = `${course.prefix} ${course.course_number}: ${course.name}`;
                 button.setAttribute('data-course-id', course.course_id);
-                // Log the courseId to verify
-                console.log(`Course button set: ${course.course_id}`);
+                
+                // Set button background color based on course_color
+                if (course.color) {
+                    button.style.backgroundColor = course.color;
+                }
 
                 // Add click event listener to the button
                 button.addEventListener('click', () => {
