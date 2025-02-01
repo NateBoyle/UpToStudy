@@ -1,3 +1,8 @@
+@font-face {
+    font-family: UTSpopfont;
+    src: url('Poppins-Regular.ttf');
+}
+
 /* Sidebar */
 .sidebar {
     flex: 0 0 26.5%;
@@ -12,6 +17,7 @@
     justify-content: space-between; /* Space evenly between buttons */
     gap: 0.5rem; /* Spacing between buttons */
     margin-bottom: 0.5rem; /* Space below the buttons */
+    font-family: UTSpopfont;
 }
 
 .sidebar-create-button {
@@ -19,7 +25,7 @@
     background: #5DD770;
     color: white;
     font-size: 1.2rem; /* Adjust font size */
-    font-weight: 600;
+    font-weight: 500;
     padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
     border: none;
     border-radius: 10px;
@@ -37,7 +43,7 @@
     background: #2EA0F3;
     color: white;
     font-size: 1.2rem; /* Adjust font size */
-    font-weight: 600;
+    font-weight: 500;
     padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
     border: none;
     border-radius: 10px;
@@ -239,45 +245,54 @@
 .goals-list-title-container,
 .todo-list-title-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between; /* Place items at opposite ends */
     align-items: center;
     margin-bottom: 0.5rem; /* Space below the title section */
     gap: 0.3rem; /* Ensure spacing between the title and button */
     flex-shrink: 0; /* Ensure the title section does not shrink */
-    padding: 10px;
+    padding: 0.25rem;
+    padding-right: 1rem;
+    flex-wrap: nowrap;
+    width: 100%;
+    
 }
 
 .assignment-list-title,
 .goals-list-title,
 .todo-list-title {
     margin: 0; /* Remove default margin */
-    font-size: 1.5rem;
+    font-size: 2.2rem;
     font-weight: 700;
     padding-right: 0.3rem;
+    font-family: UTSpopfont;
+    flex-shrink: 0; /* Prevent title from shrinking */
+    width: 60%;
+    text-align: left;
 }
 
-.assignment-list-title {
-    font-size: 1.3rem;
+/*.assignment-list-title {
+    font-size: 2rem;
     font-weight: 700;
 }
 
 .todo-list-title {
     padding-right: 1rem;
-}
+}*/
 
 .assignment-list .sidebar-create-button,
 .todo-list .sidebar-create-button {
-    padding: 0.5rem 0.2rem; /* Maintain compact padding */
-    font-size: 0.9rem; /* Compact font size */
+    padding: 0.8rem 0.5rem; /* Maintain compact padding */
+    font-size: 1.2rem; /* Compact font size */
     border-radius: 8px; /* Rounded corners */
     background: #5DD770; /* Button background color */
     color: white; /* Button text color */
     cursor: pointer;
     white-space: nowrap; /* Prevent text wrapping */
-    width: 0.65rem; /* Adjust to fit the content */
-    flex-shrink: 0; /* Prevent the button from shrinking too much */
+    width: auto; /* Adjust to fit the content */
+    /*flex-shrink: 0; /* Prevent the button from shrinking too much */
     overflow: hidden; /* Ensure the overflow is hidden */
     text-overflow: ellipsis; /* Apply the ellipsis effect */
+    margin-right: 1rem;
 }
 
 .assignment-list .sidebar-create-button:hover,

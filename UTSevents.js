@@ -54,24 +54,8 @@ export async function populateContainer(containerId, fetchFunction, type, course
         items = await fetchFunction(null, null, null, courseId); // Fetch data (assignments or to-dos)
       }
       else {
-        // Normalize today's date to start of the day
-        const startDate = new Date(todaysDate);
-        startDate.setHours(0, 0, 0, 0);
-
-        // Calculate one month from today's date
-        const endDate = new Date(startDate);
-        endDate.setMonth(startDate.getMonth() + 1);
-        endDate.setDate(0); // To handle months with varying days
-        endDate.setHours(23, 59, 59, 999); // Normalize to the end of the day
-
-        const viewStartDate = startDate.toISOString().split("T")[0];
-        const viewEndDate = endDate.toISOString().split("T")[0];
-
-        // Pass the formatted date arguments to fetchFunction
-        items = await fetchFunction(null, viewStartDate, viewEndDate);
-
-        // Exclude completed items
-        items = items.filter(item => item.status !== 'Completed');
+        // For other containers, fetch only 'Uncompleted' items
+        items = await fetchFunction(null, null, null, 'Uncompleted');
       }  
 
         if (items.length === 0) {
@@ -83,14 +67,8 @@ export async function populateContainer(containerId, fetchFunction, type, course
         }
 
         // Sort items:
-        // 1. By `status` to put 'Completed' and 'Graded' at the bottom
-        // 2. By `due_date` within the same `status`
-        items.sort((a, b) => {
-          const statusOrder = ['Uncompleted', 'Completed', 'Graded'];
-          const statusComparison = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
-          if (statusComparison !== 0) return statusComparison;
-          return new Date(a.due_date) - new Date(b.due_date); // Sort by due_date within same status
-        });
+        // Only sort by `due_date` since we're only dealing with 'Uncompleted' items
+        items.sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
 
         for (const item of items) {
             const itemId = type === 'assignment' ? item.assignment_id : item.to_do_id;
@@ -105,32 +83,18 @@ export async function populateContainer(containerId, fetchFunction, type, course
             listItem.setAttribute('data-id', itemId); // Store unique ID
             listItem.setAttribute('data-type', type); // Store type (assignment or to-do)
             listItem.style.backgroundColor = item.color; // Apply the color if it has one
-            // Determine content and styling based on the status and overdue state
-            if (item.status === 'Uncompleted') {
-              // Determine if the item is overdue
-              const isOverdue = dueDateTime < todaysDate;
-              listItem.innerHTML = `
-                  <span class="text">${item.title}</span>
-                  <span class="details">${isOverdue ? 'OVERDUE: ' + formatDate(item.due_date) : 'Due: ' + formatDate(item.due_date)}</span>
-              `;
-              if (isOverdue) {
-                  listItem.style.backgroundColor = 'black'; // Optional style for overdue
-                  listItem.style.border = '2px solid red'; // Highlight overdue with a red border
-                  listItem.style.color = 'red'; // Optional text color for overdue
-              }
-            } else if (item.status === 'Completed') {
-                listItem.innerHTML = `
-                    <span class="text">${item.title}</span>
-                    <span class="details">COMPLETED</span>
-                `;
-                listItem.style.color = 'white'; // Optional styling for completed items
-            } /*else if (item.status === 'Graded') {
-                listItem.innerHTML = `
-                    <span class="text">${item.title}</span>
-                    <span class="details">GRADED: ${item.points_earned} / ${item.points_possible}</span>
-                `;
-                listItem.style.color = 'gold'; // Optional styling for graded items
-            }*/
+            
+            // Determine content and styling based on the overdue state
+            const isOverdue = dueDateTime < todaysDate;
+            listItem.innerHTML = `
+                <span class="text">${item.title}</span>
+                <span class="details">${isOverdue ? 'OVERDUE: ' + formatDate(item.due_date) : 'Due: ' + formatDate(item.due_date)}</span>
+            `;
+            if (isOverdue) {
+                listItem.style.backgroundColor = 'black'; // Optional style for overdue
+                listItem.style.border = '2px solid red'; // Highlight overdue with a red border
+                listItem.style.color = 'red'; // Optional text color for overdue
+            }
 
             // Add click event listener
             listItem.addEventListener('click', (e) => {
@@ -349,9 +313,7 @@ export async function openModal(entity, modalId, item) {
   const modal = document.getElementById(modalId);
   const form = modal.querySelector('form');
 
-  // Console log to display entity, modalId, and id
-  //console.log(`From openModal - Entity: ${entity}, Modal ID: ${modalId}, Item: ${item}`);
-
+  
   form.reset(); // Clear previous values
   delete form.dataset.id; // Clear stored ID for new records
   await populateCourseDropdown(modalId); // Populate courses
@@ -365,6 +327,9 @@ export async function openModal(entity, modalId, item) {
 
 
   if (item) {
+    // Console log to display entity, modalId, and id
+    console.log(`From openModal - Entity: ${entity}, Modal ID: ${modalId}, Item: ${item}, Duetime: ${item.due_time}`);
+
     // Populate form fields from the item object
     Object.keys(item).forEach(key => {
         const input = form.querySelector(`[name="${key}"]`);

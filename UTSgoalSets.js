@@ -53,6 +53,12 @@ async function populateGoalSetDropdown() {
     // Clear existing options
     dropdown.innerHTML = "";
 
+    // Add "No Set" option
+    let noSetOption = document.createElement('option');
+    noSetOption.value = '0'; // Assuming 0 or '0' as the value for no set
+    noSetOption.text = 'No Set';
+    dropdown.appendChild(noSetOption);
+
     try {
         // Fetch goal sets
         const goalSets = await fetchGoalSets();
@@ -96,7 +102,13 @@ async function openChangeSetModal(container) {
     // Confirm button handler
     confirmButton.onclick = async () => {
         const dropdown = document.getElementById("goalSetDropdown");
-        const selectedGoalSet = dropdown.value; // Get the selected goal set
+        let selectedGoalSet = dropdown.value; // Get the selected goal set
+
+        // Handle 'No Set'
+        if (selectedGoalSet === '0') {
+            selectedGoalSet = null; // or 'null' if your backend expects a string
+        }
+
         const currentGoalSetId = document.getElementById(`goalSet${container}`).getAttribute('data-set-id'); // Retrieve current ID
 
         

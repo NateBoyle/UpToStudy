@@ -95,7 +95,7 @@ export async function fetchGoals(id = null, goalSetId = null) {
 }
 
 // Fetch Assignments
-export async function fetchAssignments(id = null, startDate = null, endDate = null, courseId = null) {
+export async function fetchAssignments(id = null, startDate = null, endDate = null, status = null, courseId = null) {
     const params = new URLSearchParams({ action: 'fetchAssignments' });
     
     params.append('id', id || ''); // Explicitly pass id, even if null
@@ -104,6 +104,7 @@ export async function fetchAssignments(id = null, startDate = null, endDate = nu
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
     if (courseId) params.append('courseId', courseId);
+    if (status) params.append('status', status);
 
     // Log parameters for debugging
     //console.log(`Fetching Assignments - ID: ${id}, Start Date: ${startDate}, End Date: ${endDate}`);
@@ -129,7 +130,7 @@ export async function fetchAssignments(id = null, startDate = null, endDate = nu
 }
 
 // Fetch To-Dos
-export async function fetchToDos(id = null, startDate = null, endDate = null) {
+export async function fetchToDos(id = null, startDate = null, endDate = null, status = null) {
     
     const params = new URLSearchParams({ action: 'fetchToDos' });
     //console.log(`Id: ${id}`);
@@ -138,6 +139,7 @@ export async function fetchToDos(id = null, startDate = null, endDate = null) {
     // Append parameters conditionally
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
+    if (status) params.append('status', status);
 
     //console.log(`Fetching To-Dos - ID: ${id}, Start Date: ${startDate}, End Date: ${endDate}`);
 

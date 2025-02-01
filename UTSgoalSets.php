@@ -67,23 +67,35 @@ function changeGoalSet() {
         // Begin transaction
         $conn->begin_transaction();
 
-        // Step 1: Unassign the current goal set if it exists
-        if ($currentGoalSetId) {
+        if  ($goalSetId === '0' || $goalSetId === null) { // Check for null or '0'
             $stmt = $conn->prepare("UPDATE goal_sets SET container = NULL WHERE id = ? AND user_id = ?");
             $stmt->bind_param('ii', $currentGoalSetId, $userId);
             if (!$stmt->execute()) {
-                throw new Exception("Failed to unassign the current goal set.");
+                throw new Exception("Failed to unassign the goal set.");
             }
             $stmt->close();
-        }
+        } else {
 
-        // Step 2: Assign the new goal set to the container
-        $stmt = $conn->prepare("UPDATE goal_sets SET container = ? WHERE id = ? AND user_id = ?");
-        $stmt->bind_param('iii', $containerId, $goalSetId, $userId);
-        if (!$stmt->execute()) {
-            throw new Exception("Failed to assign the new goal set.");
+            // Step 1: Unassign the current goal set if it exists
+            if ($currentGoalSetId) {
+                $stmt = $conn->prepare("UPDATE goal_sets SET container = NULL WHERE id = ? AND user_id = ?");
+                $stmt->bind_param('ii', $currentGoalSetId, $userId);
+                if (!$stmt->execute()) {
+                    throw new Exception("Failed to unassign the current goal set.");
+                }
+                $stmt->close();
+            }
+
+            // Step 2: Assign the new goal set to the container
+            $stmt = $conn->prepare("UPDATE goal_sets SET container = ? WHERE id = ? AND user_id = ?");
+            $stmt->bind_param('iii', $containerId, $goalSetId, $userId);
+            if (!$stmt->execute()) {
+                throw new Exception("Failed to assign the new goal set.");
+            }
+            $stmt->close();
+
+            
         }
-        $stmt->close();
 
         // Commit transaction
         $conn->commit();

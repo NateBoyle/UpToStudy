@@ -205,6 +205,10 @@ function addToDo() {
     $description = $_POST['description'] ?? null; // Optional
     $status = $_POST['status'] ?? 'Uncompleted'; // Default to 'Uncompleted'
 
+    if ($dueTime === '00:00:00') {
+        $dueTime = date('23:30:00'); // Set to current time, or you can use another default time like '12:00:00'
+    }
+
     if (!$title || !$dueDate) {
         echo json_encode(['success' => false, 'message' => 'Title and due date are required.']);
         return;
@@ -232,6 +236,10 @@ function editToDo() {
     $dueTime = $_POST['due_time'];
     $description = $_POST['description'] ?? null; // Optional
     $status = $_POST['status'] ?? 'Uncompleted'; // Default to 'Uncompleted' if not provided
+
+    if ($dueTime === '00:00:00') {
+        $dueTime = date("23:30:00"); // Set to current time, or you can use another default time like '12:00:00'
+    }
 
     if (!$toDoId || !$title || !$dueDate) {
         echo json_encode(['success' => false, 'message' => 'To-Do ID, title, and due date are required.']);

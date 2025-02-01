@@ -146,7 +146,7 @@ function fetchGoals($id = null, $goalSetId = null) {
 /**
  * Fetch assignments within a date range for a user.
  */
-function fetchAssignments($userId, $id = null, $startDate = null, $endDate = null, $courseId = null) {
+function fetchAssignments($userId, $id = null, $startDate = null, $endDate = null, $status = null, $courseId = null) {
 
     //error_log("fetchAssignments called with id: " . var_export($id, true));
 
@@ -161,6 +161,10 @@ function fetchAssignments($userId, $id = null, $startDate = null, $endDate = nul
         $query .= " AND assignment_id = ?";
         $params[] = $id;
         $types .= "i";
+    } elseif ($status) {
+        $query .= " AND status = ?";
+        $params[] = $status;
+        $types .= "s";
     } elseif ($startDate && $endDate) {
         // Fetch by date range if start and end dates are provided
         $query .= " AND due_date BETWEEN ? AND ?";
@@ -192,7 +196,7 @@ function fetchAssignments($userId, $id = null, $startDate = null, $endDate = nul
 /**
  * Fetch to-dos within a date range for a user.
  */
-function fetchToDos($userId, $id = null, $startDate = null, $endDate = null) {
+function fetchToDos($userId, $id = null, $startDate = null, $endDate = null, $status = null) {
 
     global $conn;
 
@@ -205,6 +209,10 @@ function fetchToDos($userId, $id = null, $startDate = null, $endDate = null) {
         $query .= " AND to_do_id = ?";
         $params[] = $id;
         $types .= "i";
+    } elseif ($status) {
+        $query .= " AND status = ?";
+        $params[] = $status;
+        $types .= "s";
     } elseif ($startDate && $endDate) {
         // Fetch by date range if start and end dates are provided
         $query .= " AND due_date BETWEEN ? AND ?";
@@ -420,14 +428,16 @@ if ($action === 'fetchGoalSets') {
     $id = $_POST['id'] ?? null;
     $startDate = $_POST['start_date'] ?? null;
     $endDate = $_POST['end_date'] ?? null;
+    $status = $_POST['status'] ?? null;
     $courseId = $_POST['courseId'] ?? null;
-    $assignments = fetchAssignments($user_id, $id, $startDate, $endDate, $courseId);
+    $assignments = fetchAssignments($user_id, $id, $startDate, $endDate, $status, $courseId);
     echo json_encode(['success' => true, 'data' => $assignments]);
 } elseif ($action === 'fetchToDos') {
     $id = $_POST['id'] ?? null;
     $startDate = $_POST['start_date'] ?? null;
     $endDate = $_POST['end_date'] ?? null;
-    $toDos = fetchToDos($user_id, $id, $startDate, $endDate);
+    $status = $_POST['status'] ?? null;
+    $toDos = fetchToDos($user_id, $id, $startDate, $endDate, $status);
     echo json_encode(['success' => true, 'data' => $toDos]);
 } elseif ($action === 'fetchEvents') {
     $id = $_POST['id'] ?? null;

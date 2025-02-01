@@ -1,3 +1,9 @@
+@font-face {
+    font-family: UTSpopfont;
+    src: url('Poppins-Regular.ttf');
+}
+
+
 /* Layout: Content */
 .content {
     display: flex;
@@ -8,72 +14,7 @@
     box-sizing: border-box;
 }
 
-/* Sidebar */
-.sidebar {
-    flex: 0 0 26.5%;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
 
-/* Sidebar Buttons */
-.sidebar-button-container {
-    display: flex; /* Flexbox layout for the buttons */
-    justify-content: space-between; /* Space evenly between buttons */
-    gap: 0.5rem; /* Spacing between buttons */
-    margin-bottom: 0.5rem; /* Space below the buttons */
-}
-
-.sidebar-create-button {
-    flex: 1; /* Make buttons evenly sized */
-    background: #5DD770;
-    color: white;
-    font-size: 1.2rem; /* Adjust font size */
-    font-weight: 600;
-    padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: center;
-    width: 4rem;
-}
-
-.sidebar-create-button:hover {
-    background: #4fb963;
-}
-
-.sidebar-view-button {
-    flex: 1; /* Make buttons evenly sized */
-    background: #2EA0F3;
-    color: white;
-    font-size: 1.2rem; /* Adjust font size */
-    font-weight: 600;
-    padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: center;
-    width: 4rem;
-}
-
-.sidebar-view-button:hover {
-    background: #1C81C2;
-}
-
-/* Modal Background */
-.creationModal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Fixed to viewport, ignores parent */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
-    z-index: 2000; /* Ensures modal appears on top */
-    justify-content: center; /* Centers horizontally */
-    align-items: center; /* Centers vertically */
-    overflow: auto; /* Ensures the modal stays accessible with lots of content */
-}
 
 /* Modal Content */
 #defineSemesterModal .modal-content {
@@ -238,6 +179,7 @@
     margin-bottom: 0.2rem; /* Reduce spacing below the header */
     background: #2C2C2C;
     border-radius: 10px;
+    
 }
 
 .calendar-titles {
@@ -256,6 +198,7 @@
     text-align: center;
     width: 120px; /* Fixed width for each title */
     white-space: nowrap; /* Prevent wrapping */
+    font-family: UTSpopfont;
 
 }
 
@@ -269,14 +212,19 @@
     padding: 5px;
     border-radius: 50%; /* Circular buttons */
     transition: background-color 0.3s ease;
+    font-family: UTSpopfont;
 }
 
 
-.calendar-header h1 {
-    margin: 0; /* Remove extra margins */
-    font-size: 1.4rem; /* Reduce font size */
+.calendar-header h2 {
+    margin: 1rem; /* Remove extra margins */
+    font-size: 2rem; 
     font-weight: 600;
     color: white;
+    font-family: UTSpopfont;
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflow content */
+    text-overflow: ellipsis; /* Add ellipsis for overflow */
 
 }
 
@@ -284,18 +232,20 @@
     display: flex;
     gap: 0.5rem;
     justify-content: flex-end;
+    font-family: UTSpopfont;
 }
 
 .calendar-create-button {
     background: #5DD970;
     color: white;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 0.8rem 1.0rem;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     width: 120px; /* Fixed width for this specific button */
+    font-family: UTSpopfont;
 }
 
 .calendar-create-button:hover {
@@ -306,12 +256,13 @@
     background: #2EA0F3;
     color: white;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 0.8rem 1.0rem;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     width: 120px; /* Fixed width for this specific button */
+    font-family: UTSpopfont;
 }
 
 .calendar-view-button:hover {
@@ -323,7 +274,7 @@
     text-align: center; /* Center-align the text */
     padding: 0.8rem 0; /* Adjust padding for a balanced look */
     font-size: 1rem; /* Keep font size consistent */
-    font-weight: 600; /* Make the text bold */
+    font-weight: 500; /* Make the text bold */
 }
 
 .days-header {
@@ -336,6 +287,7 @@
     padding: 5px 0; /* Add spacing inside the header */
     border-radius: 10px; /* Match the calendar's rounded corners */
     margin-bottom: 10px; /* Add space below the header */
+    font-family: UTSpopfont;
 }
 
 .days-header .day {

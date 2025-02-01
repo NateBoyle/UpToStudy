@@ -1,3 +1,8 @@
+@font-face {
+    font-family: UTSpopfont;
+    src: url('Poppins-Regular.ttf');
+}
+
 /* SET MODAL STYLING */
 .setModal {
     display: none; /* Hidden by default */
@@ -85,6 +90,7 @@
     text-align: center; /* Center text */
     margin: 10px auto; /* Add auto left and right margins */
     font-size: 18px;
+    font-family: UTSpopfont;
 }
 
 /* Button hover effect */
@@ -100,9 +106,10 @@
     color: white;
     border: none;
     border-radius: 5px;
-    font-size: 1rem;
+    font-size: 1.1rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-family: UTSpopfont;
 }
 
 .filter-btn:hover {
@@ -157,6 +164,7 @@
     text-align: center;
     vertical-align: middle;
     margin-right: 10px; /* Spacing between buttons */
+    font-family: UTSpopfont;
 }
 
 #createSetButton:hover {
