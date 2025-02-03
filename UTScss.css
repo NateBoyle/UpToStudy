@@ -20,6 +20,8 @@ div {
 .header {
     width: 100%;
     height: 110px;
+    max-height: 15vh; /* Adjust max height for smaller screens */
+    min-height: 70px; /* Ensure a minimum height */
     position: fixed;
     top: 0;
     left: 0;
@@ -35,36 +37,55 @@ div {
 }
 
 .header img {
-    width: 110px;
-    height: 102px;
+    /*width: 110px;
+    height: 102px;*/
+    max-width: 110px;
+    height: auto;
 }
 
 .nav-links {
     display: flex;
-    gap: 20px;
+    gap: 2rem;
 }
 
 .nav-item {
-    width: 200px;
-    height: 60px;
+    flex-grow: 1; /* Allow items to grow or shrink */
+    width: 12rem;
+    height: 3.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 15px;
     color: white;
     text-decoration: none;
-    font-size: 28px;
+    font-size: 2rem;
     font-family: UTSfont;
     font-weight: 500;
+    position: relative; /* This allows absolute positioning of children */
 }
 
 .nav-item.active {
     background: #5DD770;
 }
 
+/* Default state: Show text, hide icons */
+.nav-text {
+    display: inline;
+}
+
+.nav-icon {
+    display: none;
+    /* Additional icon styling */
+    width: 35px; /* Example size, adjust as needed */
+    height: 35px; /* Example size, adjust as needed */
+    vertical-align: middle; /* Align icon with text baseline */
+}
+
 .user-initial {
-    width: 75px;
+    min-width: 75px;
     height: 75px;
+    max-width: 10vh; /* Scale down on smaller screens */
+    max-height: 10vh;
     background: #78AFF2;
     border-radius: 50%;
     display: flex;
@@ -74,7 +95,7 @@ div {
     font-size: 40px;
     font-family: UTSfont;
     font-weight: 800;
-    margin-right: 35px;
+    margin-right: 4rem;
     cursor: pointer;
     position: relative; /* So dropdown can be positioned relative to it */
 }
@@ -114,4 +135,71 @@ div {
 .content {
     margin-top: 130px; /* Offset to account for fixed header height */
     padding: 20px;
+}
+
+/* Media query for mobile */
+@media screen and (max-width: 1300px) {
+    .header {
+        
+        padding: 0 5px;
+    }
+
+    .header img {
+        max-width: 80px; /* Smaller logo for mobile */
+    }
+
+    .nav-links {
+        gap: 0.8rem;
+    }
+
+    .nav-item {
+        width: 8rem;
+        height: 2rem;
+        font-size: 1.3rem;
+    }
+
+    .user-initial {
+        min-width: 65px;
+        height: 65px;
+        font-size: 35px;
+        margin-right: 10px;
+    }
+}
+
+/* Media query for mobile */
+@media screen and (max-width: 800px) {
+    .header {
+        
+        padding: 0 5px;
+    }
+
+    .header img {
+        max-width: 60px; /* Smaller logo for mobile */
+    }
+
+    .nav-links {
+        gap: 1rem;
+    }
+
+    /* Add a mobile menu button here if desired */
+
+    .nav-item {
+        width: auto;
+        height: auto;
+    }
+
+    .nav-text {
+        display: none;
+    }
+
+    .nav-icon {
+        display: inline;
+    }
+
+    .user-initial {
+        min-width: 50px;
+        height: 50px;
+        font-size: 25px;
+        margin-right: 10px;
+    }
 }

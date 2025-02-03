@@ -18,6 +18,7 @@
     overflow-y: hidden; /* Hides vertical scroll */
     white-space: nowrap; /* Prevents wrapping */
     margin-left: 22%; /* Centers the container itself */
+    
     margin-top: 20px; /* Ensure it starts right below the sidebar */
     /*border: 2px solid white; /* Adds a white border around the container */
     border-radius: 15px; /* Optional: adds rounded corners to the border */
@@ -83,14 +84,6 @@
 .course-content p {
     margin: 5px 0; /* Tighter margins for less spacing between items */
     line-height: 1.8; /* Adjust line height for tighter spacing */
-}
-
-/* Responsive adjustments for smaller screens (optional) */
-@media screen and (max-width: 1600px) {
-    .course-card, .add-course {
-        width: 100%;
-        height: auto;
-    }
 }
 
 .options-button {
@@ -435,6 +428,7 @@
     top: 105px; /* Align with header */
     left: 0;
     width: 20%;
+    min-width: 200px;
     height: calc(100vh - 105px); /* Full height minus header */
     padding: 20px;
     box-sizing: border-box;
@@ -472,9 +466,6 @@
 }
 
 /* Filter buttons styling*/
-
-
-
 .filter-btn {
     width: 85%;
     padding: 10px;
@@ -501,4 +492,25 @@
     border-radius: 4px; /* Optional: Rounded corners */
     margin-left: 5px; /* Space between the label and the box */
     vertical-align: middle; /* Aligns with the text */
+}
+
+
+/* Responsive adjustments for smaller screens (optional) */
+@media screen and (max-width: 800px) {
+    #courseContainer {
+        margin-left: 200px; /* Centers the container itself */
+    }
+    .course-card{
+        min-width: 300px; /* Fixed width */
+        min-height: 250px; /* Fixed height */
+    }
+    .course-content {
+        font-size: 15px;
+        font-weight: 300;
+    }
+    /* Adjust individual paragraph styles inside course-content */
+    .course-content p {
+        margin: 5px 0; /* Tighter margins for less spacing between items */
+        line-height: 1.4; /* Adjust line height for tighter spacing */
+    }
 }

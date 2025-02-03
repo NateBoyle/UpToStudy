@@ -268,7 +268,7 @@ async function updateSemesterLabel() {
         }
 
         // Update the label
-        semesterLabel.textContent = `Semester: ${currentSemester.name}`;
+        semesterLabel.textContent = `${currentSemester.name}`;
       
     } catch (error) {
         console.error("Error updating semester label:", error);

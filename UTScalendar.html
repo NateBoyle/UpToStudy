@@ -39,11 +39,26 @@
 
             <!-- Center: Navigation Links -->
             <div class="nav-links">
-                <a href="UTSdash.html" class="nav-item">Dashboard</a>
-                <a href="UTScalendar.html" class="nav-item active">Calendar</a>
-                <a href="UTScourses.html" class="nav-item">Courses</a>
-                <a href="UTScards.html" class="nav-item">Study</a>
-                <a href="UTSgoals.html" class="nav-item">Goals</a>
+                <a href="UTSdash.html" class="nav-item" aria-label="Dashboard">
+                    <span class="nav-text">Dashboard</span>
+                    <img src="dashIcon2.svg" alt="Dashboard Icon" class="nav-icon">
+                </a>
+                <a href="UTScalendar.html" class="nav-item active" aria-label="Calendar">
+                    <span class="nav-text">Calendar</span>
+                    <img src="calendarIcon2.svg" alt="Calendar Icon" class="nav-icon">
+                </a>
+                <a href="UTScourses.html" class="nav-item" aria-label="Courses">
+                    <span class="nav-text">Courses</span>
+                    <img src="coursesIcon2.svg" alt="Courses Icon" class="nav-icon">
+                </a>
+                <a href="UTScards.html" class="nav-item" aria-label="Study">
+                    <span class="nav-text">Study</span>
+                    <img src="studyIcon3.svg" alt="Study Icon" class="nav-icon">
+                </a>
+                <a href="UTSgoals.html" class="nav-item" aria-label="Goals">
+                    <span class="nav-text">Goals</span>
+                    <img src="goalsIcon2.svg" alt="Goals Icon" class="nav-icon">
+                </a>
             </div>
 
             <!-- Right Side: User Initial -->
@@ -72,7 +87,9 @@
                         <h1 id="month">Month</h1>
                         <button id="nextMonthBtn">&#8594;</button> <!-- Next month -->
                     </div>
-                    <h2 id="currentSemesterLabel">Semester: Loading...</h2>
+                    <h2>
+                        <span id="semesterLabel">Semester:</span> <span id="currentSemesterLabel">Loading...</span>
+                    </h2>
                     <div class="calendar-buttons">
                         <button class="calendar-view-button" id="todayBtn">Today</button>
                         <button class="calendar-view-button" id="weekMonthBtn">Week</button>

@@ -24,7 +24,7 @@
     flex: 1; /* Make buttons evenly sized */
     background: #5DD770;
     color: white;
-    font-size: 1.2rem; /* Adjust font size */
+    font-size: 1.4rem; /* Adjust font size */
     font-weight: 500;
     padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
     border: none;
@@ -42,7 +42,7 @@
     flex: 1; /* Make buttons evenly sized */
     background: #2EA0F3;
     color: white;
-    font-size: 1.2rem; /* Adjust font size */
+    font-size: 1.4rem; /* Adjust font size */
     font-weight: 500;
     padding: 0.7rem 0.3rem; /* Adjust padding for smaller buttons */
     border: none;

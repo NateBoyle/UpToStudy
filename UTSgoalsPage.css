@@ -80,6 +80,9 @@
 .goal-set h2 {
     font-size: 24px;
     margin-bottom: 20px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
 }
 
 /*BOTTOM SECTION SUBSECTIONS (SUBCONTAINERS)*/
@@ -99,7 +102,7 @@
 #goalSetHeader1, #goalSetHeader2, #goalSetHeader3 {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 10px; /* Space between elements */
     max-height: 4rem;
     margin-left: 10px;
@@ -107,14 +110,16 @@
 }
 
 .change-set-div {
+    display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 
 .change-set-button, .new-goals-button {
     background-color: #4BC940;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
     padding: 5px 10px;
     cursor: pointer;
     font-size: 16px;
@@ -219,6 +224,9 @@
     border-radius: 6px; /* Round the track edges */
 }
 
+.goal-list::-webkit-scrollbar-corner {
+    background: rgba(0,0,0,0); /* Transparent background */
+}
 
 .goal-list li {
     background-color: #1F1F1F;
@@ -243,6 +251,9 @@
     color: white; /* Light gray by default */
     margin-left: 10px;
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .goal-list li .details {
@@ -275,7 +286,7 @@
 /*Quote Section Contents*/
 .quote-container .quote {
     font-style: italic;
-    font-size: 20px;
+    font-size: 30px;
     margin: 20px;
     margin-top: 40px;
 
@@ -370,7 +381,22 @@
 }
 
 /*** RESPONSIVE DESIGNS ***/
-@media (max-width: 768px) {
+@media screen and (max-width: 1300px) {
+    .goal-set h2 {
+        font-size: 18px;
+    }
+    .change-set-button {
+        width: 110px;
+        font-size: 14px;
+    }
+    .new-goals-button {
+        width: 70px;
+        font-size: 10px;
+    }
+
+
+}
+@media screen and (max-width: 900px) {
     .main-container {
         grid-template-rows: auto auto auto;
         grid-template-columns: 1fr;
@@ -384,9 +410,23 @@
 
     .goals-container {
         grid-template-columns: 1fr;
+        min-height: 1000px;
     }
 
     .bottom-section {
         grid-template-columns: 1fr;
+        min-height: 1100px;
     }
+
+    .title-container h1 {
+        font-size: 20px;
+        margin-left: 20px;
+    }
+
+    .goal-set-buttons button {
+        width: 150px;
+        font-size: 15px;
+    }
+
 }
+

@@ -217,7 +217,8 @@
 
 
 .calendar-header h2 {
-    margin: 1rem; /* Remove extra margins */
+    margin: 1.2rem; /* Remove extra margins */
+    margin-left: 40px;
     font-size: 2rem; 
     font-weight: 600;
     color: white;
@@ -269,13 +270,6 @@
     background: #1C81C2;
 }
 
-#weekMonthBtn {
-    
-    text-align: center; /* Center-align the text */
-    padding: 0.8rem 0; /* Adjust padding for a balanced look */
-    font-size: 1rem; /* Keep font size consistent */
-    font-weight: 500; /* Make the text bold */
-}
 
 .days-header {
     display: grid;
@@ -305,6 +299,7 @@
 }
 
 .day-number {
+    font-size: inherit;
     display: none; /* Hide day numbers in month view */
 }
 
@@ -327,7 +322,7 @@
 .calendar-container {
     /*height: calc(100vh - 200px); /* Adjust this value based on your header height and desired visible area */
     overflow-y: auto;
-    /*scrollbar-width: thin;  Optional for thinner scrollbars */
+    overflow-x: auto;
 }
 
 .calendar .calendar-container::-webkit-scrollbar {
@@ -349,6 +344,10 @@
     background-color: #555555;
     border: 1px solid #888;
     border-radius: 6px;
+}
+
+.calendar-container::-webkit-scrollbar-corner {
+    background: rgba(0,0,0,0); /* Transparent background */
 }
 
 /* Calendar Grid */
@@ -385,7 +384,6 @@
     grid-template-rows: repeat(24, 50px); /* 24 rows for hours */
     max-height: calc(100vh - 200px); /* Constrain grid to fit viewport */
     overflow-y: auto; /* Enable vertical scrolling for the week grid */
-    /*scrollbar-width: thin; /* Optional: Thinner scrollbars */
     grid-auto-flow: column; /* Ensure items fill top-to-bottom in columns */
 }
 
@@ -410,6 +408,10 @@
     border-radius: 6px; /* Round the track edges */
 }
 
+.week-grid::-webkit-scrollbar-corner {
+    background: rgba(0,0,0,0); /* Transparent background */
+}
+
 .calendar-cell {
     background: #2C2C2C; /* Dark background for cells */
     color: white; /* Text color for contrast */
@@ -428,7 +430,7 @@
     z-index: 1; /* Ensure cells are above the grid background */
     overflow: hidden;
     min-height: 112px;
-    /*width: 90%;*/
+    min-width: 100px;
 }
 
 .inactive-cell {
@@ -462,6 +464,7 @@
 /* Time Slot Styling */
 .week-grid .time-slot {
     width: 100%; /* Ensure the slot spans the full width of the day column */
+    min-width: 100px;
     font-size: 0.7rem; /* Adjust font size */
     color: gray; /* Default text color */
     text-align: left;
@@ -534,17 +537,64 @@
 
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1300px) {
+    .calendar-titles {  
+        gap: 0.35rem;
+        width: 180px; /* Fixed width for the titles container */
+    }
+    .calendar-titles h1 {
+        margin: 0; /* Remove extra margins */
+        font-size: 1.2rem; /* Reduce font size */
+    }
+    /*.calendar-header h2 {
+        font-size: 1.25rem; 
+    }*/
+    #semesterLabel {
+        display: none;
+    }
     .content {
         flex-direction: column;
     }
-
     .calendar,
     .sidebar {
         flex: 1 0 auto;
     }
-
-    .calendar-grid {
+    /*.calendar-grid {
         grid-auto-rows: minmax(80px, auto);
+    }*/
+}
+@media (max-width: 800px) {
+
+    .calendar-titles h1 {
+        margin: 0; /* Remove extra margins */
+        font-size: 0.8rem; /* Reduce font size */
     }
+    .calendar-header h2 {
+        display: none;
+    }
+    .calendar-create-button, .calendar-view-button {
+        font-size: 0.8rem;
+        width: 80px;
+        height: 40px;
+    }
+    .calendar-create-button {
+        width: 100px;
+    }
+    .days-header {
+        font-size: 0.7rem;
+    }
+    .week-view .day-name {
+        font-size: 0.7rem; /* Smaller day name font size in week view */
+    }
+    .week-view .day-number {
+        font-size: 0.7rem; /* Smaller font size for day numbers */
+    }
+    .calendar-container {
+        overflow-x: auto;
+    }
+    /*.week-grid {
+        overflow-x: auto;
+    }*/
+
+    
 }
