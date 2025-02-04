@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     session_unset();
     session_destroy();
     error_log("Session destroyed. Redirecting to welcome page.");
-    header("Location: UTSwelcome.html");
+    header("Location: UTSlogin.html");
     exit;
 }
 

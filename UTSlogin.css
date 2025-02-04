@@ -98,6 +98,7 @@ input[type="password"]::placeholder {
 .submit-container {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin-top: auto;
     margin-bottom: 0px;
 }
@@ -129,4 +130,20 @@ input[type="submit"]:hover {
     min-height: 16px;
     display: block;
     margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+    .log-in-container {
+        width: 80%;
+    }
+    h1 {
+        font-size: 25px;
+    }
+    label {
+        font-size: 22px;
+        text-align: center;
+    }
+    input[type="submit"] {
+        font-size: 25px;
+    }
 }

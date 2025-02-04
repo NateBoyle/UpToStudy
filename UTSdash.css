@@ -1,13 +1,14 @@
 /* Dashboard Container */
 .dashboard-container {
     display: grid;
-    gap: 20px;
+    gap: 2.5%;
     padding: 20px;
-    grid-template-columns: 3fr 2fr; /* Main grid layout with two columns */
-    grid-template-rows: auto auto auto; /* Flexible row heights */
-    height: 120vh; /* Full viewport height */
+    grid-template-columns: 1fr; /* One column to ensure items stack vertically */
+    grid-template-rows: auto auto; /* Two rows */
+    height: 100%; /* Adjust height based on content */
     box-sizing: border-box; /* Ensure padding is included in height calculation */
     margin-top: 100px; /* Add margin to ensure no overlap with headers */
+    width: 100%;
 }
 
 /* For Webkit browsers (Chrome, Edge, Safari) */
@@ -39,26 +40,35 @@
     border-radius: 10px;
     padding: 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    height: 100%; /* Stretch to fill its grid cell */
+    /*height: 100%;  Stretch to fill its grid cell */
+}
+
+/* First Row */
+.row-1 {
+    display: flex;
+    width: 100%;
+    height: 110%;
+    margin-bottom: 3%;
+    gap: 1%;
+    grid-row: 1 / 2; /* First row */
 }
 
 /* Five-Day Calendar */
 .calendar-container {
-    grid-column: 1 / 2; /* Occupy the left column */
-    grid-row: 1 / 2; /* Place it at the top */
-    height: 100%; /* Stretch to fill its grid cell */
+    width: 70%; /* 75% width for calendar */
 }
 
 #dashCalendarHeader {
+    display: flex;
     align-items: center; /* Align them vertically */
     margin-bottom: 15px;
-    padding-left: 100px;
-    padding-right: 100px;
+
 }
 
 #dashCalendarHeader h2 {
     margin: 0;
     font-weight: bold; /* Optional: Make it bold */
+    width: 80%;
 }
 
 #semesterLabel {
@@ -71,7 +81,7 @@
     gap: 10px;
     justify-content: space-between;
     background-color: #333333;
-    height: 80%; /* Stretch to fill its grid cell */
+    height: 85%; /* Stretch to fill its grid cell */
     padding: 10px;
     border-radius: 10px;
 }
@@ -126,9 +136,7 @@
 
 /* Assignments Due */
 .assignments-container {
-    grid-column: 2 / 3; /* Occupy the right column */
-    grid-row: 1 / 2; /* Align with the calendar */
-    height: 100%; /* Stretch to fill its grid cell */
+    width: 28%; /* 25% width for assignments */
     background-color: #1d1d1d;
     box-sizing: border-box; /* Ensure padding is included in height calculation */
     padding: 20px;
@@ -138,7 +146,7 @@
     background-color: #333333;
     padding: 10px;
     border-radius: 10px;
-    height: 83%; /* Stretch to fill its grid cell */
+    height: 110%; /* Stretch to fill its grid cell */
     box-sizing: border-box; /* Ensure padding is included in height calculation */
 }
 
@@ -157,13 +165,23 @@
     color: white;
 }
 
+/* Second Row */
+.row-2 {
+    display: flex;
+    width: 100%;
+    height: 105%;
+    margin-top: 2%;
+    gap: 1%;
+    grid-row: 2 / 3; /* Corrected to second row */
+}
+
 /* Goals and To-Do Containers */
 .goals-todo-container {
     display: flex;
+    flex-direction: row; /* Side by side */
     gap: 10px;
-    grid-column: 1 / 2; /* Occupy the left column */
-    grid-row: 2 / 3; /* Place below the calendar */
-    height: 80%; /* Stretch to fill its grid cell */
+    width: 50%; /* 50% width for combined goals and todos */
+
     
 }
 
@@ -172,6 +190,7 @@
     background-color: #333333;
     border-radius: 10px;
     padding: 10px;
+    width: 50%; /* 50% of the goals-todo-container */
 }
 
 .goal-item, .todo-item {
@@ -179,6 +198,7 @@
     justify-content: space-between;
     align-items: center;
     margin: 5px 0;
+    
 }
 
 .goal-color {
@@ -189,9 +209,7 @@
 
 /* Featured Flashcards */
 .flashcards-container {
-    grid-column: 2 / 3; /* Occupy the right column */
-    grid-row: 2 / 3; /* Place below assignments */
-    height: 80%; /* Stretch to fill its grid cell */
+    width: 50%; /* 50% width for flashcards */
     background-color: #1d1d1d; /* Darker gray for the outer container */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
@@ -200,8 +218,8 @@
     background-color: #2C2C2C; /* Light gray for the inner content area */
     border-radius: 10px;
     display: flex;
-    gap: 10px;
-    height: 70%; /* Match the height of the inner container */
+    gap: 2%;
+    height: 80%; /* Match the height of the inner container */
     box-sizing: border-box; /* Ensure padding is included in size */
     padding: 10px;
     justify-content: center;
@@ -211,8 +229,8 @@
 /*** STUDY SET DISPLAY STYLINGS ****/
 .study-set {
     position: relative; /* Enable absolute positioning within this container */
-    width: 400px;
-    height: 250px;
+    width: 47%;
+    height: 95%;
     background: #2C2C2C;
     border: 5px solid #ddd;
     border-radius: 20px;
@@ -232,7 +250,7 @@
     cursor: pointer;
 
     /* Add the following properties */
-    width: 200px; /* Or another value based on your layout */
+    width: 90%; /* Or another value based on your layout */
     margin: 0 auto;   /* Center the clickable area within the card */
     text-align: center; /* Ensure text remains centered */
 }
@@ -308,7 +326,7 @@
 }
 
 .progress-bar-container {
-    max-width: 250px; /* Full width of the card */
+    max-width: 85%; /* Full width of the card */
     height: 10px; /* Height of the progress bar */
     background-color: #292828; /* Light gray background */
     border-radius: 5px; /* Rounded edges */
@@ -529,3 +547,112 @@
 #assignmentsLabel {
     margin-top: 30px;
 }
+
+@media screen and (max-width: 1300px) {
+    .dashboard-container {
+        gap: 4%;
+    }
+    .row-1 {
+        flex-direction: column; /* Stack calendar on top of assignments */
+        align-items: center;
+    }
+    .calendar-container, .assignments-container {
+        width: 98%; /* Both containers take full width */
+        
+    }
+    .calendar-container {
+        height: 60%;
+    }
+    .assignments-container {
+        width: 101%;
+        height: 40%;
+    }
+
+    .row-2 {
+        flex-direction: column; /* Stack goals-todo on top of flashcards */
+        margin-top: 3%;
+        gap: 3%;
+    }
+    .goals-todo-container, .flashcards-container {
+        width: 98%; /* Both containers take full width */
+    }
+}
+
+@media (max-width: 800px) {
+
+    .dashboard-container {
+
+        align-items: center;
+        gap: 3%;
+    }
+
+    #dashCalendarHeader h2 {
+        font-size: 1rem;
+    }
+
+    .row-1 {
+        gap: 2%;
+    }
+    .calendar-container .day-block .day-header h3 {
+        font-size: 16px;
+
+    }
+    
+    .calendar-container .day-block .date-number {
+        font-size: 18px;
+    
+    }
+
+    /* Specific adjustments for elements inside the calendar */
+    /* Hide the last two day blocks */
+    #day-block4, #day-block5 {
+        display: none;
+        
+    }
+
+    .day-block {
+        margin-bottom: 10px; /* Add some space between day blocks */
+        max-width: 30%;
+        padding: 5px;
+    }
+    .calendar-container .event {
+        font-size: 10px;
+    }
+
+    .row-2 {
+        /*width: 98%;*/
+        gap: 2%;
+    }
+
+    .goals-todo-container {
+        flex-direction: column; /* Stack goals on top of todos */
+
+    }
+
+    .studySetClickable {
+        margin: 0 0;   /* Center the clickable area within the card */
+        text-align: center; /* Ensure text remains centered */
+    }
+    
+
+    .study-set-header h2 {
+        font-size: 16px;
+    }
+    
+    .study-set-header p {
+        font-size: 10px;
+    }
+
+}
+
+/*@media (max-width: 500px) {
+
+    .dashboard-container {
+        width: 70%;
+    }
+
+    .row-1, .row-2 {
+        width: 80%;
+        align-items: center;
+    }
+}*/

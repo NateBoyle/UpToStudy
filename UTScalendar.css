@@ -569,32 +569,44 @@
         margin: 0; /* Remove extra margins */
         font-size: 0.8rem; /* Reduce font size */
     }
+    .calendar-header {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
     .calendar-header h2 {
         display: none;
     }
     .calendar-create-button, .calendar-view-button {
-        font-size: 0.8rem;
-        width: 80px;
-        height: 40px;
+        font-size: 0.6rem;
+        width: 70px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .calendar-create-button {
-        width: 100px;
+        width: 85px;
     }
     .days-header {
-        font-size: 0.7rem;
+        font-size: 0.5rem;
     }
     .week-view .day-name {
-        font-size: 0.7rem; /* Smaller day name font size in week view */
+        font-size: 0.5rem; /* Smaller day name font size in week view */
     }
     .week-view .day-number {
-        font-size: 0.7rem; /* Smaller font size for day numbers */
+        font-size: 0.5rem; /* Smaller font size for day numbers */
     }
     .calendar-container {
         overflow-x: auto;
     }
-    /*.week-grid {
-        overflow-x: auto;
-    }*/
+    .calendar-cell {
+        min-height: 80px;
+        min-width: 60px;
+        font-size: small;
+    }
+    .week-grid .time-slot {
+        min-width: 80px;
+    }
 
-    
 }

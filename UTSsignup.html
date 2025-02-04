@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="icon" type="image/x-icon" href="UTSicon2.png">
     <link rel="stylesheet" href="UTSsignup.css">
 
@@ -98,6 +99,22 @@
     
 
     <script>
+
+        function updatePlaceholder() {
+            const input = document.getElementById('password');
+            if (window.innerWidth <= 900) {
+                input.placeholder = "8+ chars, 1 each: lower, upper, #, ~!@#$%^&*<>?";
+            } else {
+                input.placeholder = "8 or more characters with at least one lower, uppercase, number, and ~!@#$%^&*<>? each";
+            }
+        }
+
+        // Call updatePlaceholder on initial load
+        updatePlaceholder();
+
+        // Listen for window resize events
+        window.addEventListener('resize', updatePlaceholder);
+
         function showPassword() {
             var x = document.getElementById("password");
             var toggle = document.getElementById("visibility_toggle");

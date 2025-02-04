@@ -57,7 +57,7 @@
                 </a>
                 <a href="UTSgoals.html" class="nav-item" aria-label="Goals">
                     <span class="nav-text">Goals</span>
-                    <img src="goalsIcon2.svg" alt="Goals Icon" class="nav-icon">
+                    <img src="goalsIcon3.svg" alt="Goals Icon" class="nav-icon">
                 </a>
             </div>
 
@@ -435,5 +435,29 @@
     <script type="module" src="UTScalendar.js" defer></script>
     <script type="module" src="UTSdefineSemester.js"></script>
     <script type="module" src="UTSevents.js"></script>
+    <script>
+        function updateDayNames() {
+            const dayNames = document.querySelectorAll('.day-name');
+            const dayAbbreviations = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'];
+            
+            if (window.innerWidth <= 800) {
+                dayNames.forEach((day, index) => {
+                    day.textContent = dayAbbreviations[index];
+                });
+            } else {
+                // Reset to full names if screen size increases
+                const fullNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                dayNames.forEach((day, index) => {
+                    day.textContent = fullNames[index];
+                });
+            }
+        }
+        
+        // Initial call
+        updateDayNames();
+        
+        // Update on resize
+        window.addEventListener('resize', updateDayNames);
+        </script>
 
 </body>

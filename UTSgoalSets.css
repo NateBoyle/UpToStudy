@@ -382,3 +382,80 @@
 .goal-set-change-modal-content .closeModal:hover {
     background-color: #cc4a4a;
 }
+
+@media screen and (max-width: 900px) {
+    .goal-set-modal-content {
+        min-width: 330px;
+        max-width: 330px;
+        font-size: 16px;
+    }
+    .goal-set-modal-content label {
+        font-size: 16px;
+    }
+    .goal-set-modal-content input,
+    .goal-set-modal-content select,
+    .goal-set-modal-content textarea,
+    .radio-container {
+        min-width: 300px;
+        max-width: 300px;
+        font-size: 12px;
+    }
+    .radio-container label {
+        font-size: 10px; /* Adjust font size if necessary */
+        margin: 5px;
+        gap: 5px; /* Space between the radio button and text */
+    }
+    .container-option {
+        width: 20px;
+        gap: 5px;
+        font-size: 10px;
+    }
+    .container-option input[type="radio"] {
+        min-width: 10px;
+        max-width: 10px; 
+        height: 10px; 
+    }
+    
+    .radio-container label span {
+        line-height: 10px; /* Match the line height of the text to the radio button */
+    }
+    #saveGoalSetBtn, #deleteGoalSetButton {
+        font-size: 16px;
+        width: 140px;
+        height: 35px;
+        display: flex; /* This makes the button a flex container */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+    }
+
+    .goal-modal-content { 
+        min-width: 330px;
+        max-width: 330px;
+        font-size: 16px;
+    }
+    .goal-modal-content input,
+    .goal-modal-content select,
+    .goal-modal-content textarea {
+        min-width: 300px;
+        max-width: 300px;
+        font-size: 12px;
+    }
+    #saveGoalBtn, #completeGoalButton, #deleteGoalButton {
+        height: 60px;
+        display: flex; /* This makes the button a flex container */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+    }
+
+    .goal-set-change-modal-content {
+        min-width: 330px;
+        max-width: 330px;
+    }
+    .goal-set-change-modal-content select {
+        width: 300px;
+        font-size: 16px;
+    }
+    .goal-set-change-modal-content .modal-confirm-button {
+        font-size: 18px;
+    }
+}

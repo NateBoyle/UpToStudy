@@ -204,7 +204,7 @@ export async function openGoalModal(goal = null, goalSetId = null) {
         if (dueDateField) dueDateField.value = goal.due_date || '';
 
         submitButton.textContent = 'Save Goal';
-        completeButton.style.display = 'block';
+        completeButton.style.display = 'flex';
         completeButton.onclick = async () => {
             if (confirm('Are you sure you want to complete this Goal?')) {
                 await completeGoal(goal.id);
@@ -213,7 +213,7 @@ export async function openGoalModal(goal = null, goalSetId = null) {
             }
         };
 
-        deleteButton.style.display = 'block';
+        deleteButton.style.display = 'flex';
         deleteButton.onclick = async () => {
             if (confirm('Are you sure you want to delete this Goal?')) {
                 await deleteEntity('goal', goal.id);
@@ -313,7 +313,7 @@ export async function openGoalSetModal(goalSet = null) {
         progressContainer.style.display = 'flex';
 
         submitButton.textContent = 'Save Set';
-        deleteButton.style.display = 'block';
+        deleteButton.style.display = 'flex';
         deleteButton.onclick = async () => {
             if (confirm('Are you sure you want to delete this Goal Set?')) {
                 await deleteEntity('goalSet', goalSet.id);

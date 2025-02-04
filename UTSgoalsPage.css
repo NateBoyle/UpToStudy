@@ -408,25 +408,50 @@
         grid-column: 1 / -1;
     }
 
+    .title-container {
+        flex-direction: column;
+        justify-content: center;
+    }
+    .title-container h1 {
+        font-size: 18px;
+        margin-left: 10px;
+    }
+
     .goals-container {
         grid-template-columns: 1fr;
         min-height: 1000px;
     }
+    .goal-set {
+        min-height: 300px;
+    }
+    .goal-set-buttons button {
+        width: 130px;
+        height: 35px;
+        font-size: 12px;
+    }
 
     .bottom-section {
         grid-template-columns: 1fr;
-        min-height: 1100px;
+        min-height: 1000px;
     }
-
-    .title-container h1 {
-        font-size: 20px;
-        margin-left: 20px;
+    .quote-container, .usage-time-container, .streak-counter-container {
+        min-height: 300px;
     }
-
-    .goal-set-buttons button {
-        width: 150px;
-        font-size: 15px;
+    .quote-container h2, .usage-time-container h2, .streak-counter-container h2 {
+        font-size: 25px;
     }
-
+    .quote-container .quote {
+        font-size: 23px;
+    }
+    #totalTime {
+        font-size: 1.35rem;
+    }
+    .streak-background {
+        width: 125px;
+        height: 125px;
+    }
+    .streak-counter-container .streak-number {
+        font-size: 50px;
+    }
 }
 

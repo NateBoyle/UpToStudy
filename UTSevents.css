@@ -638,9 +638,34 @@
 }
 
 /* Responsive Design */
-@media screen and (max-width: 600px) {
-  .creationModal .modal-content {
-    width: 90%;
-    padding: 15px 20px;
-  }
+@media screen and (max-width: 800px) {
+
+    #modalContent {
+        max-width: 340px;
+        padding: 15px 20px;
+    }
+
+    #assignmentModal .modal-content, 
+    #eventModal  .modal-content,
+    #toDoModal .modal-content {
+        min-width: 340px;
+        max-width: 340px;
+        padding: 15px 20px;
+    }
+
+    .sidebar-create-button, .sidebar-view-button {
+        font-size: 1rem;
+    }
+
+    .assignment-list-title, .todo-list-title {
+        font-size: 1.5rem;
+        width: 50%;
+    }
+
+    .assignment-list .sidebar-create-button, .todo-list .sidebar-create-button {
+        font-size: 0.8rem;
+    }
+    .dynamic-container .list-item .text, .dynamic-container .list-item .details {
+        font-size: 0.75rem;
+    }
 }

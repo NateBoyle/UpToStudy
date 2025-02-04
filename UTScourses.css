@@ -498,19 +498,48 @@
 /* Responsive adjustments for smaller screens (optional) */
 @media screen and (max-width: 800px) {
     #courseContainer {
-        margin-left: 200px; /* Centers the container itself */
+        margin-left: 150px; /* Centers the container itself */
     }
     .course-card{
-        min-width: 300px; /* Fixed width */
-        min-height: 250px; /* Fixed height */
+        min-width: 200px; /* Fixed width */
+        min-height: 150px; /* Fixed height */
+    }
+    .course-header {
+        font-size: 15px;
     }
     .course-content {
-        font-size: 15px;
+        font-size: 10px;
         font-weight: 300;
     }
     /* Adjust individual paragraph styles inside course-content */
     .course-content p {
         margin: 5px 0; /* Tighter margins for less spacing between items */
         line-height: 1.4; /* Adjust line height for tighter spacing */
+    }
+
+    .coursesSidebar {
+        min-width: 150px;
+        height: calc(100vh - 105px); /* Full height minus header */
+        padding: 10px;
+    }
+    
+    .coursesSidebar h2 {
+        margin-bottom: 20px;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+    
+    /* Add Course button specific styling */
+    .createBtn {
+        width: 85%;
+        padding: 10px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .filter-btn {
+        width: 85%;
+        padding: 10px;
+        font-size: 0.8rem;
     }
 }

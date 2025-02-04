@@ -18,7 +18,7 @@ const UTSsessionManager = (() => {
 
             if (!data.authenticated) {
                 console.log(data.message || 'Session inactive. Redirecting to welcome page...');
-                window.location.href = 'UTSwelcome.html';
+                window.location.href = 'UTSlogin.html';
                 return null; // Authentication failed
             } else {
                 console.log('User authenticated:', data);
@@ -67,7 +67,7 @@ const UTSsessionManager = (() => {
             const result = await response.json();
             if (result.status === 'success') {
                 console.log(result.message || 'Logged out successfully.');
-                window.location.href = 'UTSwelcome.html'; // Redirect to welcome page
+                window.location.href = 'UTSlogin.html'; // Redirect to welcome page
             } else {
                 console.error('Logout failed:', result.message || 'Unknown error.');
             }
